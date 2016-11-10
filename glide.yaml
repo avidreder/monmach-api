@@ -1,0 +1,14 @@
+package: github.com/avidreder/monmach-api
+import:
+- package: github.com/avidreder/show-hawk-server
+  subpackages:
+  - middleware/bitshows
+- package: github.com/labstack/echo
+  subpackages:
+  - engine/standard
+  - middleware
+- package: github.com/stretchr/testify
+  version: v1.1.4
+  subpackages:
+  - mock
+- package: gopkg.in/mgo.v2
