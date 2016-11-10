@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 
-	sh "github.com/avidreder/show-hawk-server/handlers/shows"
-	yh "github.com/avidreder/show-hawk-server/handlers/youtube"
-	bitmw "github.com/avidreder/show-hawk-server/middleware/bitshows"
-	ytmw "github.com/avidreder/show-hawk-server/middleware/youtube"
-	// "github.com/avidreder/show-hawk-server/resources/shows/mongo"
+	plh "github.com/avidreder/monmach-api/handlers/playlist"
+	// yh "github.com/avidreder/monmach-api/handlers/youtube"
+	// plmw "github.com/avidreder/monmach-api/middleware/playlist"
+	// ytmw "github.com/avidreder/monmach-api/middleware/youtube"
+	// "github.com/avidreder/monmach-api/resources/shows/mongo"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
@@ -28,14 +28,13 @@ func main() {
 	server.Use(emw.CORS())
 
 	// Load routes for Youtube search
-	youtube := server.Group("/youtube")
-	youtube.Use(ytmw.CompileVideos)
-	youtube.GET("", yh.GetVideos)
+	// youtube := server.Group("/youtube")
+	// youtube.Use(ytmw.CompileVideos)
+	// youtube.GET("", yh.GetVideos)
 
-	// Load routes for BIT shows
-	bitshows := server.Group("/bitshows")
-	bitshows.Use(bitmw.CompileShows)
-	bitshows.GET("", sh.GetShows)
+	// Load routes for playlists
+	bitshows := server.Group("/playlists")
+	bitshows.GET("", plh.GetShows)
 
 	log.Println("Starting...")
 	server.Run(standard.New(":3000"))
