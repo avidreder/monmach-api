@@ -2,22 +2,32 @@ package postgres
 
 import (
 	"database/sql"
-	// "database/sql/driver"
-	// "github.com/lib/pq"
+
+	// Following the lib pq example
+	_ "github.com/lib/pq"
 )
 
-const PGTable = "postgres"
-const PGArgs = "user=pqgotest dbname=pqgotest sslmode=verify-full"
+// PGArgs are the info used for the connection
+const PGArgs = "user=andrew dbname=monmach"
 
+var dataStore = Store{}
+
+// Store implements store interface
 type Store struct {
 	db *sql.DB
 }
 
-func (s Store) Connect() error {
-	db, err := sql.Open(PGTable, PGArgs)
+// Connect creates a connection to the postgres db
+func (s *Store) Connect() error {
+	db, err := sql.Open("postgres", PGArgs)
 	if err != nil {
 		return err
 	}
 	s.db = db
 	return nil
+}
+
+// Get returns a postgres instance
+func Get() (*Store, error) {
+	return &dataStore, nil
 }
