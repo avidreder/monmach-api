@@ -5,7 +5,7 @@ import (
 
 	plh "github.com/avidreder/monmach-api/handlers/playlist"
 	// yh "github.com/avidreder/monmach-api/handlers/youtube"
-	// plmw "github.com/avidreder/monmach-api/middleware/playlist"
+	stmw "github.com/avidreder/monmach-api/middleware/store"
 	"github.com/avidreder/monmach-api/resources/store/postgres"
 	// "github.com/avidreder/monmach-api/resources/shows/mongo"
 
@@ -29,8 +29,9 @@ func main() {
 	server.Use(emw.CORS())
 
 	// Load routes for playlists
-	bitshows := server.Group("/playlists")
-	bitshows.GET("", plh.GetShows)
+	playlists := server.Group("/playlists")
+	playlists.Use(stmw.LoadStore)
+	playlists.GET("/new", plh.Create)
 
 	log.Println("Starting...")
 	server.Run(standard.New(":3000"))

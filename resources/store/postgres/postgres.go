@@ -11,7 +11,7 @@ import (
 )
 
 // PGArgs are the info used for the connection
-const PGArgs = "user=andrew dbname=monmach"
+const PGArgs = "user=andrew dbname=monmach sslmode=disable"
 
 var dataStore = Store{}
 
@@ -62,12 +62,21 @@ func (s *Store) GetAll(table string) ([]interface{}, error) {
 func (s *Store) Create(table string, valueMap map[string]interface{}) (string, error) {
 	var keys []string
 	var values []interface{}
+	var valueSlice []string
 	for k, v := range valueMap {
 		keys = append(keys, k)
 		values = append(values, v)
+		_, ok := v.(string)
+		if ok {
+			valueSlice = append(valueSlice, "'?'")
+		} else {
+			valueSlice = append(valueSlice, "?")
+		}
 	}
-	keyString := strings.Join(keys, "=?, ") + "=?"
-	query := fmt.Sprintf("INSERT %s SET %s", table, keyString)
+	keyString := strings.Join(keys, ", ")
+	valueString := strings.Join(valueSlice, ",")
+	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES(?);", table, keyString)
+	log.Print(valueString)
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
 		return "", err

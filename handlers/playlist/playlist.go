@@ -1,12 +1,22 @@
-package shows
+package playlist
 
 import (
 	"net/http"
 
 	"github.com/labstack/echo"
+
+	stmw "github.com/avidreder/monmach-api/middleware/store"
 )
 
-// GetBITShows requests from BandsInTown and returns them
-func GetShows(c echo.Context) error {
-	return c.String(http.StatusOK, `{"Data":"ShowList"}`)
+const tableName = "test"
+
+// Create inserts a new playlist into the store
+func Create(c echo.Context) error {
+	store := stmw.GetStore(c)
+	payload := map[string]interface{}{"name": "Andrew", "age": 30}
+	id, err := store.Create(tableName, payload)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.String(http.StatusOK, id)
 }
