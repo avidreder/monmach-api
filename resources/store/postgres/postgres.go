@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	// Following the lib pq example
+	"github.com/fatih/structs"
 	_ "github.com/lib/pq"
 )
 
@@ -20,6 +21,12 @@ type Store struct {
 	db *sql.DB
 }
 
+type testy struct {
+	Id   int64
+	Name string
+	Age  int64
+}
+
 // Connect creates a connection to the postgres db
 func (s *Store) Connect() error {
 	db, err := sql.Open("postgres", PGArgs)
@@ -31,20 +38,37 @@ func (s *Store) Connect() error {
 }
 
 // Get grabs data from a table
-func (s *Store) Get(table string, id string) (interface{}, error) {
-	var result interface{}
-	err := s.db.QueryRow("SELECT * FROM ? WHERE id=?", table, id).Scan(&result)
-	if err != nil {
-		return nil, err
+func (s *Store) Get(table string, id string, target interface{}) (interface{}, error) {
+
+	var testSlice []interface{}
+	testStruct := testy{}
+	converted := structs.Values(&testStruct)
+	log.Print(converted)
+	for _, v := range converted {
+		testSlice = append(testSlice, &v)
 	}
-	return result, nil
+	query := fmt.Sprintf("SELECT * FROM %s WHERE id=$1;", table)
+	stmt, err := s.db.Prepare(query)
+	defer stmt.Close()
+	if err != nil {
+		return "", err
+	}
+	err = stmt.QueryRow(id).Scan(testSlice...)
+	if err != nil {
+		return "", err
+	}
+
+	val, _ := testSlice[0].(*int64)
+	log.Print(*val)
+	return target, nil
 }
 
 // GetAll grabs all data from a table
 func (s *Store) GetAll(table string) ([]interface{}, error) {
 	var results []interface{}
 	var result interface{}
-	rows, err := s.db.Query("SELECT * FROM ?", table)
+	query := fmt.Sprintf("SELECT * FROM %s;", table)
+	rows, err := s.db.Query(query)
 	if err != nil {
 		return nil, err
 	}

@@ -1,5 +1,5 @@
 hash: ab985a45816a6a424e33ada6ac01317ef15bc8984240741cd9aaeea86254ef7e
-updated: 2016-11-10T07:44:48.102727858-08:00
+updated: 2016-11-11T10:45:48.829904263-08:00
 imports:
 - name: github.com/avidreder/show-hawk-server
   version: 60ece420ca1b936316e5aacb543e58193b3a4f3c
@@ -11,6 +11,8 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: 9ed569b5d1ac936e6494082958d63a6aa4fff99a
+- name: github.com/fatih/structs
+  version: dc3312cb1a4513a366c4c9e622ad55c32df12ed3
 - name: github.com/google/go-querystring
   version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
   subpackages:

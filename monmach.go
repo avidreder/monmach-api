@@ -32,6 +32,9 @@ func main() {
 	playlists := server.Group("/playlists")
 	playlists.Use(stmw.LoadStore)
 	playlists.GET("/new", plh.Create)
+	playlists.GET("/:id", plh.Get)
+	// playlists.GET("/", plh.GetAll)
+	// playlists.PUT("/:id", plh.Update)
 
 	log.Println("Starting...")
 	server.Run(standard.New(":3000"))
