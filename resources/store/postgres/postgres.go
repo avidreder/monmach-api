@@ -11,7 +11,7 @@ import (
 )
 
 // PGArgs are the info used for the connection
-const PGArgs = "user=andrew dbname=monmach sslmode=disable"
+const PGArgs = "user=monmach dbname=monmach sslmode=disable"
 
 var dataStore = Store{}
 
@@ -62,30 +62,28 @@ func (s *Store) GetAll(table string) ([]interface{}, error) {
 func (s *Store) Create(table string, valueMap map[string]interface{}) (string, error) {
 	var keys []string
 	var values []interface{}
-	var valueSlice []string
+	var vars []string
+	count := 0
 	for k, v := range valueMap {
+		count++
 		keys = append(keys, k)
 		values = append(values, v)
-		_, ok := v.(string)
-		if ok {
-			valueSlice = append(valueSlice, "'?'")
-		} else {
-			valueSlice = append(valueSlice, "?")
-		}
+		vars = append(vars, fmt.Sprintf("$%v", count))
 	}
 	keyString := strings.Join(keys, ", ")
-	valueString := strings.Join(valueSlice, ",")
-	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES(?);", table, keyString)
-	log.Print(valueString)
+	query := fmt.Sprintf("INSERT INTO %s(%s) VALUES(%s) RETURNING id;", table, keyString, strings.Join(vars, ", "))
+	log.Print(query)
 	stmt, err := s.db.Prepare(query)
+	defer stmt.Close()
 	if err != nil {
 		return "", err
 	}
-	res, err := stmt.Exec(values)
+	res, err := stmt.Exec(values...)
 	if err != nil {
 		return "", err
 	}
-	id, err := res.LastInsertId()
+	log.Printf("%+v", res)
+	id, err := res.RowsAffected()
 	if err != nil {
 		return "", err
 	}
