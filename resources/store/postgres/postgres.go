@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	// Following the lib pq example
-	"github.com/fatih/structs"
 	_ "github.com/lib/pq"
 )
 
@@ -38,33 +37,24 @@ func (s *Store) Connect() error {
 }
 
 // Get grabs data from a table
-func (s *Store) Get(table string, id string, target interface{}) (interface{}, error) {
-
-	var testSlice []interface{}
-	testStruct := testy{}
-	converted := structs.Values(&testStruct)
-	log.Print(converted)
-	for _, v := range converted {
-		testSlice = append(testSlice, &v)
-	}
+func (s *Store) Get(table string, id string, values ...interface{}) error {
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id=$1;", table)
 	stmt, err := s.db.Prepare(query)
 	defer stmt.Close()
 	if err != nil {
-		return "", err
+		return err
 	}
-	err = stmt.QueryRow(id).Scan(testSlice...)
+	err = stmt.QueryRow(id).Scan(values...)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	val, _ := testSlice[0].(*int64)
-	log.Print(*val)
-	return target, nil
+	log.Print(values...)
+	return nil
 }
 
 // GetAll grabs all data from a table
-func (s *Store) GetAll(table string) ([]interface{}, error) {
+func (s *Store) GetAll(table string, values ...interface{}) ([]interface{}, error) {
 	var results []interface{}
 	var result interface{}
 	query := fmt.Sprintf("SELECT * FROM %s;", table)

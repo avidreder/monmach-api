@@ -11,8 +11,9 @@ import (
 const tableName = "test"
 
 type testStruct struct {
-	name string
-	age  int64
+	ID   int64
+	Name string
+	Age  int64
 }
 
 // Create inserts a new playlist into the store
@@ -41,10 +42,11 @@ func Create(c echo.Context) error {
 // Get retrieves an existing playlist in the store
 func Get(c echo.Context) error {
 	id := c.Param("id")
+	testy := testStruct{}
 	store := stmw.GetStore(c)
-	playlist, err := store.Get(tableName, id, testStruct{})
+	err := store.Get(tableName, id, &testy.ID, &testy.Name, &testy.Age)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, playlist)
+	return c.JSON(http.StatusOK, testy)
 }
