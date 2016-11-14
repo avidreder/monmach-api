@@ -22,7 +22,7 @@ type Store struct {
 }
 
 type testy struct {
-	Id   int64
+	ID   int64
 	Name string
 	Age  int64
 }
@@ -54,22 +54,24 @@ func (s *Store) Get(table string, id int64, values ...interface{}) error {
 	return nil
 }
 
-// GetAll grabs all data from a table
-func (s *Store) GetAll(table string, values ...interface{}) ([]interface{}, error) {
-	var results []interface{}
-	var result interface{}
+// GetAllPlaylists grabs all data from a table
+func (s *Store) GetAllPlaylists(table string) ([]testy, error) {
+	var results []testy
+	var result testy
 	query := fmt.Sprintf("SELECT * FROM %s;", table)
 	rows, err := s.db.Query(query)
+	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next() {
-		err = rows.Scan(&result)
+		err = rows.Scan(&result.ID, &result.Name, &result.Age)
 		if err != nil {
-			results = append(results, result)
 			log.Printf("Error reading row from table: %s", table)
 		}
+		results = append(results, result)
 	}
+	log.Print(results)
 	return results, nil
 }
 

@@ -21,7 +21,11 @@ type testStruct struct {
 // Create inserts a new playlist into the store
 func Create(c echo.Context) error {
 	store := stmw.GetStore(c)
-	payload := map[string]interface{}{"name": "Andrew", "age": 30}
+	form := c.FormParams()
+	payload := map[string]interface{}{}
+	for k, v := range form {
+		payload[k] = v[0]
+	}
 	rows, err := store.Create(tableName, payload)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -37,7 +41,11 @@ func Update(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
 	}
 	store := stmw.GetStore(c)
-	payload := map[string]interface{}{"name": "Andrew111", "age": 31}
+	form := c.FormParams()
+	payload := map[string]interface{}{}
+	for k, v := range form {
+		payload[k] = v[0]
+	}
 	rows, err := store.Update(tableName, numId, payload)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -59,6 +67,16 @@ func Get(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, testy)
+}
+
+// GetAll retrieves all existing playlists in the store
+func GetAll(c echo.Context) error {
+	store := stmw.GetStore(c)
+	playlists, err := store.GetAllPlaylists(tableName)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, playlists)
 }
 
 // Delete deletes an existing playlist in the store
