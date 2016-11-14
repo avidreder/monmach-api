@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -37,7 +38,7 @@ func (s *Store) Connect() error {
 }
 
 // Get grabs data from a table
-func (s *Store) Get(table string, id string, values ...interface{}) error {
+func (s *Store) Get(table string, id int64, values ...interface{}) error {
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id=$1;", table)
 	stmt, err := s.db.Prepare(query)
 	defer stmt.Close()
@@ -102,6 +103,57 @@ func (s *Store) Create(table string, valueMap map[string]interface{}) (string, e
 		return "", err
 	}
 	return string(id), nil
+}
+
+// Update updates an existing row in a table
+func (s *Store) Update(table string, id int64, valueMap map[string]interface{}) (string, error) {
+	var keys []string
+	var values []interface{}
+	var vars []string
+	count := 0
+	for k, v := range valueMap {
+		count++
+		keys = append(keys, k)
+		values = append(values, v)
+		vars = append(vars, fmt.Sprintf("$%v", count))
+	}
+	keyString := strings.Join(keys, ", ")
+	query := fmt.Sprintf("UPDATE %s SET (%s) = (%s) WHERE id = %v;", table, keyString, strings.Join(vars, ", "), id)
+	log.Print(query)
+	stmt, err := s.db.Prepare(query)
+	defer stmt.Close()
+	if err != nil {
+		return "", err
+	}
+	res, err := stmt.Exec(values...)
+	if err != nil {
+		return "", err
+	}
+	log.Printf("%+v", res)
+	id, err = res.RowsAffected()
+	if err != nil {
+		return "", err
+	}
+	return string(id), nil
+}
+
+// Delete deletes data from a table
+func (s *Store) Delete(table string, id int64) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1;", table)
+	stmt, err := s.db.Prepare(query)
+	defer stmt.Close()
+	if err != nil {
+		return err
+	}
+	res, err := stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	rows, err := res.RowsAffected()
+	if err != nil || rows != 1 {
+		return errors.New("Error deleting data")
+	}
+	return nil
 }
 
 // Get returns a postgres instance
