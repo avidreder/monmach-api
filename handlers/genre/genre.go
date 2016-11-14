@@ -1,4 +1,4 @@
-package playlist
+package genre
 
 import (
 	"encoding/json"
@@ -8,25 +8,21 @@ import (
 	"strconv"
 
 	stmw "github.com/avidreder/monmach-api/middleware/store"
-	playlistR "github.com/avidreder/monmach-api/resources/playlist"
+	genreR "github.com/avidreder/monmach-api/resources/genre"
 
 	"github.com/labstack/echo"
 	"gopkg.in/pg.v5"
 )
 
-const tableName = "playlists"
+const tableName = "genres"
 
-// Create inserts a new playlist into the store
+// Create inserts a new genre into the store
 func Create(c echo.Context) error {
 	store := stmw.GetStore(c)
-	payload := playlistR.Playlist{}
+	payload := genreR.Genre{}
 	userID := c.FormValue("UserID")
 	if userID == "" {
 		return echo.NewHTTPError(http.StatusInternalServerError, "UserID is required")
-	}
-	tracks := c.FormValue("Tracks")
-	if tracks == "" {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Tracks is required")
 	}
 	name := c.FormValue("Name")
 	if userID == "" {
@@ -36,13 +32,33 @@ func Create(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	var array []int64
-	err = json.Unmarshal([]byte(tracks), &array)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	if c.FormValue("SeedArtists") != "" {
+		err = json.Unmarshal([]byte(c.FormValue("SeedArtists")), &payload.SeedArtists)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+	}
+	if c.FormValue("SeedTracks") != "" {
+		err = json.Unmarshal([]byte(c.FormValue("SeedTracks")), &payload.SeedTracks)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+	}
+	if c.FormValue("TrackBlacklist") != "" {
+		err = json.Unmarshal([]byte(c.FormValue("TrackBlacklist")), &payload.TrackBlacklist)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+	}
+	if c.FormValue("TrackWhitelist") != "" {
+		err = json.Unmarshal([]byte(c.FormValue("TrackWhitelist")), &payload.TrackWhitelist)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
 	}
 	payload.UserID = numID
-	payload.Tracks = array
+	payload.Description = c.FormValue("Description")
+	payload.AvatarURL = c.FormValue("AvatarURL")
 	payload.Name = name
 	err = store.Create(&payload)
 	if err != nil {
@@ -51,7 +67,7 @@ func Create(c echo.Context) error {
 	return c.JSON(http.StatusOK, payload)
 }
 
-// Update updates an existing playlist in the store
+// Update updates an existing genre in the store
 func Update(c echo.Context) error {
 	id := c.Param("id")
 	numId, err := strconv.ParseInt(id, 10, 0)
@@ -64,13 +80,34 @@ func Update(c echo.Context) error {
 	for k, v := range form {
 		if k == "UserID" {
 			payload["user_id"] = v[0]
-		} else if k == "Tracks" {
+		} else if k == "SeedTracks" {
 			var array []int64
 			err = json.Unmarshal([]byte(v[0]), &array)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
-			payload[k] = pg.Array(array)
+			payload["seed_tracks"] = pg.Array(array)
+		} else if k == "SeedArtists" {
+			var array []int64
+			err = json.Unmarshal([]byte(v[0]), &array)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+			}
+			payload["seed_artists"] = pg.Array(array)
+		} else if k == "TrackWhitelist" {
+			var array []int64
+			err = json.Unmarshal([]byte(v[0]), &array)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+			}
+			payload["track_whitelist"] = pg.Array(array)
+		} else if k == "TrackBlacklist" {
+			var array []int64
+			err = json.Unmarshal([]byte(v[0]), &array)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+			}
+			payload["track_blacklist"] = pg.Array(array)
 		} else {
 			payload[k] = v[0]
 		}
@@ -82,14 +119,14 @@ func Update(c echo.Context) error {
 	return c.HTML(http.StatusOK, "Update was successful")
 }
 
-// Get retrieves an existing playlist in the store
+// Get retrieves an existing genre in the store
 func Get(c echo.Context) error {
 	id := c.Param("id")
 	numID, err := strconv.ParseInt(id, 10, 0)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
 	}
-	result := playlistR.Playlist{ID: numID}
+	result := genreR.Genre{ID: numID}
 	store := stmw.GetStore(c)
 	err = store.Get(&result)
 	if err != nil {
@@ -99,29 +136,29 @@ func Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-// GetAll retrieves all existing playlists in the store
+// GetAll retrieves all existing genres in the store
 func GetAll(c echo.Context) error {
-	var playlists []playlistR.Playlist
+	var genres []genreR.Genre
 	store := stmw.GetStore(c)
-	err := store.GetAll(&playlists, tableName)
+	err := store.GetAll(&genres, tableName)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, playlists)
+	return c.JSON(http.StatusOK, genres)
 }
 
-// Delete deletes an existing playlist in the store
+// Delete deletes an existing genre in the store
 func Delete(c echo.Context) error {
 	id := c.Param("id")
 	numID, err := strconv.ParseInt(id, 10, 0)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
 	}
-	playlist := playlistR.Playlist{ID: numID}
+	genre := genreR.Genre{ID: numID}
 	store := stmw.GetStore(c)
-	err = store.Delete(&playlist)
+	err = store.Delete(&genre)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, fmt.Sprintf("Playlist %s deleted", id))
+	return c.JSON(http.StatusOK, fmt.Sprintf("Genre %s deleted", id))
 }

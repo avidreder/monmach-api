@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	gh "github.com/avidreder/monmach-api/handlers/genre"
 	plh "github.com/avidreder/monmach-api/handlers/playlist"
 	// yh "github.com/avidreder/monmach-api/handlers/youtube"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
@@ -36,6 +37,15 @@ func main() {
 	playlists.GET("/all", plh.GetAll)
 	playlists.PUT("/:id", plh.Update)
 	playlists.DELETE("/:id", plh.Delete)
+
+	// Load routes for genres
+	genres := server.Group("/genres")
+	genres.Use(stmw.LoadStore)
+	genres.POST("/new", gh.Create)
+	genres.GET("/:id", gh.Get)
+	genres.GET("/all", gh.GetAll)
+	genres.PUT("/:id", gh.Update)
+	genres.DELETE("/:id", gh.Delete)
 
 	log.Println("Starting...")
 	server.Run(standard.New(":3000"))

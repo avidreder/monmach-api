@@ -2,7 +2,7 @@ CREATE TABLE playlists(
        id serial PRIMARY KEY NOT NULL,
        name varchar (50),
        user_id int,
-       tracks int[],
+       tracks int[] default '{}',
        created timestamptz default current_timestamp NOT NULL,
        updated timestamptz default current_timestamp NOT NULL
 );
@@ -14,20 +14,20 @@ CREATE TABLE users(
        avatar_url varchar (200),
        created timestamptz default current_timestamp NOT NULL,
        updated timestamptz default current_timestamp NOT NULL,
-       track_blacklist int[],
-       track_whitelist int[],
-       listened_tracks int[]
+       track_blacklist int[] default '{}',
+       track_whitelist int[] default '{}',
+       listened_tracks int[] default '{}'
 );
 
 CREATE TABLE tracks(
        id serial PRIMARY KEY NOT NULL,
        name varchar (50),
-       artists varchar(50)[][]
+       artists varchar(50)[][] default '{}{}'
        image_url varchar (200),
-       spotify_id varchar(20)[]
+       spotify_id varchar(20)[] default '{}'
        created timestamptz default current_timestamp NOT NULL,
        updated timestamptz default current_timestamp NOT NULL,
-       features real[]
+       features real[] default '{}'
 );
 
 CREATE TABLE genres(
@@ -35,13 +35,13 @@ CREATE TABLE genres(
        user_id int,
        name varchar (50),
        description varchar (200),
-       seed_artists int[],
-       seed_tracks int[],
+       seed_artists int[] default '{}',
+       seed_tracks int[] default '{}',
        avatar_url varchar (200),
        created timestamptz default current_timestamp NOT NULL,
        updated timestamptz default current_timestamp NOT NULL,
-       track_blacklist int[],
-       track_whitelist int[]
+       track_blacklist int[] default '{}',
+       track_whitelist int[] default '{}' 
 );
 
 CREATE OR REPLACE FUNCTION update_updated_preserve_created()
