@@ -9,7 +9,7 @@ type Playlist struct {
 	ID      int64
 	Name    string
 	UserID  int64
-	Tracks  []int64
+	Tracks  []int64 `pg:",array"`
 	Created time.Time
 	Updated time.Time
 }

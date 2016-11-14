@@ -11,7 +11,7 @@ type Track struct {
 	Name      string
 	Artists   []Artist
 	ImageURL  url.URL
-	SpotifyID int64
+	SpotifyID string
 	Created   time.Time
 	Updated   time.Time
 	Features  SpotifyFeatures
@@ -22,7 +22,7 @@ type SpotifyFeatures struct {
 	Danceability     float64
 	Energy           float64
 	Key              int64
-	Loudness         int64
+	Loudness         float64
 	Mode             int64
 	Speechiness      float64
 	Acousticness     float64
