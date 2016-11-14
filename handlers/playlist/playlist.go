@@ -2,7 +2,7 @@ package playlist
 
 import (
 	"encoding/json"
-	// "fmt"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -50,29 +50,29 @@ func Create(c echo.Context) error {
 	return c.JSON(http.StatusOK, payload)
 }
 
-// // Update updates an existing playlist in the store
-// func Update(c echo.Context) error {
-// 	id := c.Param("id")
-// 	numId, err := strconv.ParseInt(id, 10, 0)
-// 	if err != nil {
-// 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
-// 	}
-// 	store := stmw.GetStore(c)
-// 	form := c.FormParams()
-// 	payload := map[string]interface{}{}
-// 	for k, v := range form {
-// 		if k == "UserID" {
-// 			payload["user_id"] = v[0]
-// 		} else {
-// 			payload[k] = v[0]
-// 		}
-// 	}
-// 	rows, err := store.Update(tableName, numId, payload)
-// 	if err != nil {
-// 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-// 	}
-// 	return c.HTML(http.StatusOK, rows)
-// }
+// Update updates an existing playlist in the store
+func Update(c echo.Context) error {
+	id := c.Param("id")
+	numId, err := strconv.ParseInt(id, 10, 0)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
+	}
+	store := stmw.GetStore(c)
+	form := c.FormParams()
+	payload := map[string]interface{}{}
+	for k, v := range form {
+		if k == "UserID" {
+			payload["user_id"] = v[0]
+		} else {
+			payload[k] = v[0]
+		}
+	}
+	err = store.Update(tableName, numId, payload)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.HTML(http.StatusOK, "Update was successful")
+}
 
 // Get retrieves an existing playlist in the store
 func Get(c echo.Context) error {
@@ -91,27 +91,29 @@ func Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-// // GetAll retrieves all existing playlists in the store
-// func GetAll(c echo.Context) error {
-// 	store := stmw.GetStore(c)
-// 	playlists, err := store.GetAllPlaylists(tableName)
-// 	if err != nil {
-// 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-// 	}
-// 	return c.JSON(http.StatusOK, playlists)
-// }
+// GetAll retrieves all existing playlists in the store
+func GetAll(c echo.Context) error {
+	var playlists []playlistR.Playlist
+	store := stmw.GetStore(c)
+	err := store.GetAll(&playlists, tableName)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, playlists)
+}
 
-// // Delete deletes an existing playlist in the store
-// func Delete(c echo.Context) error {
-// 	id := c.Param("id")
-// 	numId, err := strconv.ParseInt(id, 10, 0)
-// 	if err != nil {
-// 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
-// 	}
-// 	store := stmw.GetStore(c)
-// 	err = store.Delete(tableName, numId)
-// 	if err != nil {
-// 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-// 	}
-// 	return c.JSON(http.StatusOK, fmt.Sprintf("Playlist %s deleted", id))
-// }
+// Delete deletes an existing playlist in the store
+func Delete(c echo.Context) error {
+	id := c.Param("id")
+	numID, err := strconv.ParseInt(id, 10, 0)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
+	}
+	playlist := playlistR.Playlist{ID: numID}
+	store := stmw.GetStore(c)
+	err = store.Delete(&playlist)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, fmt.Sprintf("Playlist %s deleted", id))
+}

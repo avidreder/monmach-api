@@ -33,9 +33,9 @@ func main() {
 	playlists.Use(stmw.LoadStore)
 	playlists.POST("/new", plh.Create)
 	playlists.GET("/:id", plh.Get)
-	// playlists.GET("/all", plh.GetAll)
-	// playlists.PUT("/:id", plh.Update)
-	// playlists.DELETE("/:id", plh.Delete)
+	playlists.GET("/all", plh.GetAll)
+	playlists.PUT("/:id", plh.Update)
+	playlists.DELETE("/:id", plh.Delete)
 
 	log.Println("Starting...")
 	server.Run(standard.New(":3000"))
