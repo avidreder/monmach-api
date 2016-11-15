@@ -1,5 +1,5 @@
 hash: ab985a45816a6a424e33ada6ac01317ef15bc8984240741cd9aaeea86254ef7e
-updated: 2016-11-11T10:45:48.829904263-08:00
+updated: 2016-11-15T09:31:22.137025567-08:00
 imports:
 - name: github.com/avidreder/show-hawk-server
   version: 60ece420ca1b936316e5aacb543e58193b3a4f3c
@@ -11,12 +11,16 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: 9ed569b5d1ac936e6494082958d63a6aa4fff99a
-- name: github.com/fatih/structs
-  version: dc3312cb1a4513a366c4c9e622ad55c32df12ed3
+- name: github.com/golang/protobuf
+  version: da116c3771bf4a398a43f44e069195ef1c9688ef
+  subpackages:
+  - proto
 - name: github.com/google/go-querystring
   version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
   subpackages:
   - query
+- name: github.com/jinzhu/inflection
+  version: 74387dc39a75e970e7a3ae6a3386b5bd2e5c5cff
 - name: github.com/labstack/echo
   version: e08070379af60f5b9c0fb5bb2d1527ba9624fe43
   subpackages:
@@ -36,6 +40,10 @@ imports:
   version: d8eeeb8bae8896dd8e1b7e514ab0d396c4f12a1b
   subpackages:
   - oid
+- name: github.com/markbates/goth
+  version: fe9a7e293372a2839c9e9eb3bbb48bb977f2cfa8
+  subpackages:
+  - providers/spotify
 - name: github.com/mattn/go-colorable
   version: d228849504861217f796da67fae4f6e347643f15
 - name: github.com/mattn/go-isatty
@@ -59,10 +67,24 @@ imports:
   - context
   - html
   - html/atom
+- name: golang.org/x/oauth2
+  version: d5040cddfc0da40b408c9a1da4728662435176a9
+  subpackages:
+  - internal
 - name: golang.org/x/sys
   version: 9a2e24c3733eddc63871eda99f253e2db29bd3b9
   subpackages:
   - unix
+- name: google.golang.org/appengine
+  version: c7b8227c83007befd67b324a64c969ebc1d7475d
+  subpackages:
+  - internal
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch
 - name: gopkg.in/mgo.v2
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
@@ -70,4 +92,12 @@ imports:
   - internal/json
   - internal/sasl
   - internal/scram
+- name: gopkg.in/pg.v5
+  version: 3f395a9844fbaf3a8591d6d3a067f6842e5614fb
+  subpackages:
+  - internal
+  - internal/parser
+  - internal/pool
+  - orm
+  - types
 testImports: []

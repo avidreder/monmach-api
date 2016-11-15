@@ -23,7 +23,7 @@ CREATE TABLE queues(
 CREATE TABLE users(
        id serial PRIMARY KEY NOT NULL,
        name varchar (50) NOT NULL,
-       email varchar (100) NOT NULL,
+       email varchar (100) NOT NULL UNIQUE,
        avatar_url varchar (200),
        spotify_token varchar (40),
        spotify_refresh_token varchar (40),
