@@ -82,7 +82,7 @@ func Update(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
 	}
 	store := stmw.GetStore(c)
-	form := c.FormParams()
+	form, _ := c.FormParams()
 	payload := map[string]interface{}{}
 	for k, v := range form {
 		if k == "UserID" {

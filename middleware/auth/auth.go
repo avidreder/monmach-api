@@ -17,16 +17,16 @@ func LoadSpotifyProvider(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		file, err := os.Open("spotify.json") // For read access.
 		if err != nil {
-			log.Fatalf("Could not Initialize Spotify: %s", err)
+			log.Printf("Could not Initialize Spotify: %s", err)
 		}
 		contents, err := ioutil.ReadAll(file)
 		if err != nil {
-			log.Fatalf("Could not Initialize Spotify: %s", err)
+			log.Printf("Could not Initialize Spotify: %s", err)
 		}
 		credentials := auth.SpotifyCredentials{}
 		err = json.Unmarshal(contents, &credentials)
 		if err != nil {
-			log.Fatalf("Could not Initialize Spotify: %s", err)
+			log.Printf("Could not Initialize Spotify: %s", err)
 		}
 		provider := spotify.New(credentials.ClientKey, credentials.Secret, credentials.CallbackURL, auth.SpotifyScopes...)
 		c.Set("spotifyProvider", provider)

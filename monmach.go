@@ -3,16 +3,17 @@ package main
 import (
 	"log"
 
+	authh "github.com/avidreder/monmach-api/handlers/auth"
 	gh "github.com/avidreder/monmach-api/handlers/genre"
 	plh "github.com/avidreder/monmach-api/handlers/playlist"
 	qh "github.com/avidreder/monmach-api/handlers/queue"
 	th "github.com/avidreder/monmach-api/handlers/track"
 	uh "github.com/avidreder/monmach-api/handlers/user"
+	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	"github.com/avidreder/monmach-api/resources/store/postgres"
 
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/engine/standard"
 	emw "github.com/labstack/echo/middleware"
 )
 
@@ -29,6 +30,11 @@ func main() {
 	server.Use(emw.Logger())
 	server.Use(emw.Recover())
 	server.Use(emw.CORS())
+
+	// Load routes for auth
+	auth := server.Group("/auth/spotify")
+	auth.Use(authmw.LoadSpotifyProvider)
+	auth.GET("", authh.StartAuth)
 
 	// Load routes for playlists
 	playlists := server.Group("/playlists")
@@ -76,5 +82,5 @@ func main() {
 	queues.DELETE("/:id", qh.Delete)
 
 	log.Println("Starting...")
-	server.Run(standard.New(":3000"))
+	server.Start(":3000")
 }

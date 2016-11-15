@@ -1,5 +1,5 @@
-hash: ab985a45816a6a424e33ada6ac01317ef15bc8984240741cd9aaeea86254ef7e
-updated: 2016-11-15T09:31:22.137025567-08:00
+hash: 41e323cb6ed3010eff39f7bb7973422d02d2657fd59815cfa55a901968caa604
+updated: 2016-11-15T11:12:43.725657825-08:00
 imports:
 - name: github.com/avidreder/show-hawk-server
   version: 60ece420ca1b936316e5aacb543e58193b3a4f3c
@@ -19,15 +19,17 @@ imports:
   version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
   subpackages:
   - query
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/securecookie
+  version: fa5329f913702981df43dcb2a380bac429c810b5
+- name: github.com/gorilla/sessions
+  version: ca9ada44574153444b00d3fd9c8559e4cc95f896
 - name: github.com/jinzhu/inflection
   version: 74387dc39a75e970e7a3ae6a3386b5bd2e5c5cff
 - name: github.com/labstack/echo
-  version: e08070379af60f5b9c0fb5bb2d1527ba9624fe43
+  version: c5a3575d4c4121ba7a01a9aa21637c712adec067
   subpackages:
-  - context
-  - engine
-  - engine/standard
-  - log
   - middleware
 - name: github.com/labstack/gommon
   version: 2d272df536d051e737aea353b86c979d6e88bce0
@@ -43,15 +45,20 @@ imports:
 - name: github.com/markbates/goth
   version: fe9a7e293372a2839c9e9eb3bbb48bb977f2cfa8
   subpackages:
+  - gothic
   - providers/spotify
 - name: github.com/mattn/go-colorable
   version: d228849504861217f796da67fae4f6e347643f15
 - name: github.com/mattn/go-isatty
   version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
+- name: github.com/miekg/dns
+  version: 58f52c57ce9df13460ac68200cef30a008b9c468
 - name: github.com/pmezard/go-difflib
   version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:
   - difflib
+- name: github.com/rsc/letsencrypt
+  version: 76104d26167d38b6a0010f42bfc8ec5487742e8b
 - name: github.com/stretchr/objx
   version: cbeaeb16a013161a98496fad62933b1d21786672
 - name: github.com/stretchr/testify
@@ -59,14 +66,25 @@ imports:
   subpackages:
   - assert
   - mock
+- name: github.com/tylerb/graceful
+  version: 50a48b6e73fcc75b45e22c05b79629a67c79e938
 - name: github.com/valyala/fasttemplate
   version: 3b874956e03f1636d171bda64b130f9135f42cff
+- name: github.com/xenolf/lego
+  version: 9f86882f775f75f69617ecc160e39f4e0b7ae27f
+  subpackages:
+  - acme
+- name: golang.org/x/crypto
+  version: 9477e0b78b9ac3d0b03822fd95422e2fe07627cd
+  subpackages:
+  - ocsp
 - name: golang.org/x/net
   version: 9ef22118a4b25863aa94546daffbc0a18feaafb3
   subpackages:
   - context
   - html
   - html/atom
+  - publicsuffix
 - name: golang.org/x/oauth2
   version: d5040cddfc0da40b408c9a1da4728662435176a9
   subpackages:
@@ -75,6 +93,10 @@ imports:
   version: 9a2e24c3733eddc63871eda99f253e2db29bd3b9
   subpackages:
   - unix
+- name: golang.org/x/time
+  version: f51c12702a4d776e4c1fa9b0fabab841babae631
+  subpackages:
+  - rate
 - name: google.golang.org/appengine
   version: c7b8227c83007befd67b324a64c969ebc1d7475d
   subpackages:
@@ -100,4 +122,9 @@ imports:
   - internal/pool
   - orm
   - types
+- name: gopkg.in/square/go-jose.v1
+  version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
+  subpackages:
+  - cipher
+  - json
 testImports: []
