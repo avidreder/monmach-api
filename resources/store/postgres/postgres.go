@@ -40,6 +40,16 @@ func (s *Store) Get(model interface{}) error {
 	return nil
 }
 
+// GetByValue grabs data from a table
+func (s *Store) GetByEmail(model interface{}, value interface{}) error {
+	err := s.db.Model(model).Where("email = ?", value).Select()
+	if err != nil {
+		log.Printf("Error from Get: %v", err)
+		return err
+	}
+	return nil
+}
+
 // GetAll grabs all data from a table
 func (s *Store) GetAll(model interface{}, tableName string) error {
 	query := fmt.Sprintf(`SELECT * FROM %s`, tableName)
@@ -77,6 +87,37 @@ func (s *Store) Update(table string, id int64, valueMap map[string]interface{}) 
 	vars = append(vars, "current_timestamp")
 	keyString := strings.Join(keys, ", ")
 	query := fmt.Sprintf("UPDATE %s SET (%s) = (%s) WHERE id = %v;", table, keyString, strings.Join(vars, ", "), id)
+	stmt, err := s.db.Prepare(query)
+	defer stmt.Close()
+	if err != nil {
+		log.Printf("Error from Update: %v", err)
+		return err
+	}
+	_, err = stmt.Exec(values...)
+	if err != nil {
+		log.Printf("Error from Update: %v", err)
+		return err
+	}
+	return nil
+}
+
+// UpdateByEmail updates an existing row in a table
+func (s *Store) UpdateByEmail(table string, email string, valueMap map[string]interface{}) error {
+	var keys []string
+	var values []interface{}
+	var vars []string
+	count := 0
+	for k, v := range valueMap {
+		count++
+		keys = append(keys, k)
+		values = append(values, v)
+		vars = append(vars, fmt.Sprintf("$%v", count))
+	}
+	keys = append(keys, "updated")
+	vars = append(vars, "current_timestamp")
+	keyString := strings.Join(keys, ", ")
+	query := fmt.Sprintf("UPDATE %s SET (%s) = (%s) WHERE email = '%s';", table, keyString, strings.Join(vars, ", "), email)
+	log.Print(query)
 	stmt, err := s.db.Prepare(query)
 	defer stmt.Close()
 	if err != nil {
