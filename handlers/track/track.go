@@ -1,4 +1,4 @@
-package genre
+package track
 
 import (
 	"encoding/json"
@@ -8,58 +8,44 @@ import (
 	"strconv"
 
 	stmw "github.com/avidreder/monmach-api/middleware/store"
-	genreR "github.com/avidreder/monmach-api/resources/genre"
+	trackR "github.com/avidreder/monmach-api/resources/track"
 
 	"github.com/labstack/echo"
 	"gopkg.in/pg.v5"
 )
 
-const tableName = "genres"
+const tableName = "tracks"
 
-// Create inserts a new genre into the store
+// Create inserts a new track into the store
 func Create(c echo.Context) error {
 	store := stmw.GetStore(c)
-	payload := genreR.Genre{}
-	userID := c.FormValue("UserID")
-	if userID == "" {
-		return echo.NewHTTPError(http.StatusInternalServerError, "UserID is required")
+	payload := trackR.Track{}
+	spotifyID := c.FormValue("SpotifyID")
+	if spotifyID == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "SpotifyID is required")
 	}
 	name := c.FormValue("Name")
 	if name == "" {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Name is required")
 	}
-	numID, err := strconv.ParseInt(userID, 10, 0)
+	artists := c.FormValue("Artists")
+	if artists == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Artists is required")
+	}
+	err := json.Unmarshal([]byte(artists), &payload.Artists)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	if c.FormValue("SeedArtists") != "" {
-		err = json.Unmarshal([]byte(c.FormValue("SeedArtists")), &payload.SeedArtists)
+
+	if c.FormValue("Features") != "" {
+		err = json.Unmarshal([]byte(c.FormValue("Features")), &payload.Features)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 	}
-	if c.FormValue("SeedTracks") != "" {
-		err = json.Unmarshal([]byte(c.FormValue("SeedTracks")), &payload.SeedTracks)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-		}
-	}
-	if c.FormValue("TrackBlacklist") != "" {
-		err = json.Unmarshal([]byte(c.FormValue("TrackBlacklist")), &payload.TrackBlacklist)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-		}
-	}
-	if c.FormValue("TrackWhitelist") != "" {
-		err = json.Unmarshal([]byte(c.FormValue("TrackWhitelist")), &payload.TrackWhitelist)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-		}
-	}
-	payload.UserID = numID
-	payload.Description = c.FormValue("Description")
-	payload.AvatarURL = c.FormValue("AvatarURL")
 	payload.Name = name
+	payload.SpotifyID = spotifyID
+	payload.ImageURL = c.FormValue("ImageURL")
 	err = store.Create(&payload)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -67,7 +53,7 @@ func Create(c echo.Context) error {
 	return c.JSON(http.StatusOK, payload)
 }
 
-// Update updates an existing genre in the store
+// Update updates an existing track in the store
 func Update(c echo.Context) error {
 	id := c.Param("id")
 	numId, err := strconv.ParseInt(id, 10, 0)
@@ -78,36 +64,31 @@ func Update(c echo.Context) error {
 	form := c.FormParams()
 	payload := map[string]interface{}{}
 	for k, v := range form {
-		if k == "UserID" {
-			payload["user_id"] = v[0]
-		} else if k == "SeedTracks" {
-			var array []int64
+		if k == "ImageUrl" {
+			payload["image_url"] = v[0]
+		} else if k == "SpotifyID" {
+			payload["spotify_id"] = v[0]
+		} else if k == "Artists" {
+			var array []string
 			err = json.Unmarshal([]byte(v[0]), &array)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
-			payload["seed_tracks"] = pg.Array(array)
-		} else if k == "SeedArtists" {
-			var array []int64
+			payload["artists"] = pg.Array(array)
+		} else if k == "Features" {
+			var array []float64
 			err = json.Unmarshal([]byte(v[0]), &array)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
-			payload["seed_artists"] = pg.Array(array)
+			payload["features"] = pg.Array(array)
 		} else if k == "TrackWhitelist" {
-			var array []int64
+			var array []float64
 			err = json.Unmarshal([]byte(v[0]), &array)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			payload["track_whitelist"] = pg.Array(array)
-		} else if k == "TrackBlacklist" {
-			var array []int64
-			err = json.Unmarshal([]byte(v[0]), &array)
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-			}
-			payload["track_blacklist"] = pg.Array(array)
 		} else {
 			payload[k] = v[0]
 		}
@@ -119,14 +100,14 @@ func Update(c echo.Context) error {
 	return c.HTML(http.StatusOK, "Update was successful")
 }
 
-// Get retrieves an existing genre in the store
+// Get retrieves an existing track in the store
 func Get(c echo.Context) error {
 	id := c.Param("id")
 	numID, err := strconv.ParseInt(id, 10, 0)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
 	}
-	result := genreR.Genre{ID: numID}
+	result := trackR.Track{ID: numID}
 	store := stmw.GetStore(c)
 	err = store.Get(&result)
 	if err != nil {
@@ -136,29 +117,29 @@ func Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-// GetAll retrieves all existing genres in the store
+// GetAll retrieves all existing tracks in the store
 func GetAll(c echo.Context) error {
-	var genres []genreR.Genre
+	var tracks []trackR.Track
 	store := stmw.GetStore(c)
-	err := store.GetAll(&genres, tableName)
+	err := store.GetAll(&tracks, tableName)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, genres)
+	return c.JSON(http.StatusOK, tracks)
 }
 
-// Delete deletes an existing genre in the store
+// Delete deletes an existing track in the store
 func Delete(c echo.Context) error {
 	id := c.Param("id")
 	numID, err := strconv.ParseInt(id, 10, 0)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
 	}
-	genre := genreR.Genre{ID: numID}
+	track := trackR.Track{ID: numID}
 	store := stmw.GetStore(c)
-	err = store.Delete(&genre)
+	err = store.Delete(&track)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, fmt.Sprintf("Genre %s deleted", id))
+	return c.JSON(http.StatusOK, fmt.Sprintf("Track %s deleted", id))
 }

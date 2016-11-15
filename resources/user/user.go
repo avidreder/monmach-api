@@ -1,7 +1,6 @@
 package user
 
 import (
-	"net/url"
 	"time"
 )
 
@@ -10,10 +9,10 @@ type User struct {
 	ID             int64
 	Name           string
 	Email          string
-	AvatarURL      url.URL
+	AvatarURL      string
 	Created        time.Time
 	Updated        time.Time
-	TrackBlacklist []int64
-	TrackWhitelist []int64
-	ListenedTracks []int64
+	TrackBlacklist []int64 `pg:",array"`
+	TrackWhitelist []int64 `pg:",array"`
+	ListenedTracks []int64 `pg:",array"`
 }

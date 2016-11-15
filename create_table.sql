@@ -22,9 +22,9 @@ CREATE TABLE users(
 CREATE TABLE tracks(
        id serial PRIMARY KEY NOT NULL,
        name varchar (50),
-       artists varchar(50)[][] default '{}{}'
+       artists text[] default '{}',
        image_url varchar (200),
-       spotify_id varchar(20)[] default '{}'
+       spotify_id varchar(20),
        created timestamptz default current_timestamp NOT NULL,
        updated timestamptz default current_timestamp NOT NULL,
        features real[] default '{}'
@@ -54,3 +54,9 @@ END;
 $$ language 'plpgsql';
 
 CREATE TRIGGER update_timestamp BEFORE UPDATE ON playlists FOR EACH ROW EXECUTE PROCEDURE update_updated_preserve_created();
+
+CREATE TRIGGER update_timestamp BEFORE UPDATE ON genres FOR EACH ROW EXECUTE PROCEDURE update_updated_preserve_created();
+
+CREATE TRIGGER update_timestamp BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_updated_preserve_created();
+
+CREATE TRIGGER update_timestamp BEFORE UPDATE ON tracks FOR EACH ROW EXECUTE PROCEDURE update_updated_preserve_created();
