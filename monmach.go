@@ -35,6 +35,7 @@ func main() {
 	auth := server.Group("/auth/spotify")
 	auth.Use(authmw.LoadSpotifyProvider)
 	auth.GET("", authh.StartAuth)
+	auth.GET("/callback", authh.FinishAuth)
 
 	// Load routes for playlists
 	playlists := server.Group("/playlists")
