@@ -5,12 +5,11 @@ import (
 
 	gh "github.com/avidreder/monmach-api/handlers/genre"
 	plh "github.com/avidreder/monmach-api/handlers/playlist"
+	qh "github.com/avidreder/monmach-api/handlers/queue"
 	th "github.com/avidreder/monmach-api/handlers/track"
 	uh "github.com/avidreder/monmach-api/handlers/user"
-	// yh "github.com/avidreder/monmach-api/handlers/youtube"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	"github.com/avidreder/monmach-api/resources/store/postgres"
-	// "github.com/avidreder/monmach-api/resources/shows/mongo"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
@@ -66,6 +65,15 @@ func main() {
 	tracks.GET("/all", th.GetAll)
 	tracks.PUT("/:id", th.Update)
 	tracks.DELETE("/:id", th.Delete)
+
+	// Load routes for queues
+	queues := server.Group("/queues")
+	queues.Use(stmw.LoadStore)
+	queues.POST("/new", qh.Create)
+	queues.GET("/:id", qh.Get)
+	queues.GET("/all", qh.GetAll)
+	queues.PUT("/:id", qh.Update)
+	queues.DELETE("/:id", qh.Delete)
 
 	log.Println("Starting...")
 	server.Run(standard.New(":3000"))

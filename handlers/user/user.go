@@ -24,15 +24,17 @@ func Create(c echo.Context) error {
 	if name == "" {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Name is required")
 	}
+	spotifyToken := c.FormValue("SpotifyToken")
+	if spotifyToken == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Spotify Token is required")
+	}
+	spotifyRefreshToken := c.FormValue("SpotifyRefreshToken")
+	if spotifyRefreshToken == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "SpotifyRefreshToken is required")
+	}
 	email := c.FormValue("Email")
 	if email == "" {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Email is required")
-	}
-	if c.FormValue("ListenedTracks") != "" {
-		err := json.Unmarshal([]byte(c.FormValue("ListenedTracks")), &payload.ListenedTracks)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-		}
 	}
 	if c.FormValue("TrackBlacklist") != "" {
 		err := json.Unmarshal([]byte(c.FormValue("TrackBlacklist")), &payload.TrackBlacklist)
@@ -40,15 +42,11 @@ func Create(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 	}
-	if c.FormValue("TrackWhitelist") != "" {
-		err := json.Unmarshal([]byte(c.FormValue("TrackWhitelist")), &payload.TrackWhitelist)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-		}
-	}
 	payload.Email = email
 	payload.AvatarURL = c.FormValue("AvatarURL")
 	payload.Name = name
+	payload.SpotifyToken = spotifyToken
+	payload.SpotifyRefreshToken = spotifyRefreshToken
 	err := store.Create(&payload)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -67,13 +65,12 @@ func Update(c echo.Context) error {
 	form := c.FormParams()
 	payload := map[string]interface{}{}
 	for k, v := range form {
-		if k == "ListenedTracks" {
-			var array []int64
-			err = json.Unmarshal([]byte(v[0]), &array)
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-			}
-			payload["listened_tracks"] = pg.Array(array)
+		if k == "SpotifyToken" {
+			payload["spotify_token"] = v[0]
+		} else if k == "SpotifyRefreshToken" {
+			payload["spotify_refresh_token"] = v[0]
+		} else if k == "AvatarURL" {
+			payload["avatar_url"] = v[0]
 		} else if k == "TrackWhitelist" {
 			var array []int64
 			err = json.Unmarshal([]byte(v[0]), &array)
