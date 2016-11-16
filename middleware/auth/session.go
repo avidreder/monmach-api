@@ -35,7 +35,7 @@ func CheckLogin(h echo.HandlerFunc) echo.HandlerFunc {
 		sessionStore := GetStore(c)
 		session, err := sessionStore.Get(c.Request(), "auth-session")
 		if session.IsNew || err != nil {
-			return c.Redirect(302, "/")
+			return c.Redirect(302, "/login")
 		}
 		return h(c)
 	}

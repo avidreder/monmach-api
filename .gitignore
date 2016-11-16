@@ -23,4 +23,7 @@ _testmain.go
 *.exe
 *.test
 *.prof
+react/dist/bundle.js
+react/dist/libs
 spotify.json
+node_modules

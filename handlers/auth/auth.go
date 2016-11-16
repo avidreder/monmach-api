@@ -60,21 +60,21 @@ func FinishAuth(c echo.Context) error {
 	}
 	session.Values["email"] = user.Email
 	session.Save(c.Request(), c.Response().Writer())
+	http.Redirect(c.Response().Writer(), c.Request(), "/", 302)
 	go HandleUserLogin(user, store)
-	return c.JSON(http.StatusOK, user)
+	return nil
 }
 
 func HandleUserLogin(user userR.User, store *postgres.Store) {
 	oldUser := userR.User{Email: user.Email}
-	log.Printf("oldUser: %+v", oldUser)
 	err := store.GetByEmail(&oldUser, user.Email)
 	if err != nil {
 		err = store.Create(&user)
 		if err != nil {
-			log.Printf("Error storing new user: %+v", user)
+			log.Printf("Error storing new user: %+v", user.Email)
 			return
 		}
-		log.Printf("Stored new user: %+v", user)
+		log.Printf("Stored new user: %+v", user.Email)
 		return
 	}
 	values := map[string]interface{}{}
@@ -84,9 +84,9 @@ func HandleUserLogin(user userR.User, store *postgres.Store) {
 	values["track_blacklist"] = pg.Array(oldUser.TrackBlacklist)
 	err = store.UpdateByEmail("users", user.Email, values)
 	if err != nil {
-		log.Printf("Error updating user: %+v", user)
+		log.Printf("Error updating user: %+v", user.Email)
 		return
 	}
-	log.Printf("Updated user: %+v", user)
+	log.Printf("Updated user: %+v", user.Email)
 	return
 }

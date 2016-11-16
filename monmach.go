@@ -26,10 +26,22 @@ func main() {
 	} else {
 		log.Print("Connected to Postgres")
 	}
+
 	// Load middleware for all routes
 	server.Use(emw.Logger())
 	server.Use(emw.Recover())
 	server.Use(emw.CORS())
+	server.Static("/lib", "react/dist/lib")
+	server.Static("/img", "react/dist/img")
+	server.File("/bundle.js", "react/dist/bundle.js")
+
+	monmach := server.Group("/")
+	monmach.Use(authmw.LoadStore,
+		authmw.CheckLogin)
+	monmach.Static("", "react/dist/index.html")
+
+	login := server.Group("/login")
+	login.Static("", "react/dist/login.html")
 
 	test := server.Group("/test")
 	test.Use(authmw.LoadStore,

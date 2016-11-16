@@ -117,7 +117,6 @@ func (s *Store) UpdateByEmail(table string, email string, valueMap map[string]in
 	vars = append(vars, "current_timestamp")
 	keyString := strings.Join(keys, ", ")
 	query := fmt.Sprintf("UPDATE %s SET (%s) = (%s) WHERE email = '%s';", table, keyString, strings.Join(vars, ", "), email)
-	log.Print(query)
 	stmt, err := s.db.Prepare(query)
 	defer stmt.Close()
 	if err != nil {
