@@ -31,12 +31,19 @@ func main() {
 	server.Use(emw.Recover())
 	server.Use(emw.CORS())
 
+	test := server.Group("/test")
+	test.Use(authmw.LoadStore,
+		authmw.CheckLogin)
+	test.GET("", func(c echo.Context) error {
+		return c.HTML(200, "Logged In")
+	})
 	// Load routes for auth
-	auth := server.Group("/auth/spotify")
+	auth := server.Group("/auth")
 	auth.Use(authmw.LoadSpotifyProvider,
-		stmw.LoadStore)
-	auth.GET("", authh.StartAuth)
-	auth.GET("/callback", authh.FinishAuth)
+		stmw.LoadStore,
+		authmw.LoadStore)
+	auth.GET("/spotify", authh.StartAuth)
+	auth.GET("/spotify/callback", authh.FinishAuth)
 
 	// Load routes for playlists
 	playlists := server.Group("/playlists")

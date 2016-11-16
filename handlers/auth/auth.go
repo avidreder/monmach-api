@@ -37,6 +37,7 @@ func StartAuth(c echo.Context) error {
 // FinishAuth finishes logging in the user
 func FinishAuth(c echo.Context) error {
 	store := stmw.GetStore(c)
+	sessionStore := authmw.GetStore(c)
 	q := c.Request().URL.Query()
 	q.Add("provider", "spotify")
 	c.Request().URL.RawQuery = q.Encode()
@@ -52,6 +53,13 @@ func FinishAuth(c echo.Context) error {
 		log.Printf("Could not log the user in: %v", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
 	}
+	session, err := sessionStore.New(c.Request(), "auth-session")
+	if err != nil {
+		log.Printf("Could not log the user in: %v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
+	}
+	session.Values["email"] = user.Email
+	session.Save(c.Request(), c.Response().Writer())
 	go HandleUserLogin(user, store)
 	return c.JSON(http.StatusOK, user)
 }
