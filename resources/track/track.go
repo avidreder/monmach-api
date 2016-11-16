@@ -13,6 +13,7 @@ type Track struct {
 	SpotifyID string
 	Genres    []int64 `pg:",array"`
 	Playlists []int64 `pg:",array"`
+	Rating    int64
 	Created   time.Time
 	Updated   time.Time
 	Features  []float64 `pg:",array"`

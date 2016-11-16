@@ -20,6 +20,11 @@ const tableName = "tracks"
 func Create(c echo.Context) error {
 	store := stmw.GetStore(c)
 	payload := trackR.Track{}
+	rating := c.FormValue("Rating")
+	numRating, err := strconv.ParseInt(rating, 10, 0)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "rating cannot be a string")
+	}
 	spotifyID := c.FormValue("SpotifyID")
 	if spotifyID == "" {
 		return echo.NewHTTPError(http.StatusInternalServerError, "SpotifyID is required")
@@ -32,7 +37,7 @@ func Create(c echo.Context) error {
 	if artists == "" {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Artists is required")
 	}
-	err := json.Unmarshal([]byte(artists), &payload.Artists)
+	err = json.Unmarshal([]byte(artists), &payload.Artists)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -56,6 +61,7 @@ func Create(c echo.Context) error {
 		}
 	}
 	payload.Name = name
+	payload.Rating = numRating
 	payload.SpotifyID = spotifyID
 	payload.ImageURL = c.FormValue("ImageURL")
 	err = store.Create(&payload)

@@ -41,6 +41,7 @@ CREATE TABLE tracks(
        spotify_id varchar(20),
        genres int[] default '{}',
        playlists int[] default '{}',
+       rating int,
        created timestamptz default current_timestamp NOT NULL,
        updated timestamptz default current_timestamp NOT NULL,
        features real[] default '{}'
