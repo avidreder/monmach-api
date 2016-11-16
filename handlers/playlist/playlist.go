@@ -44,6 +44,7 @@ func Create(c echo.Context) error {
 	payload.UserID = numID
 	payload.Tracks = array
 	payload.Name = name
+	payload.SpotifyID = c.FormValue("SpotifyID")
 	err = store.Create(&payload)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -71,6 +72,8 @@ func Update(c echo.Context) error {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			payload[k] = pg.Array(array)
+		} else if k == "SpotifyID" {
+			payload["spotify_id"] = v[0]
 		} else {
 			payload[k] = v[0]
 		}

@@ -11,6 +11,8 @@ type Track struct {
 	Artists   []string `pg:",array"`
 	ImageURL  string
 	SpotifyID string
+	Genres    []int64 `pg:",array"`
+	Playlists []int64 `pg:",array"`
 	Created   time.Time
 	Updated   time.Time
 	Features  []float64 `pg:",array"`

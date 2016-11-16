@@ -43,6 +43,18 @@ func Create(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 	}
+	if c.FormValue("Genres") != "" {
+		err = json.Unmarshal([]byte(c.FormValue("Genres")), &payload.Genres)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+	}
+	if c.FormValue("Playlists") != "" {
+		err = json.Unmarshal([]byte(c.FormValue("Playlists")), &payload.Playlists)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+	}
 	payload.Name = name
 	payload.SpotifyID = spotifyID
 	payload.ImageURL = c.FormValue("ImageURL")
@@ -75,6 +87,20 @@ func Update(c echo.Context) error {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			payload["artists"] = pg.Array(array)
+		} else if k == "Genres" {
+			var array []string
+			err = json.Unmarshal([]byte(v[0]), &array)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+			}
+			payload["genres"] = pg.Array(array)
+		} else if k == "Playlists" {
+			var array []string
+			err = json.Unmarshal([]byte(v[0]), &array)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+			}
+			payload["playlists"] = pg.Array(array)
 		} else if k == "Features" {
 			var array []float64
 			err = json.Unmarshal([]byte(v[0]), &array)

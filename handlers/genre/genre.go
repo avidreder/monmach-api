@@ -52,6 +52,12 @@ func Create(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 	}
+	if c.FormValue("SeedPlaylists") != "" {
+		err = json.Unmarshal([]byte(c.FormValue("SeedPlaylists")), &payload.SeedPlaylists)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+	}
 	if c.FormValue("TrackBlacklist") != "" {
 		err = json.Unmarshal([]byte(c.FormValue("TrackBlacklist")), &payload.TrackBlacklist)
 		if err != nil {
@@ -105,6 +111,13 @@ func Update(c echo.Context) error {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			payload["seed_artists"] = pg.Array(array)
+		} else if k == "SeedPlaylists" {
+			var array []int64
+			err = json.Unmarshal([]byte(v[0]), &array)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+			}
+			payload["seed_playlists"] = pg.Array(array)
 		} else if k == "TrackWhitelist" {
 			var array []int64
 			err = json.Unmarshal([]byte(v[0]), &array)

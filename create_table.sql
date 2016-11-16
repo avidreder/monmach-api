@@ -2,6 +2,7 @@ CREATE TABLE playlists(
        id serial PRIMARY KEY NOT NULL,
        name varchar (50),
        user_id int,
+       spotify_id varchar (40),
        tracks int[] default '{}',
        created timestamptz default current_timestamp NOT NULL,
        updated timestamptz default current_timestamp NOT NULL
@@ -23,7 +24,7 @@ CREATE TABLE queues(
 CREATE TABLE users(
        id serial UNIQUE NOT NULL,
        name varchar (50) NOT NULL,
-       email varchar (100) PRIMARY KEY,
+       email varchar (100) PRIMARY KEY NOT NULL,
        avatar_url varchar (200),
        spotify_token varchar (400),
        spotify_refresh_token varchar (400),
@@ -38,6 +39,8 @@ CREATE TABLE tracks(
        artists text[] default '{}',
        image_url varchar (200),
        spotify_id varchar(20),
+       genres int[] default '{}',
+       playlists int[] default '{}',
        created timestamptz default current_timestamp NOT NULL,
        updated timestamptz default current_timestamp NOT NULL,
        features real[] default '{}'
@@ -51,6 +54,7 @@ CREATE TABLE genres(
        description varchar (200),
        seed_artists int[] default '{}',
        seed_tracks int[] default '{}',
+       seed_playlists int[] default '{}',
        avatar_url varchar (200),
        created timestamptz default current_timestamp NOT NULL,
        updated timestamptz default current_timestamp NOT NULL,

@@ -13,6 +13,7 @@ type Genre struct {
 	Description    string
 	SeedArtists    []int64 `pg:",array"`
 	SeedTracks     []int64 `pg:",array"`
+	SeedPlaylists  []int64 `pg:",array"`
 	AvatarURL      string
 	Created        time.Time
 	Updated        time.Time
