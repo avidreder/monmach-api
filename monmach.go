@@ -31,7 +31,7 @@ func main() {
 	server.Use(emw.Logger())
 	server.Use(emw.Recover())
 	server.Use(emw.CORS())
-	server.Static("/lib", "react/dist/lib")
+	server.Static("/libs", "react/dist/libs")
 	server.Static("/img", "react/dist/img")
 	server.File("/bundle.js", "react/dist/bundle.js")
 
@@ -42,6 +42,14 @@ func main() {
 
 	login := server.Group("/login")
 	login.Static("", "react/dist/login.html")
+
+	logout := server.Group("/logout")
+	logout.Use(authmw.LoadStore)
+	logout.GET("", authh.LogoutUser)
+
+	getUser := server.Group("/getuser")
+	getUser.Use(authmw.LoadStore)
+	getUser.GET("", authh.GetUser)
 
 	test := server.Group("/test")
 	test.Use(authmw.LoadStore,

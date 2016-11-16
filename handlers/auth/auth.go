@@ -23,6 +23,34 @@ func init() {
 	gothic.Store = sessions.NewFilesystemStore(os.TempDir(), []byte("monmach"))
 }
 
+// LogoutUser ends a user session
+func LogoutUser(c echo.Context) error {
+	sessionStore := authmw.GetStore(c)
+	session, err := sessionStore.Get(c.Request(), "auth-session")
+	if err != nil {
+		return c.Redirect(302, "/")
+	}
+	session.Options.MaxAge = -1
+	session.Save(c.Request(), c.Response().Writer())
+	return c.Redirect(302, "/login")
+}
+
+// GetUser ends a user session
+func GetUser(c echo.Context) error {
+	sessionStore := authmw.GetStore(c)
+	session, err := sessionStore.Get(c.Request(), "auth-session")
+	payload := struct {
+		LoggedIn bool
+		Email    string
+	}{}
+	if session.IsNew || err != nil {
+		return c.JSON(404, payload)
+	}
+	payload.Email = session.Values["email"].(string)
+	payload.LoggedIn = true
+	return c.JSON(200, payload)
+}
+
 // StartAuth begins authorization
 func StartAuth(c echo.Context) error {
 	provider := authmw.GetSpotifyProvider(c)
