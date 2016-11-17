@@ -1,32 +1,36 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import thunkMiddleware from 'redux-thunk'
-import createLogger from 'redux-logger'
+// import thunkMiddleware from 'redux-thunk'
+// import createLogger from 'redux-logger'
 import {Router, Route, hashHistory} from 'react-router';
-import {createStore, applyMiddleware} from 'redux';
+// import {createStore, applyMiddleware} from 'redux';
 import {Provider} from 'react-redux';
-import reducer from './reducer';
+// import reducer from './reducer';
 import App from './components/App';
-import {HomePageContainer} from './components/HomePage';
-import {fromJS} from 'immutable';
-import * as actionCreators from './action_creators';
-require('./style.css');
+import HomePage from './components/HomePage';
+import ComponentPage from './components/ComponentPage';
+import injectTapEventPlugin from 'react-tap-event-plugin';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
-const loggerMiddleware = createLogger();
-var store = createStore(reducer, applyMiddleware(thunkMiddleware, loggerMiddleware));
+injectTapEventPlugin();
+// import {fromJS} from 'immutable';
 
-store.dispatch({type: 'SET_STATE'});
-store.dispatch(actionCreators.retrieveStorage())
-store.dispatch(actionCreators.fetchShows());
+// const loggerMiddleware = createLogger();
+// var store = createStore(reducer, applyMiddleware(thunkMiddleware, loggerMiddleware));
+
+// store.dispatch({type: 'SET_STATE'});
+// if (process.env.liveData) {
+//    store.dispatch(actionCreators.retrieveStorage())
+//    store.dispatch(actionCreators.fetchShows());
+// }
 
 const routes = <Route component={App}>
-  <Route path="/" component={HomePageContainer} />
+      
+      <Route path="/" component={HomePage} />
+      <Route path="/components" component={ComponentPage} />
 </Route>;
 
 ReactDOM.render(
-  <Provider store={store}>
-    <Router history={hashHistory}>{routes}</Router>
-  </Provider>,
+	<Router history={hashHistory}>{routes}</Router>,
   document.getElementById('app')
 );
-
