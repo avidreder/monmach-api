@@ -19,6 +19,7 @@ export default React.createClass({
           <ul className="nav navbar-nav">
             <li style={{cursor: 'pointer'}} className="navbar-link"><Link to="/">Home</Link></li>
 	    <li style={{cursor: 'pointer'}} className="navbar-link"><Link to="/components">Components</Link></li>
+	    <li style={{cursor: 'pointer'}} className="navbar-link"><Link to="/genre">Genre</Link></li>
           </ul>
         </div>
 	  </div>

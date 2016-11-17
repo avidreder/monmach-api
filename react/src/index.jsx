@@ -9,6 +9,7 @@ import {Provider} from 'react-redux';
 import App from './components/App';
 import HomePage from './components/HomePage';
 import ComponentPage from './components/ComponentPage';
+import GenrePage from './components/GenrePage';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
@@ -25,12 +26,12 @@ injectTapEventPlugin();
 // }
 
 const routes = <Route component={App}>
-      
-      <Route path="/" component={HomePage} />
-      <Route path="/components" component={ComponentPage} />
+    <Route path="/" component={HomePage} />
+    <Route path="/components" component={ComponentPage} />
+    <Route path="/genre" component={GenrePage} />
 </Route>;
 
 ReactDOM.render(
-	<Router history={hashHistory}>{routes}</Router>,
-  document.getElementById('app')
+    <Router history={hashHistory}>{routes}</Router>,
+    document.getElementById('app')
 );
