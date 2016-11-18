@@ -16,7 +16,7 @@ export default React.createClass({
 		    <TrackVisualization />
 		</CardMedia>
 		<CardText>
-		    <Paper size={100}>Song BPM</Paper>
+		    <Paper size={100}>Song BPM: {Math.floor(this.props.track.Features[10])}</Paper>
 		</CardText>
 	    </Card>
 	</div>

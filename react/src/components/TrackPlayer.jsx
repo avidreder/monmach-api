@@ -7,13 +7,17 @@ import Avatar from 'material-ui/Avatar';
 
 export default React.createClass({
     mixins: [PureRenderMixin],
+    onChange: function() {
+	console.log(this.refs.externalPlayer);
+	this.refs.externalPlayer.click();
+    },
     render: function() {
 	return <div>
 	    <Card>
-		<CardTitle title="Song title" subtitle="Song artist" />
+		<CardTitle title={this.props.track.Name} subtitle={this.props.track.Artists} />
 		<CardText>
 		    <Paper>
-			<iframe src="https://embed.spotify.com/?uri=spotify:track:2TpxZ7JUBn3uw46aR7qd6V" width="100%" height="80" frameBorder="0" allowTransparency="true"></iframe>
+			<iframe ref="externalPlayer" id="externalPlayer" src={"https://embed.spotify.com/?uri=spotify:track:" + this.props.track.SpotifyID} width="100%" height="80" frameBorder="0" allowTransparency="true"></iframe>
 		    </Paper>
 		    <TrackActions />
 		</CardText>

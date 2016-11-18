@@ -8,8 +8,7 @@ export default React.createClass({
     mixins: [PureRenderMixin],
     render: function() {
 	return <div>
-	    <QueueItem />
-	    <QueueItem />
+	{this.props.queue.TrackQueue.map(track => <QueueItem key={track.ID} setTrack={this.props.setTrack} track={track}/>)}
 	</div>
     }
 });

@@ -18,6 +18,8 @@ import {Grid, Row, Col} from 'react-flexbox-grid/lib';
 import {List, ListItem} from 'material-ui/List';
 import Avatar from 'material-ui/Avatar';
 import Paper from 'material-ui/Paper';
+import {connect} from 'react-redux';
+import * as actionCreators from '../action_creators';
 
 const muiTheme = getMuiTheme({
     palette: {
@@ -25,7 +27,7 @@ const muiTheme = getMuiTheme({
     },
 });
 
-export default React.createClass({
+export const GenrePage = React.createClass({
     mixins: [PureRenderMixin],
     render: function() {
 	return <MuiThemeProvider muiTheme={muiTheme}>
@@ -37,7 +39,7 @@ export default React.createClass({
 		<Grid fluid>
 		    <Row>
 			<Col md={12}>
-			    <h1>Genre Title</h1>
+			    <h1>{this.props.genre.get("Name")}</h1>
 			</Col>
 		    </Row>
 		    <Row>
@@ -47,22 +49,22 @@ export default React.createClass({
 				<CardText>
 				    <Row>
 					<Col md={12}>
-					    <TrackPlayer />
+					    <TrackPlayer track={this.props.currentTrack.toJS()} />
 					</Col>
 				    </Row>
 				    <Row>
 					<Col md={6}>
-					    <TrackProfile />
+					    <TrackProfile track={this.props.currentTrack.toJS()} />
 					</Col>
 					<Col md={6}>
 					    <Row>
 						<Col md={12}>
-						    <TrackGenres />
+						    <TrackGenres track={this.props.currentTrack.toJS()} />
 						</Col>
 					    </Row>
 					    <Row>
 						<Col md={12}>
-						    <TrackPlaylists />
+						    <TrackPlaylists track={this.props.currentTrack.toJS()} />
 						</Col>
 					    </Row>
 					</Col>
@@ -74,7 +76,7 @@ export default React.createClass({
 			    <Card>
 				<CardTitle title="Queue" />
 				<CardText>
-				    <Queue />
+				    <Queue setTrack={this.props.dispatchSetTrack} queue={this.props.queue.toJS()} />
 				</CardText>
 			    </Card>
 			</Col>
@@ -85,3 +87,23 @@ export default React.createClass({
 	</MuiThemeProvider>;
     }
 });
+
+function mapStateToProps(state) {
+    console.log(state.get('currentTrack'));
+    return {
+	currentTrack: state.get('currentTrack'),
+	queue: state.get('queue'),
+	genre: state.get('genre'),
+	playlist: state.get('playlist')
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+ 	dispatchSetTrack: function(track) {
+ 	    dispatch(actionCreators.setTrack(track));
+ 	}
+    }
+}
+
+export const GenrePageContainer = connect(mapStateToProps, mapDispatchToProps)(GenrePage);

@@ -11,10 +11,10 @@ export default React.createClass({
 	    <Paper>
 		<Toolbar>
 		    <ToolbarGroup>
-			<ToolbarTitle text="Track Name" />
+			<ToolbarTitle text={this.props.track.Name} />
 		    </ToolbarGroup>
 		    <ToolbarGroup>
-			<FontIcon className="material-icons">play_circle_outline</FontIcon>
+	<FontIcon className="material-icons" onClick={() => this.props.setTrack(this.props.track)}>play_circle_outline</FontIcon>
 			<FontIcon className="material-icons">not_interested</FontIcon>
 			<FontIcon className="material-icons">playlist_add</FontIcon>
 		    </ToolbarGroup>
