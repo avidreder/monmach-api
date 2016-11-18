@@ -8,16 +8,18 @@ export default React.createClass({
     mixins: [PureRenderMixin],
     render: function() {
 	return <div>
-	    <Paper><Toolbar>
-		<ToolbarGroup>
-		    <ToolbarTitle text="Track Name" />
-		</ToolbarGroup>
-		<ToolbarGroup>
-		    <FontIcon className="material-icons">play_arrow</FontIcon>
-		    <FontIcon className="material-icons">cancel</FontIcon>
-		    <FontIcon className="material-icons">menu</FontIcon>
-		</ToolbarGroup>
-	    </Toolbar></Paper>
+	    <Paper>
+		<Toolbar>
+		    <ToolbarGroup>
+			<ToolbarTitle text="Track Name" />
+		    </ToolbarGroup>
+		    <ToolbarGroup>
+			<FontIcon className="material-icons">play_circle_outline</FontIcon>
+			<FontIcon className="material-icons">not_interested</FontIcon>
+			<FontIcon className="material-icons">playlist_add</FontIcon>
+		    </ToolbarGroup>
+		</Toolbar>
+	    </Paper>
 	</div>
     }
 });

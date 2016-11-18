@@ -11,9 +11,7 @@ export default React.createClass({
     render: function() {
 	return <div>
 	    <Card>
-		<CardHeader
-		    title="Track Genre"
-		/>
+		<CardHeader title="Track Genre" />
 		<CardText>
 		    <DropDownMenu value={1} >
 			<MenuItem value={1} primaryText="Rock" />

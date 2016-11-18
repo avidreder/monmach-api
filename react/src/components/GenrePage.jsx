@@ -43,9 +43,7 @@ export default React.createClass({
 		    <Row>
 			<Col md={6}>
 			    <Card>
-				<CardHeader
-title="Currently Playing"
-				/>
+				<CardTitle title="Currently Playing" />
 				<CardText>
 				    <Row>
 					<Col md={12}>
@@ -74,9 +72,7 @@ title="Currently Playing"
 			</Col>
 			<Col md={6}>
 			    <Card>
-				<CardHeader
-				    title="Queue"
-/>
+				<CardTitle title="Queue" />
 				<CardText>
 				    <Queue />
 				</CardText>
