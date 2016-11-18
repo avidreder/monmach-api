@@ -1,8 +1,14 @@
 import React from 'react';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import NavMenu from './NavMenu';
+import Queue from './Queue';
 import MaterialNav from './MaterialNav';
 import Footer from './Footer';
+import TrackProfile from './TrackProfile';
+import TrackGenres from './TrackGenres';
+import TrackPlaylists from './TrackPlaylists';
+import TrackPlayer from './TrackPlayer';
+import TrackVisualization from './TrackVisualization';
 import classnames from 'classnames';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {deepOrange500} from 'material-ui/styles/colors';
@@ -26,9 +32,6 @@ export default React.createClass({
 	    <div className="pageWrapper">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" />
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-		<link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css" />
-		<script src="libs/jquery/dist/jquery.min.js"></script>
-		<script src="libs/bootstrap/dist/js/bootstrap.min.js"></script>
 		<NavMenu />
 		<MaterialNav />
 		<Grid fluid>
@@ -41,59 +44,27 @@ export default React.createClass({
 			<Col md={6}>
 			    <Card>
 				<CardHeader
-title="Track Name"
+title="Currently Playing"
 				/>
 				<CardText>
 				    <Row>
 					<Col md={12}>
-					    <Card>
-						<CardHeader
-title="Song title"
-subtitle="Song artist"
-						/>
-						<CardText>
-						    <iframe src="https://embed.spotify.com/?uri=spotify:track:2TpxZ7JUBn3uw46aR7qd6V" width="300" height="80" frameborder="0" allowtransparency="true"></iframe>
-						</CardText>
-					    </Card>
+					    <TrackPlayer />
 					</Col>
 				    </Row>
 				    <Row>
 					<Col md={6}>
-					    <Card>
-						<CardHeader
-title="Song profile"
-						/>
-						<CardText>
-						    <Avatar size={40}>M</Avatar>
-						    <Paper size={100}>Song BPM</Paper>
-						</CardText>
-					    </Card>
+					    <TrackProfile />
 					</Col>
 					<Col md={6}>
 					    <Row>
 						<Col md={12}>
-						    <Card>
-							<CardHeader
-							title="Song profile"
-/>
-						    <CardText>
-							<Avatar size={40}>M</Avatar>
-							<Paper size={100}>Song BPM</Paper>
-						    </CardText>
-						    </Card>
+						    <TrackGenres />
 						</Col>
 					    </Row>
 					    <Row>
 						<Col md={12}>
-						    <Card>
-							<CardHeader
-							title="Song profile"
-/>
-						    <CardText>
-							<Avatar size={40}>M</Avatar>
-							<Paper size={100}>Song BPM</Paper>
-						    </CardText>
-						    </Card>
+						    <TrackPlaylists />
 						</Col>
 					    </Row>
 					</Col>
@@ -107,48 +78,7 @@ title="Song profile"
 				    title="Queue"
 />
 				<CardText>
-				    <List>
-					<ListItem>
-					    <Card>
-						<CardHeader
-						    title="Track Name"
-/>
-						<CardText>
-						    Actions
-						</CardText>
-					    </Card>
-					</ListItem>
-					<ListItem>
-					    <Card>
-						<CardHeader
-						    title="Track Name"
-						/>
-						<CardText>
-						    Actions
-						</CardText>
-					    </Card>
-					</ListItem>
-					<ListItem>
-					    <Card>
-						<CardHeader
-						    title="Track Name"
-						/>
-						<CardText>
-						    Actions
-						</CardText>
-					    </Card>
-					</ListItem>
-					<ListItem>
-					    <Card>
-						<CardHeader
-						    title="Track Name"
-						/>
-						<CardText>
-						    Actions
-						</CardText>
-					    </Card>
-					</ListItem>
-				    </List>
+				    <Queue />
 				</CardText>
 			    </Card>
 			</Col>
