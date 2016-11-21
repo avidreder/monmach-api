@@ -49,7 +49,7 @@ export const GenrePage = React.createClass({
 				<CardText>
 				    <Row>
 					<Col md={12}>
-					    <TrackPlayer track={this.props.currentTrack.toJS()} />
+					    <TrackPlayer track={this.props.currentTrack.toJS()} addGenre={this.props.dispatchAddGenre}/>
 					</Col>
 				    </Row>
 				    <Row>
@@ -76,7 +76,7 @@ export const GenrePage = React.createClass({
 			    <Card>
 				<CardTitle title="Queue" />
 				<CardText>
-				    <Queue setTrack={this.props.dispatchSetTrack} queue={this.props.queue.toJS()} />
+				    <Queue addGenre={this.props.dispatchAddGenre} removeFromQueue={this.props.dispatchRemoveFromQueue} setTrack={this.props.dispatchSetTrack} queue={this.props.queue.toJS()} />
 				</CardText>
 			    </Card>
 			</Col>
@@ -89,7 +89,6 @@ export const GenrePage = React.createClass({
 });
 
 function mapStateToProps(state) {
-    console.log(state.get('currentTrack'));
     return {
 	currentTrack: state.get('currentTrack'),
 	queue: state.get('queue'),
@@ -102,6 +101,12 @@ function mapDispatchToProps(dispatch) {
     return {
  	dispatchSetTrack: function(track) {
  	    dispatch(actionCreators.setTrack(track));
+ 	},
+	dispatchRemoveFromQueue: function(track) {
+ 	    dispatch(actionCreators.removeFromQueue(track));
+ 	},
+	dispatchAddGenre: function(track) {
+ 	    dispatch(actionCreators.addGenre(track));
  	}
     }
 }

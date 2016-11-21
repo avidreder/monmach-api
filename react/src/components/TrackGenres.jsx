@@ -13,11 +13,8 @@ export default React.createClass({
 	    <Card>
 		<CardHeader title="Track Genre" />
 		<CardText>
-		    <DropDownMenu value={1} >
-			<MenuItem value={1} primaryText="Rock" />
-			<MenuItem value={2} primaryText="Dance" />
-			<MenuItem value={3} primaryText="Chill" />
-			<MenuItem value={4} primaryText="HipHop" />
+		    <DropDownMenu value={this.props.track.Genres[0]} >
+			{this.props.track.Genres.map(genre => <MenuItem key={genre} value={genre} primaryText={genre}/>)}
 		    </DropDownMenu>
 		</CardText>
 	    </Card>

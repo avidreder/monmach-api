@@ -1,4 +1,4 @@
-import {List, Map, fromJS} from 'immutable';
+import {List, Map, fromJS, toJS} from 'immutable';
 import _ from 'lodash'
 
 const initialState = fromJS(
@@ -9,7 +9,7 @@ const initialState = fromJS(
 	    Artists: ["Pink Floyd"],
 	    ImageURL: "https://i.scdn.co/image/aab31a87e274822dd11c1de4b6e851aa3a471500",
 	    SpotifyID: "6mFkJmJqdDVQ1REhVfGgd1",
-	    Genres: [1],
+	    Genres: [],
 	    Playlists: [1],
 	    Rating: 0,
 	    Created: 0,
@@ -28,7 +28,7 @@ const initialState = fromJS(
 		Artists: ["Pink Floyd"],
 		ImageURL: "https://i.scdn.co/image/aab31a87e274822dd11c1de4b6e851aa3a471500",
 		SpotifyID: "6mFkJmJqdDVQ1REhVfGgd1",
-		Genres: [1],
+		Genres: [],
 		Playlists: [1],
 		Rating: 0,
 		Created: 0,
@@ -123,6 +123,25 @@ function setState(state, newState) {
 }
 
 function setTrack(state, track) {
+    state = addToListened(state, track)
+    return state.set('currentTrack', fromJS(track));
+}
+
+function removeFromQueue(state, track) {
+    var queue = state.get('queue')
+    // queue = state.get('queue').toJS();
+    queue.set('TrackQueue',fromJS(_.filter(queue.get('TrackQueue').toJS(), {ID: track.ID})))
+    return state.set('queue', queue);
+}
+
+function addToListened(state, track) {
+    var queue = state.get('queue');
+    queue.set('ListenedTracks', queue.get('ListenedTracks').push(track.ID));
+    return state.set('queue', queue);
+}
+
+function addGenre(state, track) {
+    track.Genres.push(state.get('genre').get('ID'))
     return state.set('currentTrack', fromJS(track));
 }
 
@@ -171,17 +190,21 @@ export default function(state = initialState, action) {
     switch (action.type) {
     case 'SET_CURRENT_TRACK':
 	return setTrack(state, action.track);
-    // case 'CLOSE_MODAL':
-    //   return closeModal(state, action.modalType);
-    // case 'REQUEST_SHOWS':
-    //   return requestShows(state);
-    // case 'RECEIVE_SHOWS_SUCCESS':
-    //   return receiveShowsSuccess(state, action.shows);
-    // case 'RECEIVE_SHOWS_ERROR':
-    //   return receiveShowsError(state, action.error
-			      // );
+    case 'REMOVE_FROM_QUEUE':
+	return removeFromQueue(state, action.track);
+    case 'ADD_TO_LISTENED':
+	return addToListened(state, action.track);
+    case 'ADD_GENRE':
+	return addGenre(state, action.track);
+	// case 'REQUEST_SHOWS':
+	//   return requestShows(state);
+	// case 'RECEIVE_SHOWS_SUCCESS':
+	//   return receiveShowsSuccess(state, action.shows);
+	// case 'RECEIVE_SHOWS_ERROR':
+	//   return receiveShowsError(state, action.error
+	// );
     case 'SET_STATE':
-      return state.merge(action.state);
-  }
-  return state;
+	return state.merge(action.state);
+    }
+    return state;
 }

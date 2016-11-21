@@ -29,6 +29,20 @@ export function setTrack(track) {
   };
 }
 
+export function removeFromQueue(track) {
+  return {
+    type: 'REMOVE_FROM_QUEUE',
+    track
+  };
+}
+
+export function addGenre(track) {
+  return {
+    type: 'ADD_GENRE',
+    track
+  };
+}
+
 // export function requestShows() {
 //   return {
 //     type: 'REQUEST_SHOWS'

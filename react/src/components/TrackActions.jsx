@@ -21,7 +21,7 @@ export default React.createClass({
 		    </ToolbarGroup>
 		    <ToolbarGroup>
 			<FloatingActionButton mini={true}>
-			    <FontIcon className="material-icons">playlist_add</FontIcon>
+			    <FontIcon className="material-icons" onClick={() => this.props.addGenre(this.props.track)}>playlist_add</FontIcon>
 			</FloatingActionButton>
 			<FloatingActionButton mini={true}>
 			    <FontIcon className="material-icons">not_interested</FontIcon>

@@ -15,7 +15,7 @@ export default React.createClass({
 		    </ToolbarGroup>
 		    <ToolbarGroup>
 	<FontIcon className="material-icons" onClick={() => this.props.setTrack(this.props.track)}>play_circle_outline</FontIcon>
-			<FontIcon className="material-icons">not_interested</FontIcon>
+	<FontIcon className="material-icons" onClick={() => this.props.removeFromQueue(this.props.track)}>not_interested</FontIcon>
 			<FontIcon className="material-icons">playlist_add</FontIcon>
 		    </ToolbarGroup>
 		</Toolbar>

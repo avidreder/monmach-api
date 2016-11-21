@@ -19,7 +19,7 @@ export default React.createClass({
 		    <Paper>
 			<iframe ref="externalPlayer" id="externalPlayer" src={"https://embed.spotify.com/?uri=spotify:track:" + this.props.track.SpotifyID} width="100%" height="80" frameBorder="0" allowTransparency="true"></iframe>
 		    </Paper>
-		    <TrackActions />
+		    <TrackActions track={this.props.track} addGenre={this.props.addGenre} />
 		</CardText>
 	    </Card>
 	</div>
