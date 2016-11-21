@@ -123,15 +123,14 @@ function setState(state, newState) {
 }
 
 function setTrack(state, track) {
-    state = addToListened(state, track)
+    state = removeFromQueue(addToListened(state, track), track)
     return state.set('currentTrack', fromJS(track));
 }
 
 function removeFromQueue(state, track) {
     var queue = state.get('queue')
-    // queue = state.get('queue').toJS();
-    queue.set('TrackQueue',fromJS(_.filter(queue.get('TrackQueue').toJS(), {ID: track.ID})))
-    return state.set('queue', queue);
+    var newQueue = queue.set('TrackQueue', fromJS(_.reject(queue.get('TrackQueue').toJS(), {ID: track.ID})))
+    return state.set('queue', newQueue);
 }
 
 function addToListened(state, track) {

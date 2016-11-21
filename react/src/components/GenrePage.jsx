@@ -1,7 +1,7 @@
 import React from 'react';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import NavMenu from './NavMenu';
-import Queue from './Queue';
+import {QueueContainer} from './Queue';
 import MaterialNav from './MaterialNav';
 import Footer from './Footer';
 import TrackProfile from './TrackProfile';
@@ -76,7 +76,7 @@ export const GenrePage = React.createClass({
 			    <Card>
 				<CardTitle title="Queue" />
 				<CardText>
-				    <Queue addGenre={this.props.dispatchAddGenre} removeFromQueue={this.props.dispatchRemoveFromQueue} setTrack={this.props.dispatchSetTrack} queue={this.props.queue.toJS()} />
+				    <QueueContainer addGenre={this.props.dispatchAddGenre} removeFromQueue={this.props.dispatchRemoveFromQueue} setTrack={this.props.dispatchSetTrack} />
 				</CardText>
 			    </Card>
 			</Col>
