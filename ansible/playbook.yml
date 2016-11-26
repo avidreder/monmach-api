@@ -9,7 +9,6 @@
         - build-essential
         - npm
         - git
-        - nginx
         - golang
         - runit
         - postgresql

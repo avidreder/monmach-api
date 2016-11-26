@@ -1,1 +1,0 @@
-{"rsync":{"/vagrant":{"type":"rsync","rsync__exclude":".git/","rsync__args":["--copy-links","--verbose","--archive","--delete","-z"],"guestpath":"/vagrant","hostpath":"/Users/areder/go/src/github.com/avidreder/monmach-api","disabled":false,"__vagrantfile":true,"exclude":".git/","args":["--copy-links","--verbose","--archive","--delete","-z"],"owner":"vagrant","group":"vagrant"}}}
