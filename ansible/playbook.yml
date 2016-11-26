@@ -1,0 +1,107 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install apt packages
+      apt: name={{ item }} update_cache=yes state=installed
+      with_items:
+        - nodejs-legacy
+        - build-essential
+        - npm
+        - git
+        - nginx
+        - golang
+        - runit
+        - postgresql
+        - postgresql-contrib
+        - python-psycopg2
+
+    - name: ensure database is created
+      become_user: postgres
+      postgresql_db: name=monmach
+
+    - name: ensure user has access to database
+      become_user: postgres
+      postgresql_user: db=monmach name=monmach priv=ALL
+
+    - name: Trust momach user
+      become_user: root
+      copy:
+        src: pg_hba.conf
+        dest: /etc/postgresql/9.3/main/pg_hba.conf
+        mode: 0751
+
+    - name: restart postgresql
+      service: name=postgresql state=restarted
+
+    - name: Copy sql script
+      copy:
+        src: create_table.sql
+        dest: /create_table.sql
+        mode: 0751
+        
+    - name: Create postgres tables
+      command: psql -d monmach -U monmach -a -f /create_table.sql    
+
+    - name: Delete sql script
+      file: path="/create_table.sql" state=absent
+
+    - name: Install n globally
+      npm: name=n global=yes
+
+    - name: Use latest node
+      command: n stable
+
+    - name: Update npm
+      npm: name=npm global=yes
+
+    - name: Create node symlink
+      command: ln -sf /usr/local/n/versions/node/6.8.0/bin/node /usr/bin/node
+
+    - name: Install bower
+      npm: name=bower global=yes
+
+    - name: Install webpack globally
+      npm: name=webpack path=/srv/show-hawk-client global=yes
+
+    - name: Clone repo
+      git: repo=https://github.com/avidreder/monmach-api.git dest=/srv/monmach-api version=master force=yes
+      ignore_errors: yes
+
+    - name: Install deps
+      npm: path=/srv/monmach-api
+      ignore_errors: yes
+
+    - name: Install bower deps
+      command: bower install --allow-root chdir=/srv/monmach-api
+      ignore_errors: yes
+
+    - name: Create shs rundir for runit
+      file:
+        path: /etc/sv/monmach-api
+        state: directory
+        mode: 0755
+
+    - name: Install monmach runfile for runit
+      copy:
+        src: runit_monmach_api.run
+        dest: /etc/sv/monmach-api/run
+        mode: 0751
+
+    - name: Install monmach-api binary
+      command: mv /srv/monmach-api/monmach-api /etc/sv/monmach-api/monmach-api
+
+    - name: Bundle
+      command: webpack chdir=/srv/monmach-api
+
+    - name: fix owner/group
+      file:
+        path: /etc/sv/monmach-api/monmach-api
+        owner: root
+        group: root
+
+    - name: Activate monmach-api in runit
+      file:
+        path: /etc/service/monmach-api
+        src: /etc/sv/monmach-api
+        state: link

@@ -1,0 +1,159 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install apt packages
+      apt: name={{ item }} update_cache=yes state=latest
+      with_items:
+        - nodejs-legacy
+        - build-essential
+        - npm
+        - git
+        - nginx
+        - golang
+        - runit
+
+    # - name: Add Go bin
+    #   command: export PATH=$PATH:/usr/local/go/bin
+
+    # - name: Set Go Path
+    #   command: export GOPATH=$HOME/go
+
+    # - name: Add Go Path to Path
+    #   command: export PATH=$GOPATH/bin:$PATH
+
+    - name: Install n globally
+      npm: name=n global=yes
+
+    - name: Use latest node
+      command: n stable
+
+    - name: Update npm
+      npm: name=npm global=yes
+
+    - name: Create node symlink
+      command: ln -sf /usr/local/n/versions/node/6.8.0/bin/node /usr/bin/node
+
+    - name: Install pm2
+      npm: name=pm2 global=yes
+
+    - name: Install bower
+      npm: name=bower global=yes
+
+    - name: Install webpack globally
+      npm: name=webpack path=/srv/show-hawk-client global=yes
+    
+    - name: Clone website repo
+      git: repo=https://github.com/avidreder/avidreder-portfolio.git dest=/srv/avidreder-portfolio version=topic/simple-ansible force=yes
+      ignore_errors: yes
+
+    - name: Clone show-hawk-client repo
+      git: repo=https://github.com/avidreder/show-hawk-client.git dest=/srv/show-hawk-client force=yes
+      ignore_errors: yes
+
+    - name: Clone show-hawk-server repo
+      git: repo=https://github.com/avidreder/show-hawk-server.git dest=/srv/show-hawk-server force=yes
+      ignore_errors: yes
+      
+    - name: Install website deps
+      npm: path=/srv/avidreder-portfolio
+      ignore_errors: yes
+
+    - name: Install npm show-hawk-client deps
+      npm: path=/srv/show-hawk-client
+      ignore_errors: yes
+
+    - name: Install bower show-hawk-client deps
+      command: bower install --allow-root chdir=/srv/show-hawk-client
+      ignore_errors: yes
+
+    # - name: Build show-hawk-server
+    #   command: go build chdir=/srv/show-hawk-server
+      
+    - name: Create shs rundir for runit
+      file:
+        path: /etc/sv/show-hawk-server
+        state: directory
+        mode: 0755
+
+    - name: Install profilesd runfile for runit
+      copy:
+        src: runit_show_hawk_server.run
+        dest: /etc/sv/show-hawk-server/run
+        mode: 0751
+
+    - name: Install show-hawk-server binary
+      command: mv /srv/show-hawk-server/show-hawk-server /etc/sv/show-hawk-server/show-hawk-server
+
+    - name: fix owner/group
+      file:
+        path: /etc/sv/show-hawk-server/show-hawk-server
+        owner: root
+        group: root
+
+    - name: Activate profilesd in runit
+      file:
+        path: /etc/service/show-hawk-server
+        src: /etc/sv/show-hawk-server
+        state: link
+
+    - name: Bundle show-hawk-client
+      command: webpack chdir=/srv/show-hawk-client
+
+    - name: Run show-hawk-client
+      command: pm2 start server.js -f --name "shc" chdir=/srv/show-hawk-client
+      ignore_errors: yes
+
+    - name: Run server
+      command: pm2 start index.js -f --name "portfolio" chdir=/srv/avidreder-portfolio
+      ignore_errors: yes
+
+- hosts: production
+  become: yes
+  tasks:
+    - name: Install nginx avidreder
+      copy:
+        src: avidreder.conf
+        dest: /etc/nginx/sites-available/avidreder.conf
+        mode: 0751
+
+    - name: Create nginx localhost symlink
+      command: ln -s /etc/nginx/sites-available/avidreder.conf /etc/nginx/sites-enabled/
+      ignore_errors: yes
+
+    - name: Delete default available
+      command: rm /etc/nginx/sites-available/default
+      ignore_errors: yes
+
+    - name: Delete default enabled
+      command: rm /etc/nginx/sites-enabled/default
+      ignore_errors: yes
+
+    - name: Restart nginx
+      command: service nginx restart
+      ignore_errors: yes
+
+- hosts: localhost
+  become: yes
+  tasks:
+    - name: Install nginx localhost
+      copy:
+        src: localhost.conf
+        dest: /etc/nginx/sites-available/localhost.conf
+        mode: 0751
+
+    - name: Create nginx localhost symlink
+      command: ln -s /etc/nginx/sites-available/localhost.conf /etc/nginx/sites-enabled/
+      ignore_errors: yes
+
+    - name: Delete default available
+      command: rm /etc/nginx/sites-available/default
+      ignore_errors: yes
+
+    - name: Delete default enabled
+      command: rm /etc/nginx/sites-enabled/default
+      ignore_errors: yes
+
+    - name: Restart nginx
+      command: service nginx restart
+      ignore_errors: yes
