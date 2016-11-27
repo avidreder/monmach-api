@@ -31,17 +31,17 @@ func main() {
 	server.Use(emw.Logger())
 	server.Use(emw.Recover())
 	server.Use(emw.CORS())
-	server.Static("/libs", "react/dist/libs")
-	server.Static("/img", "react/dist/img")
-	server.File("/bundle.js", "react/dist/bundle.js")
+	server.Static("/libs", "/srv/monmach-api/react/dist/libs")
+	server.Static("/img", "/srv/monmach-api/react/dist/img")
+	server.File("/bundle.js", "/srv/monmach-api/react/dist/bundle.js")
 
 	monmach := server.Group("/")
 	monmach.Use(authmw.LoadStore,
 		authmw.CheckLogin)
-	monmach.Static("", "react/dist/index.html")
+	monmach.Static("", "/srv/monmach-api/react/dist/index.html")
 
 	login := server.Group("/login")
-	login.Static("", "react/dist/login.html")
+	login.Static("", "/srv/monmach-api/react/dist/login.html")
 
 	logout := server.Group("/logout")
 	logout.Use(authmw.LoadStore)

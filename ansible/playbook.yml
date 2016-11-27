@@ -61,7 +61,7 @@
       npm: name=bower global=yes
 
     - name: Install webpack globally
-      npm: name=webpack path=/srv/show-hawk-client global=yes
+      npm: name=webpack path=/srv/monmach-api global=yes
 
     - name: Clone repo
       git: repo=https://github.com/avidreder/monmach-api.git dest=/srv/monmach-api version=master force=yes
@@ -87,8 +87,25 @@
         dest: /etc/sv/monmach-api/run
         mode: 0751
 
+    - name: Install spotify credentials
+      copy:
+        src: spotify.json
+        dest: /srv/monmach-api/spotify.json
+        mode: 0777
+
     - name: Install monmach-api binary
-      command: mv /srv/monmach-api/monmach-api /etc/sv/monmach-api/monmach-api
+      copy:
+        src: monmach-api
+        dest: /etc/sv/monmach-api/monmach-api
+        mode: 0777
+
+    - name: Install monmach-api binary
+      copy:
+        src: monmach-api
+        dest: /srv/monmach-api/monmach-api
+        mode: 0777
+        
+    - file: path=/tmp state=directory mode=0777
 
     - name: Bundle
       command: webpack chdir=/srv/monmach-api
