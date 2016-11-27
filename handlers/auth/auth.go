@@ -27,18 +27,23 @@ func init() {
 func LogoutUser(c echo.Context) error {
 	sessionStore := authmw.GetStore(c)
 	session, err := sessionStore.Get(c.Request(), "auth-session")
+	log.Printf("authSession: %v", session)
 	if err != nil {
-		return c.Redirect(302, "/")
+		http.Redirect(c.Response().Writer(), c.Request(), "/", 302)
+		return nil
 	}
 	session.Options.MaxAge = -1
 	session.Save(c.Request(), c.Response().Writer())
-	session, err = sessionStore.Get(c.Request(), "_gothic_session")
+	session, err = gothic.Store.Get(c.Request(), "_gothic_session")
+	log.Printf("gothicSession: %v", session)
 	if err != nil {
-		return c.Redirect(302, "/")
+		http.Redirect(c.Response().Writer(), c.Request(), "/", 302)
+		return nil
 	}
 	session.Options.MaxAge = -1
 	session.Save(c.Request(), c.Response().Writer())
-	return c.Redirect(302, "/login")
+	http.Redirect(c.Response().Writer(), c.Request(), "/login", 302)
+	return nil
 }
 
 // GetUser ends a user session
