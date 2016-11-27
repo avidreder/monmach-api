@@ -32,6 +32,12 @@ func LogoutUser(c echo.Context) error {
 	}
 	session.Options.MaxAge = -1
 	session.Save(c.Request(), c.Response().Writer())
+	session, err = sessionStore.Get(c.Request(), "_gothic_session")
+	if err != nil {
+		return c.Redirect(302, "/")
+	}
+	session.Options.MaxAge = -1
+	session.Save(c.Request(), c.Response().Writer())
 	return c.Redirect(302, "/login")
 }
 
