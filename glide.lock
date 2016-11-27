@@ -1,5 +1,5 @@
 hash: 41e323cb6ed3010eff39f7bb7973422d02d2657fd59815cfa55a901968caa604
-updated: 2016-11-15T11:12:43.725657825-08:00
+updated: 2016-11-27T14:02:52.559833591-08:00
 imports:
 - name: github.com/avidreder/show-hawk-server
   version: 60ece420ca1b936316e5aacb543e58193b3a4f3c
@@ -74,6 +74,8 @@ imports:
   version: 9f86882f775f75f69617ecc160e39f4e0b7ae27f
   subpackages:
   - acme
+- name: github.com/zmb3/spotify
+  version: c9bcaa12ab08e26b462136cf4fe2d7c7013993aa
 - name: golang.org/x/crypto
   version: 9477e0b78b9ac3d0b03822fd95422e2fe07627cd
   subpackages:

@@ -32,6 +32,10 @@ func Create(c echo.Context) error {
 	if spotifyRefreshToken == "" {
 		return echo.NewHTTPError(http.StatusInternalServerError, "SpotifyRefreshToken is required")
 	}
+	spotifyID := c.FormValue("SpotifyID")
+	if spotifyID == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "SpotifyID is required")
+	}
 	email := c.FormValue("Email")
 	if email == "" {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Email is required")
@@ -47,6 +51,7 @@ func Create(c echo.Context) error {
 	payload.Name = name
 	payload.SpotifyToken = spotifyToken
 	payload.SpotifyRefreshToken = spotifyRefreshToken
+	payload.SpotifyID = spotifyID
 	err := store.Create(&payload)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -69,6 +74,8 @@ func Update(c echo.Context) error {
 			payload["spotify_token"] = v[0]
 		} else if k == "SpotifyRefreshToken" {
 			payload["spotify_refresh_token"] = v[0]
+		} else if k == "SpotifyID" {
+			payload["spotify_id"] = v[0]
 		} else if k == "AvatarURL" {
 			payload["avatar_url"] = v[0]
 		} else if k == "TrackWhitelist" {

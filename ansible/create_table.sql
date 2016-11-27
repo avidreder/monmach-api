@@ -26,6 +26,7 @@ CREATE TABLE users(
        name varchar (50) NOT NULL,
        email varchar (100) PRIMARY KEY NOT NULL,
        avatar_url varchar (200),
+       spotify_id varchar (200),
        spotify_token varchar (400),
        spotify_refresh_token varchar (400),
        created timestamptz default current_timestamp NOT NULL,

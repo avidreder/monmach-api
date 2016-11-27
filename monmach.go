@@ -7,11 +7,14 @@ import (
 	gh "github.com/avidreder/monmach-api/handlers/genre"
 	plh "github.com/avidreder/monmach-api/handlers/playlist"
 	qh "github.com/avidreder/monmach-api/handlers/queue"
+	spoth "github.com/avidreder/monmach-api/handlers/spotify"
 	th "github.com/avidreder/monmach-api/handlers/track"
 	uh "github.com/avidreder/monmach-api/handlers/user"
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
+	usermw "github.com/avidreder/monmach-api/middleware/user"
 	"github.com/avidreder/monmach-api/resources/config"
+	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
 	"github.com/avidreder/monmach-api/resources/store/postgres"
 
 	"github.com/labstack/echo"
@@ -69,6 +72,15 @@ func main() {
 		authmw.LoadStore)
 	auth.GET("/spotify", authh.StartAuth)
 	auth.GET("/spotify/callback", authh.FinishAuth)
+
+	// Load routes for spotify
+	spotify := server.Group("/spotify")
+	spotify.Use(authmw.LoadSpotifyProvider,
+		stmw.LoadStore,
+		authmw.LoadStore,
+		usermw.LoadUser,
+		spotifyR.LoadClient)
+	spotify.GET("/discover", spoth.DiscoverPlaylist)
 
 	// Load routes for playlists
 	playlists := server.Group("/playlists")

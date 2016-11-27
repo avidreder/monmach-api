@@ -7,6 +7,7 @@ import (
 // User is the struct representing a user
 type User struct {
 	ID                  int64
+	SpotifyID           string `json:"UserID"`
 	Name                string `sql:",pk"`
 	Email               string
 	AvatarURL           string

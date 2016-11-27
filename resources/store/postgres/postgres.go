@@ -40,7 +40,7 @@ func (s *Store) Get(model interface{}) error {
 	return nil
 }
 
-// GetByValue grabs data from a table
+// GetByEmail grabs data from a table
 func (s *Store) GetByEmail(model interface{}, value interface{}) error {
 	err := s.db.Model(model).Where("email = ?", value).Select()
 	if err != nil {

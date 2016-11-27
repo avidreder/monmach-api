@@ -120,6 +120,7 @@ func HandleUserLogin(user userR.User, store *postgres.Store) {
 	values["name"] = user.Name
 	values["spotify_token"] = user.SpotifyToken
 	values["spotify_refresh_token"] = user.SpotifyRefreshToken
+	values["spotify_id"] = user.SpotifyID
 	values["track_blacklist"] = pg.Array(oldUser.TrackBlacklist)
 	err = store.UpdateByEmail("users", user.Email, values)
 	if err != nil {

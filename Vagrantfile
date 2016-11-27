@@ -11,7 +11,6 @@ Vagrant.configure(2) do |config|
 
   # Private Network
   config.vm.network :private_network, ip:"192.168.88.8"
-  # config.vm.network "forwarded_port", guest: 80, host: 8888
   
   # ansible!
   config.vm.provision "ansible" do |ansible|
