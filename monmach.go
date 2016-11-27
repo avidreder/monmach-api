@@ -11,6 +11,7 @@ import (
 	uh "github.com/avidreder/monmach-api/handlers/user"
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
+	"github.com/avidreder/monmach-api/resources/config"
 	"github.com/avidreder/monmach-api/resources/store/postgres"
 
 	"github.com/labstack/echo"
@@ -26,22 +27,25 @@ func main() {
 	} else {
 		log.Print("Connected to Postgres")
 	}
-
+	config, err := config.GetConfig()
+	if err != nil {
+		log.Fatalf("Could not get Service Config: %v", err)
+	}
 	// Load middleware for all routes
 	server.Use(emw.Logger())
 	server.Use(emw.Recover())
 	server.Use(emw.CORS())
-	server.Static("/libs", "/srv/monmach-api/react/dist/libs")
-	server.Static("/img", "/srv/monmach-api/react/dist/img")
-	server.File("/bundle.js", "/srv/monmach-api/react/dist/bundle.js")
+	server.Static("/libs", config.ReactPath+"libs")
+	server.Static("/img", config.ReactPath+"img")
+	server.File("/bundle.js", config.ReactPath+"bundle.js")
 
 	monmach := server.Group("/")
 	monmach.Use(authmw.LoadStore,
 		authmw.CheckLogin)
-	monmach.Static("", "/srv/monmach-api/react/dist/index.html")
+	monmach.Static("", config.ReactPath+"index.html")
 
 	login := server.Group("/login")
-	login.Static("", "/srv/monmach-api/react/dist/login.html")
+	login.Static("", config.ReactPath+"login.html")
 
 	logout := server.Group("/logout")
 	logout.Use(authmw.LoadStore)
