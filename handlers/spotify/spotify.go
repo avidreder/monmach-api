@@ -1,6 +1,7 @@
 package spotify
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -12,7 +13,6 @@ import (
 // UserPlaylists gets a user's spotify playlists
 func UserPlaylists(c echo.Context) error {
 	client := spotify.GetClient(c)
-	log.Printf("The client: %+v", client)
 	playlists, err := client.CurrentUsersPlaylists()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -23,10 +23,14 @@ func UserPlaylists(c echo.Context) error {
 // DiscoverPlaylist gets a user's spotify discover playlist
 func DiscoverPlaylist(c echo.Context) error {
 	client := spotify.GetClient(c)
-	log.Printf("The client: %+v", client)
-	tracks, err := client.GetPlaylistTracks("spotifydiscover", "5yjxqPpY8Ch9knz2rGW0CH")
+	response, err := client.GetPlaylistTracksOpt("spotifydiscover", "5yjxqPpY8Ch9knz2rGW0CH", nil, "items(track(images(url),name,id,artists(name,id)))")
+	responseJSON, err := json.Marshal(response.Tracks)
+	log.Printf("tracks: %+v", string(responseJSON))
+	err = json.Unmarshal(responseJSON, &SpotifyTracks)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, tracks)
+	return c.JSON(http.StatusOK, SpotifyTracks)
 }
+
+var SpotifyTracks []spotify.SpotifyTrack

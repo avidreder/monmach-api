@@ -14,6 +14,21 @@ import (
 	"golang.org/x/oauth2"
 )
 
+type SpotifyTrack struct {
+	Track SpotifyTrackData `json:"track"`
+}
+
+type SpotifyTrackData struct {
+	Name      string          `json:"name"`
+	SpotifyID string          `json:"id"`
+	Artists   []SpotifyArtist `json:"artists"`
+}
+
+type SpotifyArtist struct {
+	Name      string `json:"name"`
+	SpotifyID string `json:"id"`
+}
+
 // LoadClient places initialized spotify client
 func LoadClient(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
