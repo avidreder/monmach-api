@@ -14,6 +14,20 @@ import (
 	"golang.org/x/oauth2"
 )
 
+type FeaturedPlaylist struct {
+	Name       string
+	OwnerID    spotify.ID
+	PlaylistID spotify.ID
+}
+
+var FeaturedPlaylists = []FeaturedPlaylist{
+	FeaturedPlaylist{
+		Name:       "Pitchfork Top Tracks",
+		OwnerID:    "pitchforkmedia",
+		PlaylistID: "5ItokEl1f0bbHeXWFiisrm",
+	},
+}
+
 type SpotifyTrack struct {
 	Track struct {
 		Name      string `json:"name"`
