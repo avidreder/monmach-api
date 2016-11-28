@@ -31,7 +31,6 @@ func main() {
 		log.Print("Connected to Postgres")
 	}
 	config, err := config.GetConfig()
-	log.Print(config)
 	if err != nil {
 		log.Fatalf("Could not get Service Config: %v", err)
 	}

@@ -15,18 +15,21 @@ import (
 )
 
 type SpotifyTrack struct {
-	Track SpotifyTrackData `json:"track"`
-}
-
-type SpotifyTrackData struct {
-	Name      string          `json:"name"`
-	SpotifyID string          `json:"id"`
-	Artists   []SpotifyArtist `json:"artists"`
-}
-
-type SpotifyArtist struct {
-	Name      string `json:"name"`
-	SpotifyID string `json:"id"`
+	Track struct {
+		Name      string `json:"name"`
+		SpotifyID string `json:"id"`
+		Album     struct {
+			Images []struct {
+				Height int64  `json:"height"`
+				Width  int64  `json:"width"`
+				URL    string `json:"url"`
+			} `json:"images"`
+		} `json:"album"`
+		Artists []struct {
+			Name      string `json:"name"`
+			SpotifyID string `json:"id"`
+		} `json:"artists"`
+	} `json:"track"`
 }
 
 // LoadClient places initialized spotify client
@@ -53,7 +56,6 @@ func LoadClient(h echo.HandlerFunc) echo.HandlerFunc {
 			AccessToken: user.SpotifyToken,
 		}
 		client := auth.NewClient(token)
-		log.Printf("Is this the loaded client: %+v", client)
 		c.Set("spotifyClient", &client)
 		return h(c)
 	}

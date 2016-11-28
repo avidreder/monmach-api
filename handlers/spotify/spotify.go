@@ -2,17 +2,19 @@ package spotify
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
-	"github.com/avidreder/monmach-api/resources/spotify"
+	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
 
 	"github.com/labstack/echo"
+	"github.com/zmb3/spotify"
 )
 
 // UserPlaylists gets a user's spotify playlists
 func UserPlaylists(c echo.Context) error {
-	client := spotify.GetClient(c)
+	client := spotifyR.GetClient(c)
 	playlists, err := client.CurrentUsersPlaylists()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -20,12 +22,30 @@ func UserPlaylists(c echo.Context) error {
 	return c.JSON(http.StatusOK, playlists)
 }
 
+func FindDiscoverPlaylist(client *spotify.Client) (spotify.ID, error) {
+	playlists, err := client.CurrentUsersPlaylists()
+	if err != nil {
+		return "", err
+	}
+	playlistArray := playlists.Playlists
+	for _, pl := range playlistArray {
+		if pl.Name == "Discover Weekly" {
+			return pl.ID, nil
+		}
+	}
+	return "", errors.New("Could not find discover playlist")
+}
+
 // DiscoverPlaylist gets a user's spotify discover playlist
 func DiscoverPlaylist(c echo.Context) error {
-	client := spotify.GetClient(c)
-	response, err := client.GetPlaylistTracksOpt("spotifydiscover", "5yjxqPpY8Ch9knz2rGW0CH", nil, "items(track(images(url),name,id,artists(name,id)))")
+	client := spotifyR.GetClient(c)
+	discoverID, err := FindDiscoverPlaylist(client)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	response, err := client.GetPlaylistTracksOpt("spotifydiscover", discoverID, nil, "items(track(album(images(url,height,width)),name,id,artists(name,id)))")
+	log.Printf("%+v", response)
 	responseJSON, err := json.Marshal(response.Tracks)
-	log.Printf("tracks: %+v", string(responseJSON))
 	err = json.Unmarshal(responseJSON, &SpotifyTracks)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -33,4 +53,4 @@ func DiscoverPlaylist(c echo.Context) error {
 	return c.JSON(http.StatusOK, SpotifyTracks)
 }
 
-var SpotifyTracks []spotify.SpotifyTrack
+var SpotifyTracks []spotifyR.SpotifyTrack

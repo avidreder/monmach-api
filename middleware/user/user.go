@@ -2,7 +2,6 @@ package user
 
 import (
 	"errors"
-	"log"
 
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
@@ -31,7 +30,6 @@ func LoadUser(h echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return errors.New("Could not retrieve logged-in user")
 		}
-		log.Printf("User: %+v", user)
 		c.Set("user", &user)
 		return h(c)
 	}
