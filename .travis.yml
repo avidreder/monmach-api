@@ -1,8 +1,9 @@
 language: go
 go:
  - 1.7.3
-node_js: "6.1"
 before_install:
+  - nvm install 7.2.0
+  - nvm use 7.2.0
   - npm install
   - sudo add-apt-repository ppa:masterminds/glide -y
   - sudo apt-get -qq update
