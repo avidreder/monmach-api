@@ -1,10 +1,6 @@
-hash: 41e323cb6ed3010eff39f7bb7973422d02d2657fd59815cfa55a901968caa604
-updated: 2016-11-27T14:02:52.559833591-08:00
+hash: 57f4df4871a025e7704b6e170b1581115e681a68f51deb6da460eb7d6f3008e9
+updated: 2016-12-02T09:08:57.044130784-08:00
 imports:
-- name: github.com/avidreder/show-hawk-server
-  version: 60ece420ca1b936316e5aacb543e58193b3a4f3c
-  subpackages:
-  - middleware/bitshows
 - name: github.com/davecgh/go-spew
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
@@ -15,10 +11,6 @@ imports:
   version: da116c3771bf4a398a43f44e069195ef1c9688ef
   subpackages:
   - proto
-- name: github.com/google/go-querystring
-  version: 9235644dd9e52eeae6fa48efd539fdc351a0af53
-  subpackages:
-  - query
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/securecookie
@@ -66,6 +58,8 @@ imports:
   subpackages:
   - assert
   - mock
+  - require
+  - suite
 - name: github.com/tylerb/graceful
   version: 50a48b6e73fcc75b45e22c05b79629a67c79e938
 - name: github.com/valyala/fasttemplate
@@ -84,8 +78,6 @@ imports:
   version: 9ef22118a4b25863aa94546daffbc0a18feaafb3
   subpackages:
   - context
-  - html
-  - html/atom
   - publicsuffix
 - name: golang.org/x/oauth2
   version: d5040cddfc0da40b408c9a1da4728662435176a9

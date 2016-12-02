@@ -1,3 +1,0 @@
-#!/bin/sh
-exec 2>&1
-exec /etc/sv/show-hawk-server/show-hawk-server

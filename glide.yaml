@@ -1,8 +1,5 @@
 package: github.com/avidreder/monmach-api
 import:
-- package: github.com/avidreder/show-hawk-server
-  subpackages:
-  - middleware/bitshows
 - package: github.com/labstack/echo
   version: v3
 - package: github.com/stretchr/testify
