@@ -9,7 +9,7 @@ import (
 
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
-	"github.com/avidreder/monmach-api/resources/store/postgres"
+	"github.com/avidreder/monmach-api/resources/store"
 	userR "github.com/avidreder/monmach-api/resources/user"
 
 	"github.com/gorilla/sessions"
@@ -104,7 +104,7 @@ func FinishAuth(c echo.Context) error {
 	return nil
 }
 
-func HandleUserLogin(user userR.User, store *postgres.Store) {
+func HandleUserLogin(user userR.User, store store.Store) {
 	oldUser := userR.User{Email: user.Email}
 	err := store.GetByEmail(&oldUser, user.Email)
 	if err != nil {

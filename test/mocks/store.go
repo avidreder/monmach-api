@@ -22,8 +22,20 @@ func (m Store) Get(interface{}) error {
 	return args.Error(0)
 }
 
+// GetByEmail mocks the associated store function
+func (m Store) GetByEmail(interface{}, interface{}) error {
+	args := m.Called()
+	return args.Error(0)
+}
+
 // Update mocks the associated store function
 func (m Store) Update(string, int64, map[string]interface{}) error {
+	args := m.Called()
+	return args.Error(0)
+}
+
+// UpdateByEmail mocks the associated store function
+func (m Store) UpdateByEmail(string, string, map[string]interface{}) error {
 	args := m.Called()
 	return args.Error(0)
 }
