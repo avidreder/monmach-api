@@ -2,14 +2,14 @@ language: go
 go:
  - 1.7.3
 node_js:
-  - node
+  - "6.1"
 before_install:
+  - npm install
   - sudo add-apt-repository ppa:masterminds/glide -y
   - sudo apt-get -qq update
   - sudo apt-get install -y glide
   - glide update
   - glide install
-  - npm install
 script:
  - go test $(glide nv)
  - npm test
