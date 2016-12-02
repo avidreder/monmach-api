@@ -1,15 +1,16 @@
 language: go
 go:
  - 1.7.3
-node_js:
-  - "6.1"
+node_js: "6.1"
 before_install:
   - npm install
   - sudo add-apt-repository ppa:masterminds/glide -y
   - sudo apt-get -qq update
   - sudo apt-get install -y glide
+  - go get github.com/mattn/goveralls
   - glide update
   - glide install
 script:
  - go test $(glide nv)
  - npm test
+ - $HOME/gopath/bin/goveralls -service=travis-ci
