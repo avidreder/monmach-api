@@ -7,5 +7,7 @@ before_install:
   - sudo apt-get install -y glide
   - glide update
   - glide install
+  - npm install
 script:
  - go test $(glide nv)
+ - npm test
