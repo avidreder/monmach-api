@@ -36,7 +36,7 @@ func (s *GenreTestSuite) SetupTest() {
 func (s *GenreTestSuite) TestCreateOK() {
   mockStore := mocks.Store{}
   mockStore.On("Create",mock.Anything).Return(nil)
-  s.c.Set("store", &mockStore)
+  s.c.Set("store", mockStore)
   testGenreJSON, _ := json.Marshal(genreR.Genre{
     ID: 1,
   	UserID: 1,

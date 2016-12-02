@@ -24,14 +24,14 @@ type Store struct {
 }
 
 // Connect creates a connection to the postgres db
-func (s *Store) Connect() error {
+func (s Store) Connect() error {
 	db := pg.Connect(&PGOpts)
 	s.db = db
 	return nil
 }
 
 // Get grabs data from a table
-func (s *Store) Get(model interface{}) error {
+func (s Store) Get(model interface{}) error {
 	err := s.db.Select(model)
 	if err != nil {
 		log.Printf("Error from Get: %v", err)
@@ -41,7 +41,7 @@ func (s *Store) Get(model interface{}) error {
 }
 
 // GetByEmail grabs data from a table
-func (s *Store) GetByEmail(model interface{}, value interface{}) error {
+func (s Store) GetByEmail(model interface{}, value interface{}) error {
 	err := s.db.Model(model).Where("email = ?", value).Select()
 	if err != nil {
 		log.Printf("Error from Get: %v", err)
@@ -51,8 +51,8 @@ func (s *Store) GetByEmail(model interface{}, value interface{}) error {
 }
 
 // GetAll grabs all data from a table
-func (s *Store) GetAll(model interface{}, tableName string) error {
-	query := fmt.Sprintf(`SELECT * FROM %s`, tableName)
+func (s Store) GetAll(model interface{}, tableName string) error {
+	query := fmt.Sprintf(`SELECT  FROM %s`, tableName)
 	_, err := s.db.Query(model, query)
 	if err != nil {
 		log.Printf("Error from GetAllPlaylists: %v", err)
@@ -62,7 +62,7 @@ func (s *Store) GetAll(model interface{}, tableName string) error {
 }
 
 // Create inserts a row into a table
-func (s *Store) Create(model interface{}) error {
+func (s Store) Create(model interface{}) error {
 	err := s.db.Insert(model)
 	if err != nil {
 		log.Printf("Error from Create: %v", err)
@@ -72,7 +72,7 @@ func (s *Store) Create(model interface{}) error {
 }
 
 // Update updates an existing row in a table
-func (s *Store) Update(table string, id int64, valueMap map[string]interface{}) error {
+func (s Store) Update(table string, id int64, valueMap map[string]interface{}) error {
 	var keys []string
 	var values []interface{}
 	var vars []string
@@ -102,7 +102,7 @@ func (s *Store) Update(table string, id int64, valueMap map[string]interface{}) 
 }
 
 // UpdateByEmail updates an existing row in a table
-func (s *Store) UpdateByEmail(table string, email string, valueMap map[string]interface{}) error {
+func (s Store) UpdateByEmail(table string, email string, valueMap map[string]interface{}) error {
 	var keys []string
 	var values []interface{}
 	var vars []string
@@ -132,7 +132,7 @@ func (s *Store) UpdateByEmail(table string, email string, valueMap map[string]in
 }
 
 // Delete deletes data from a table
-func (s *Store) Delete(model interface{}) error {
+func (s Store) Delete(model interface{}) error {
 	err := s.db.Delete(model)
 	if err != nil {
 		log.Printf("Error from Delete: %v", err)
@@ -142,8 +142,8 @@ func (s *Store) Delete(model interface{}) error {
 }
 
 // Get returns a postgres instance
-func Get() (*Store, error) {
-	return &dataStore, nil
+func Get() (Store, error) {
+	return dataStore, nil
 }
 
 // Set sets the store (mostly for testing)

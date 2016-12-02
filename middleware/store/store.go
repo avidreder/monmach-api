@@ -25,6 +25,6 @@ func LoadStore(h echo.HandlerFunc) echo.HandlerFunc {
 }
 
 // GetStore retieves a data store from the context
-func GetStore(c echo.Context) *store.Store {
-	return c.Get("store").(*store.Store)
+func GetStore(c echo.Context) store.Store {
+	return c.Get("store").(store.Store)
 }
