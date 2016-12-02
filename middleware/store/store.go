@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/avidreder/monmach-api/resources/store"
 	"github.com/avidreder/monmach-api/resources/store/postgres"
 
 	"github.com/labstack/echo"
@@ -24,6 +25,6 @@ func LoadStore(h echo.HandlerFunc) echo.HandlerFunc {
 }
 
 // GetStore retieves a data store from the context
-func GetStore(c echo.Context) *postgres.Store {
-	return c.Get("store").(*postgres.Store)
+func GetStore(c echo.Context) *store.Store {
+	return c.Get("store").(*store.Store)
 }
