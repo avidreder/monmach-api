@@ -1,18 +1,21 @@
 language: go
 go:
- - 1.7.3
+- 1.7.3
 before_install:
-  - nvm install 7.2.0
-  - nvm use 7.2.0
-  - npm install
-  - sudo add-apt-repository ppa:masterminds/glide -y
-  - sudo apt-get -qq update
-  - sudo apt-get install -y glide
-  - go get github.com/mattn/goveralls
-  - glide update
-  - glide install
+- nvm install 7.2.0
+- nvm use 7.2.0
+- npm install
+- sudo add-apt-repository ppa:masterminds/glide -y
+- sudo apt-get -qq update
+- sudo apt-get install -y glide
+- go get github.com/mattn/goveralls
+- glide update
+- glide install
 script:
- - go test $(glide nv)
- - npm test
- - ./coverage.bash
- - $HOME/gopath/bin/goveralls -coverprofile=profile.cov -service=travis-ci
+- go test $(glide nv)
+- npm test
+- ./coverage.bash
+- $HOME/gopath/bin/goveralls -coverprofile=profile.cov -service=travis-ci -repotoken $COVERALLS_TOKEN
+env:
+  global:
+    secure: iLPdRpplBgR3Gd93tjSYBzV5ABUJJlZC6RKWxsEjmCRoTh0ROWZdJAZFlNubMY/MYZNvvE6bRFi1IkAXvos1neNnABiv2l9vUAoCiWJNBQjgR9FYQ/mKA+G+Szh7ho1MLdbxH+fwipGa7sDF8ACM5RDIx5Pb78ROYwIVrxKLODM8gt/EEkCqQO9pghcO1BKxsw0SMgF9m32k55+eTLTqfNkFuY01tXJj8ic+YXN6gvHHfsSLrXQO0Lu5jON3fmzfltsxdW4cbuhmZPdSN8LkB48Waeqyp0GxdB8nKgYbUqNBWFuyAcGiV3Ec3CIPjUW72KmTazJbmOc5shZBQpeMlhz5n3HBQ/nOeYa5B5gVSyVSudfOqv+Xx0uaWx4TqjOzp9mhkxke6xi/NgxeE42Spjxw1hf26VisT03RAg9h8UVNGxuJ8dAbNd4ANoFOnQQEbgfu2zpmOedXRFM5nIXS9i1UoyuKWwns/TR68QDkOvRSROXfTZAqUbp59mxjhOcnZbL7reUMSZIwXn8Tzx82AuqqIOm0PPLaDIScVWtwtGYmtAdYv+dkN1IJfeRq26JjQAuzBZwPb2LgiDX5UoWqAA8RmUZTFx2iUSZT7KzElhuKp1V8Yse5bkZI5Y1BLA/1+fyVEraD+y3Z1mTAT/QKP20+EZQJ+fqb5IhpN+YeRGg=
