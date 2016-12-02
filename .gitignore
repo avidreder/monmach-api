@@ -29,3 +29,5 @@ spotify.json
 node_modules
 .vagrant
 ansible/spotify.json
+profile_tmp.cov
+profile.cov
