@@ -31,3 +31,6 @@ node_modules
 ansible/spotify.json
 profile_tmp.cov
 profile.cov
+.coveralls.yml
+coverage
+coverage.xml
