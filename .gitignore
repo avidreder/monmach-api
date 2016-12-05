@@ -34,3 +34,4 @@ profile.cov
 .coveralls.yml
 coverage
 coverage.xml
+.DS_Store

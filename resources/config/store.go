@@ -8,7 +8,6 @@ import (
 )
 
 type ServiceConfig struct {
-	ReactPath             string
 	SpotifyCredentialPath string
 }
 

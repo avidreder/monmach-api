@@ -2,9 +2,6 @@ language: go
 go:
 - 1.7.3
 before_install:
-- nvm install 7.2.0
-- nvm use 7.2.0
-- npm install
 - sudo add-apt-repository ppa:masterminds/glide -y
 - sudo apt-get -qq update
 - sudo apt-get install -y glide
@@ -13,7 +10,6 @@ before_install:
 - glide install
 script:
 - go test $(glide nv)
-- npm test --coverage
 - ./coverage.bash
 - $HOME/gopath/bin/goveralls -coverprofile=profile.cov -service=travis-ci -repotoken
   $COVERALLS_REPO_TOKEN

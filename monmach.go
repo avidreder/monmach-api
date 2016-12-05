@@ -13,7 +13,6 @@ import (
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	usermw "github.com/avidreder/monmach-api/middleware/user"
-	"github.com/avidreder/monmach-api/resources/config"
 	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
 	"github.com/avidreder/monmach-api/resources/store/postgres"
 
@@ -30,25 +29,11 @@ func main() {
 	} else {
 		log.Print("Connected to Postgres")
 	}
-	config, err := config.GetConfig()
-	if err != nil {
-		log.Fatalf("Could not get Service Config: %v", err)
-	}
+
 	// Load middleware for all routes
 	server.Use(emw.Logger())
 	server.Use(emw.Recover())
 	server.Use(emw.CORS())
-	server.Static("/libs", config.ReactPath+"libs")
-	server.Static("/img", config.ReactPath+"img")
-	server.File("/bundle.js", config.ReactPath+"bundle.js")
-
-	monmach := server.Group("/")
-	monmach.Use(authmw.LoadStore,
-		authmw.CheckLogin)
-	monmach.Static("", config.ReactPath+"index.html")
-
-	login := server.Group("/login")
-	login.Static("", config.ReactPath+"login.html")
 
 	logout := server.Group("/logout")
 	logout.Use(authmw.LoadStore)
