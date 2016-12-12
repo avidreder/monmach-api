@@ -26,7 +26,7 @@ func LoadUser(h echo.HandlerFunc) echo.HandlerFunc {
 		userEmail := session.Values["email"].(string)
 		user := user.User{}
 		store := stmw.GetStore(c)
-		err = store.GetByEmail(&user, userEmail)
+		err = store.GetByKey("user", &user, "email", userEmail)
 		if err != nil {
 			return errors.New("Could not retrieve logged-in user")
 		}

@@ -14,7 +14,7 @@ import (
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	usermw "github.com/avidreder/monmach-api/middleware/user"
 	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
-	"github.com/avidreder/monmach-api/resources/store/postgres"
+	"github.com/avidreder/monmach-api/resources/store/mongo"
 
 	"github.com/labstack/echo"
 	emw "github.com/labstack/echo/middleware"
@@ -22,12 +22,12 @@ import (
 
 func main() {
 	server := echo.New()
-	store, _ := postgres.Get()
+	store, _ := mongo.Get()
 	err := store.Connect()
 	if err != nil {
-		log.Printf("Could not connect to Postgres: %v", err)
+		log.Printf("Could not connect to Mongo: %v", err)
 	} else {
-		log.Print("Connected to Postgres")
+		log.Print("Connected to Mongo")
 	}
 
 	// Load middleware for all routes

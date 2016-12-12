@@ -105,10 +105,10 @@ func FinishAuth(c echo.Context) error {
 }
 
 func HandleUserLogin(user userR.User, store store.Store) {
-	oldUser := userR.User{Email: user.Email}
-	err := store.GetByEmail(&oldUser, user.Email)
+	oldUser := userR.User{}
+	err := store.GetByKey("users", &oldUser, "email", user.Email)
 	if err != nil {
-		err = store.Create(&user)
+		err = store.Create("users", &user)
 		if err != nil {
 			log.Printf("Error storing new user: %+v", user.Email)
 			return
@@ -116,13 +116,9 @@ func HandleUserLogin(user userR.User, store store.Store) {
 		log.Printf("Stored new user: %+v", user.Email)
 		return
 	}
-	values := map[string]interface{}{}
-	values["name"] = user.Name
-	values["spotify_token"] = user.SpotifyToken
-	values["spotify_refresh_token"] = user.SpotifyRefreshToken
-	values["spotify_id"] = user.SpotifyID
-	values["track_blacklist"] = pg.Array(oldUser.TrackBlacklist)
-	err = store.UpdateByEmail("users", user.Email, values)
+	oldUser.SpotifyToken = user.SpotifyToken
+	oldUser.SpotifyRefreshToken = user.SpotifyRefreshToken
+	err = store.UpdateByKey("users", oldUser, "email", user.Email)
 	if err != nil {
 		log.Printf("Error updating user: %+v", user.Email)
 		return
