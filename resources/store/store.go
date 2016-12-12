@@ -5,7 +5,7 @@ type Store interface {
 	Connect() error
 	GetAll(string, interface{}) error
 	GetByKey(string, interface{}, string, interface{}) error
-	UpdateByKey(string, interface{}, string, interface{}) error
+	UpdateByKey(string, map[string]interface{}, string, interface{}) error
 	DeleteByKey(string, string, interface{}) error
 	Create(string, interface{}) error
 }

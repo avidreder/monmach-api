@@ -115,9 +115,10 @@ func HandleUserLogin(user userR.User, store store.Store) {
 		log.Printf("Stored new user: %+v", user.Email)
 		return
 	}
-	oldUser.SpotifyToken = user.SpotifyToken
-	oldUser.SpotifyRefreshToken = user.SpotifyRefreshToken
-	err = store.UpdateByKey("users", oldUser, "email", user.Email)
+	updates := map[string]interface{}{}
+	updates["SpotifyToken"] = user.SpotifyToken
+	updates["SpotifyRefreshToken"] = user.SpotifyRefreshToken
+	err = store.UpdateByKey("users", updates, "email", user.Email)
 	if err != nil {
 		log.Printf("Error updating user: %+v", user.Email)
 		return
