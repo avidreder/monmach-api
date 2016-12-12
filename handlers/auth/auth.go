@@ -16,7 +16,6 @@ import (
 	"github.com/labstack/echo"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
-	"gopkg.in/pg.v5"
 )
 
 func init() {

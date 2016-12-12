@@ -11,7 +11,6 @@ import (
 	genreR "github.com/avidreder/monmach-api/resources/genre"
 
 	"github.com/labstack/echo"
-	"gopkg.in/pg.v5"
 )
 
 const tableName = "genres"
@@ -75,7 +74,7 @@ func Create(c echo.Context) error {
 	payload.Description = c.FormValue("Description")
 	payload.AvatarURL = c.FormValue("AvatarURL")
 	payload.Name = name
-	err = store.Create(&payload)
+	err = store.Create(tableName, &payload)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -85,7 +84,7 @@ func Create(c echo.Context) error {
 // Update updates an existing genre in the store
 func Update(c echo.Context) error {
 	id := c.Param("id")
-	numId, err := strconv.ParseInt(id, 10, 0)
+	numID, err := strconv.ParseInt(id, 10, 0)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
 	}
@@ -93,50 +92,9 @@ func Update(c echo.Context) error {
 	form, _ := c.FormParams()
 	payload := map[string]interface{}{}
 	for k, v := range form {
-		if k == "UserID" {
-			payload["user_id"] = v[0]
-		} else if k == "QueueID" {
-			payload["queue_id"] = v[0]
-		} else if k == "SeedTracks" {
-			var array []int64
-			err = json.Unmarshal([]byte(v[0]), &array)
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-			}
-			payload["seed_tracks"] = pg.Array(array)
-		} else if k == "SeedArtists" {
-			var array []int64
-			err = json.Unmarshal([]byte(v[0]), &array)
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-			}
-			payload["seed_artists"] = pg.Array(array)
-		} else if k == "SeedPlaylists" {
-			var array []int64
-			err = json.Unmarshal([]byte(v[0]), &array)
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-			}
-			payload["seed_playlists"] = pg.Array(array)
-		} else if k == "TrackWhitelist" {
-			var array []int64
-			err = json.Unmarshal([]byte(v[0]), &array)
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-			}
-			payload["track_whitelist"] = pg.Array(array)
-		} else if k == "TrackBlacklist" {
-			var array []int64
-			err = json.Unmarshal([]byte(v[0]), &array)
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-			}
-			payload["track_blacklist"] = pg.Array(array)
-		} else {
-			payload[k] = v[0]
-		}
+		payload[k] = v
 	}
-	err = store.Update(tableName, numId, payload)
+	err = store.UpdateByKey(tableName, payload, "_id", numID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -150,9 +108,9 @@ func Get(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
 	}
-	result := genreR.Genre{ID: numID}
+	result := genreR.Genre{}
 	store := stmw.GetStore(c)
-	err = store.Get(&result)
+	err = store.GetByKey(tableName, &result, "_id", numID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -164,7 +122,7 @@ func Get(c echo.Context) error {
 func GetAll(c echo.Context) error {
 	var genres []genreR.Genre
 	store := stmw.GetStore(c)
-	err := store.GetAll(&genres, tableName)
+	err := store.GetAll(tableName, &genres)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -178,9 +136,8 @@ func Delete(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
 	}
-	genre := genreR.Genre{ID: numID}
 	store := stmw.GetStore(c)
-	err = store.Delete(&genre)
+	err = store.DeleteByKey(tableName, "_id", numID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

@@ -11,7 +11,6 @@ import (
 	playlistR "github.com/avidreder/monmach-api/resources/playlist"
 
 	"github.com/labstack/echo"
-	"gopkg.in/pg.v5"
 )
 
 const tableName = "playlists"
@@ -45,7 +44,7 @@ func Create(c echo.Context) error {
 	payload.Tracks = array
 	payload.Name = name
 	payload.SpotifyID = c.FormValue("SpotifyID")
-	err = store.Create(&payload)
+	err = store.Create(tableName, &payload)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -55,7 +54,7 @@ func Create(c echo.Context) error {
 // Update updates an existing playlist in the store
 func Update(c echo.Context) error {
 	id := c.Param("id")
-	numId, err := strconv.ParseInt(id, 10, 0)
+	numID, err := strconv.ParseInt(id, 10, 0)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
 	}
@@ -63,22 +62,9 @@ func Update(c echo.Context) error {
 	form, _ := c.FormParams()
 	payload := map[string]interface{}{}
 	for k, v := range form {
-		if k == "UserID" {
-			payload["user_id"] = v[0]
-		} else if k == "Tracks" {
-			var array []int64
-			err = json.Unmarshal([]byte(v[0]), &array)
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-			}
-			payload[k] = pg.Array(array)
-		} else if k == "SpotifyID" {
-			payload["spotify_id"] = v[0]
-		} else {
-			payload[k] = v[0]
-		}
+		payload[k] = v
 	}
-	err = store.Update(tableName, numId, payload)
+	err = store.UpdateByKey(tableName, payload, "_id", numID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -94,7 +80,7 @@ func Get(c echo.Context) error {
 	}
 	result := playlistR.Playlist{ID: numID}
 	store := stmw.GetStore(c)
-	err = store.Get(&result)
+	err = store.GetByKey(tableName, &result, "_id", numID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -106,7 +92,7 @@ func Get(c echo.Context) error {
 func GetAll(c echo.Context) error {
 	var playlists []playlistR.Playlist
 	store := stmw.GetStore(c)
-	err := store.GetAll(&playlists, tableName)
+	err := store.GetAll(tableName, &playlists)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -120,9 +106,8 @@ func Delete(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
 	}
-	playlist := playlistR.Playlist{ID: numID}
 	store := stmw.GetStore(c)
-	err = store.Delete(&playlist)
+	err = store.DeleteByKey(tableName, "_id", numID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

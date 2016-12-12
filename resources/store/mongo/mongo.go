@@ -1,9 +1,6 @@
 package mongo
 
 import (
-	"log"
-	"encoding/json"
-
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -27,7 +24,7 @@ func (s Store) Connect() error {
 }
 
 func (s Store) GetAll(collection string, model interface{}) error {
-	data, err := s.mongoSession.DB(db).Collection(collection).Find().All(model)
+	err := s.mongoSession.DB(db).C(collection).Find(bson.M{}).All(model)
 	if err != nil {
 		return err
 	}
@@ -35,15 +32,16 @@ func (s Store) GetAll(collection string, model interface{}) error {
 }
 
 func (s Store) GetByKey(collection string, model interface{}, key string, value interface{}) error {
-	err := s.mongoSession.DB(db).Collection(collection).Find(bson.M{key: value}).One(model)
+	err := s.mongoSession.DB(db).C(collection).Find(bson.M{key: value}).One(model)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s Store) UpdateByKey(collection string, model interface{}, key string, value interface{}) error {
-	err := s.mongoSession.DB(db).Collection(collection).Update(bson.M{key: value}, bson.M{"$set":bson.M{model}})
+func (s Store) UpdateByKey(collection string, updates map[string]interface{}, key string, value interface{}) error {
+
+	err := s.mongoSession.DB(db).C(collection).Update(bson.M{key: value}, bson.M{"$set":updates})
 	if err != nil {
 		return err
 	}
@@ -51,7 +49,7 @@ func (s Store) UpdateByKey(collection string, model interface{}, key string, val
 }
 
 func (s Store) DeleteByKey(collection string, key string, value interface{}) error {
-	err := s.mongoSession.DB(db).Collection(collection).Remove{bson.M{key: value})
+	err := s.mongoSession.DB(db).C(collection).Remove(bson.M{key: value})
 	if err != nil {
 		return err
 	}
@@ -59,7 +57,7 @@ func (s Store) DeleteByKey(collection string, key string, value interface{}) err
 }
 
 func (s Store) Create(collection string, model interface{}) error {
-	err := s.mongoSession.DB(db).Collection(collection).Insert{model})
+	err := s.mongoSession.DB(db).C(collection).Insert(model)
 	if err != nil {
 		return err
 	}

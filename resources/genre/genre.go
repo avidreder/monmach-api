@@ -2,11 +2,13 @@ package genre
 
 import (
 	"time"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 // Genre is the struct for a user's custom genre
 type Genre struct {
-	ID             int64
+	ID             bson.ObjectId `bson:"_id,omitempty"`
 	UserID         int64
 	QueueID        int64
 	Name           string

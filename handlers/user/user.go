@@ -11,7 +11,6 @@ import (
 	userR "github.com/avidreder/monmach-api/resources/user"
 
 	"github.com/labstack/echo"
-	"gopkg.in/pg.v5"
 )
 
 const tableName = "users"
@@ -52,7 +51,7 @@ func Create(c echo.Context) error {
 	payload.SpotifyToken = spotifyToken
 	payload.SpotifyRefreshToken = spotifyRefreshToken
 	payload.SpotifyID = spotifyID
-	err := store.Create(&payload)
+	err := store.Create(tableName, &payload)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -62,7 +61,7 @@ func Create(c echo.Context) error {
 // Update updates an existing user in the store
 func Update(c echo.Context) error {
 	id := c.Param("id")
-	numId, err := strconv.ParseInt(id, 10, 0)
+	numID, err := strconv.ParseInt(id, 10, 0)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
 	}
@@ -70,33 +69,9 @@ func Update(c echo.Context) error {
 	form, _ := c.FormParams()
 	payload := map[string]interface{}{}
 	for k, v := range form {
-		if k == "SpotifyToken" {
-			payload["spotify_token"] = v[0]
-		} else if k == "SpotifyRefreshToken" {
-			payload["spotify_refresh_token"] = v[0]
-		} else if k == "SpotifyID" {
-			payload["spotify_id"] = v[0]
-		} else if k == "AvatarURL" {
-			payload["avatar_url"] = v[0]
-		} else if k == "TrackWhitelist" {
-			var array []int64
-			err = json.Unmarshal([]byte(v[0]), &array)
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-			}
-			payload["track_whitelist"] = pg.Array(array)
-		} else if k == "TrackBlacklist" {
-			var array []int64
-			err = json.Unmarshal([]byte(v[0]), &array)
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-			}
-			payload["track_blacklist"] = pg.Array(array)
-		} else {
-			payload[k] = v[0]
-		}
+		payload[k] = v
 	}
-	err = store.Update(tableName, numId, payload)
+	err = store.UpdateByKey(tableName, payload, "_id", numID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -112,7 +87,7 @@ func Get(c echo.Context) error {
 	}
 	result := userR.User{ID: numID}
 	store := stmw.GetStore(c)
-	err = store.Get(&result)
+	err = store.GetByKey(tableName, &result, "_id", id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -124,7 +99,7 @@ func Get(c echo.Context) error {
 func GetAll(c echo.Context) error {
 	var users []userR.User
 	store := stmw.GetStore(c)
-	err := store.GetAll(&users, tableName)
+	err := store.GetAll(tableName, &users)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -138,9 +113,8 @@ func Delete(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
 	}
-	user := userR.User{ID: numID}
 	store := stmw.GetStore(c)
-	err = store.Delete(&user)
+	err = store.DeleteByKey(tableName, "_id", numID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
