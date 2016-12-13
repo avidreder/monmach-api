@@ -6,11 +6,12 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
+
 var dataStore = Store{}
 
 // Store implements store interface
 type Store struct {
-	mongoSession *mgo.Session
+	db *mgo.Database
 }
 
 const dbURL = "mongodb://localhost:27017"
@@ -25,19 +26,25 @@ func (s Store) Connect() error {
 	if err != nil {
 		return err
 	}
-	s.mongoSession = session
+	s.db = session.DB(db)
 	return nil
 }
 
-func getCollection(session *mgo.Session, collectionName string) *mgo.Collection {
-	collection := session.DB(db).C(collectionName)
+func getCollection(database *mgo.Database, collectionName string) *mgo.Collection {
+	collection := database.C(collectionName)
 	log.Printf("collection: %+v", collection)
 	return collection
 }
 
 func (s Store) GetAll(collection string, model interface{}) error {
-	c := getCollection(s.mongoSession, collection)
-	err := c.Find(bson.M{}).All(model)
+	session, err := mgo.Dial(dbURL)
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	s.db = session.DB(db)
+	c := getCollection(s.db, collection)
+	err = c.Find(bson.M{}).All(model)
 	if err != nil {
 		return err
 	}
@@ -45,8 +52,14 @@ func (s Store) GetAll(collection string, model interface{}) error {
 }
 
 func (s Store) GetByKey(collection string, model interface{}, key string, value interface{}) error {
-	c := getCollection(s.mongoSession, collection)
-	err := c.Find(bson.M{key: value}).One(model)
+	session, err := mgo.Dial(dbURL)
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	s.db = session.DB(db)
+	c := getCollection(s.db, collection)
+	err = c.Find(bson.M{key: value}).One(model)
 	if err != nil {
 		return err
 	}
@@ -54,8 +67,14 @@ func (s Store) GetByKey(collection string, model interface{}, key string, value 
 }
 
 func (s Store) UpdateByKey(collection string, updates map[string]interface{}, key string, value interface{}) error {
-	c := getCollection(s.mongoSession, collection)
-	err := c.Update(bson.M{key: value}, bson.M{"$set":updates})
+	session, err := mgo.Dial(dbURL)
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	s.db = session.DB(db)
+	c := getCollection(s.db, collection)
+	err = c.Update(bson.M{key: value}, bson.M{"$set": updates})
 	if err != nil {
 		return err
 	}
@@ -63,8 +82,14 @@ func (s Store) UpdateByKey(collection string, updates map[string]interface{}, ke
 }
 
 func (s Store) DeleteByKey(collection string, key string, value interface{}) error {
-	c := getCollection(s.mongoSession, collection)
-	err := c.Remove(bson.M{key: value})
+	session, err := mgo.Dial(dbURL)
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	s.db = session.DB(db)
+	c := getCollection(s.db, collection)
+	err = c.Remove(bson.M{key: value})
 	if err != nil {
 		return err
 	}
@@ -72,8 +97,14 @@ func (s Store) DeleteByKey(collection string, key string, value interface{}) err
 }
 
 func (s Store) Create(collection string, model interface{}) error {
-	c := getCollection(s.mongoSession, collection)
-	err := c.Insert(model)
+	session, err := mgo.Dial(dbURL)
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	s.db = session.DB(db)
+	c := getCollection(s.db, collection)
+	err = c.Insert(model)
 	if err != nil {
 		return err
 	}

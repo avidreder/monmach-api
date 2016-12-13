@@ -18,7 +18,11 @@ import (
 
 	"github.com/labstack/echo"
 	emw "github.com/labstack/echo/middleware"
+	"gopkg.in/mgo.v2"
 )
+
+const dbURL = "mongodb://localhost:27017"
+const db = "monmach"
 
 func main() {
 	server := echo.New()
@@ -29,7 +33,20 @@ func main() {
 	} else {
 		log.Print("Connected to Mongo")
 	}
+	session, err := mgo.Dial(dbURL)
+	if err != nil {
+		panic(err)
+	}
+	testData := struct{
+		name string
+	}{
+		name: "Andrew",
+	}
+	err = session.DB("test").C("test").Insert(&testData)
 
+	if err != nil{
+		panic(err)
+	}
 	// Load middleware for all routes
 	server.Use(emw.Logger())
 	server.Use(emw.Recover())
