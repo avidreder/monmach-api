@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 
+	"gopkg.in/mgo.v2/bson"
+
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	userR "github.com/avidreder/monmach-api/resources/user"
 
@@ -69,7 +71,7 @@ func Update(c echo.Context) error {
 	for k, v := range form {
 		payload[k] = v
 	}
-	err := store.UpdateByKey(tableName, payload, "_id", id)
+	err := store.UpdateByKey(tableName, payload, "_id", bson.ObjectIdHex(id))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -84,7 +86,7 @@ func Get(c echo.Context) error {
 	}
 	result := userR.User{}
 	store := stmw.GetStore(c)
-	err := store.GetByKey(tableName, &result, "_id", id)
+	err := store.GetByKey(tableName, &result, "_id", bson.ObjectIdHex(id))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -110,7 +112,7 @@ func Delete(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
 	}
 	store := stmw.GetStore(c)
-	err := store.DeleteByKey(tableName, "_id", id)
+	err := store.DeleteByKey(tableName, "_id", bson.ObjectIdHex(id))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
