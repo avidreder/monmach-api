@@ -2,21 +2,23 @@ package track
 
 import (
 	"time"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 // Track is the struct for a user's playlist
 type Track struct {
-	ID        int64
+	ID        bson.ObjectId `bson:"_id,omitempty"`
 	Name      string
-	Artists   []string `pg:",array"`
+	Artists   []string
 	ImageURL  string
 	SpotifyID string
-	Genres    []int64 `pg:",array"`
-	Playlists []int64 `pg:",array"`
+	Genres    []string
+	Playlists []string
 	Rating    int64
 	Created   time.Time
 	Updated   time.Time
-	Features  []float64 `pg:",array"`
+	Features  []float64
 }
 
 // SpotifyFeatures is the response from Spotify's Audio Features API

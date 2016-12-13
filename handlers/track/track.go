@@ -40,7 +40,6 @@ func Create(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-
 	if c.FormValue("Features") != "" {
 		err = json.Unmarshal([]byte(c.FormValue("Features")), &payload.Features)
 		if err != nil {
@@ -73,9 +72,8 @@ func Create(c echo.Context) error {
 // Update updates an existing track in the store
 func Update(c echo.Context) error {
 	id := c.Param("id")
-	numID, err := strconv.ParseInt(id, 10, 0)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
+	if id == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
 	}
 	store := stmw.GetStore(c)
 	form, _ := c.FormParams()
@@ -83,7 +81,7 @@ func Update(c echo.Context) error {
 	for k, v := range form {
 		payload[k] = v
 	}
-	err = store.UpdateByKey(tableName, payload, "_id", numID)
+	err := store.UpdateByKey(tableName, payload, "_id", numID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -93,13 +91,12 @@ func Update(c echo.Context) error {
 // Get retrieves an existing track in the store
 func Get(c echo.Context) error {
 	id := c.Param("id")
-	numID, err := strconv.ParseInt(id, 10, 0)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
+	if id == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
 	}
-	result := trackR.Track{ID: numID}
+	result := trackR.Track{}
 	store := stmw.GetStore(c)
-	err = store.GetByKey(tableName, &result, "_id", numID)
+	err := store.GetByKey(tableName, &result, "_id", id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -121,12 +118,11 @@ func GetAll(c echo.Context) error {
 // Delete deletes an existing track in the store
 func Delete(c echo.Context) error {
 	id := c.Param("id")
-	numID, err := strconv.ParseInt(id, 10, 0)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
+	if id == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
 	}
 	store := stmw.GetStore(c)
-	err = store.DeleteByKey(tableName, "_id", numID)
+	err := store.DeleteByKey(tableName, "_id", id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	genreR "github.com/avidreder/monmach-api/resources/genre"
@@ -17,23 +16,16 @@ const tableName = "genres"
 
 // Create inserts a new genre into the store
 func Create(c echo.Context) error {
+	var err error
 	store := stmw.GetStore(c)
 	payload := genreR.Genre{}
 	userID := c.FormValue("UserID")
 	if userID == "" {
 		return echo.NewHTTPError(http.StatusInternalServerError, "UserID is required")
 	}
-	numUserID, err := strconv.ParseInt(userID, 10, 0)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
 	queueID := c.FormValue("QueueID")
 	if queueID == "" {
 		return echo.NewHTTPError(http.StatusInternalServerError, "QueueID is required")
-	}
-	numQueueID, err := strconv.ParseInt(queueID, 10, 0)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	name := c.FormValue("Name")
 	if name == "" {
@@ -69,8 +61,8 @@ func Create(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 	}
-	payload.UserID = numUserID
-	payload.QueueID = numQueueID
+	payload.UserID = userID
+	payload.QueueID = queueID
 	payload.Description = c.FormValue("Description")
 	payload.AvatarURL = c.FormValue("AvatarURL")
 	payload.Name = name
@@ -84,9 +76,8 @@ func Create(c echo.Context) error {
 // Update updates an existing genre in the store
 func Update(c echo.Context) error {
 	id := c.Param("id")
-	numID, err := strconv.ParseInt(id, 10, 0)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
+	if id == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
 	}
 	store := stmw.GetStore(c)
 	form, _ := c.FormParams()
@@ -94,7 +85,7 @@ func Update(c echo.Context) error {
 	for k, v := range form {
 		payload[k] = v
 	}
-	err = store.UpdateByKey(tableName, payload, "_id", numID)
+	err := store.UpdateByKey(tableName, payload, "_id", id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -104,13 +95,12 @@ func Update(c echo.Context) error {
 // Get retrieves an existing genre in the store
 func Get(c echo.Context) error {
 	id := c.Param("id")
-	numID, err := strconv.ParseInt(id, 10, 0)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
+	if id == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
 	}
 	result := genreR.Genre{}
 	store := stmw.GetStore(c)
-	err = store.GetByKey(tableName, &result, "_id", numID)
+	err := store.GetByKey(tableName, &result, "_id", id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -132,12 +122,11 @@ func GetAll(c echo.Context) error {
 // Delete deletes an existing genre in the store
 func Delete(c echo.Context) error {
 	id := c.Param("id")
-	numID, err := strconv.ParseInt(id, 10, 0)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
+	if id == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
 	}
 	store := stmw.GetStore(c)
-	err = store.DeleteByKey(tableName, "_id", numID)
+	err := store.DeleteByKey(tableName, "_id", id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

@@ -9,16 +9,16 @@ import (
 // Genre is the struct for a user's custom genre
 type Genre struct {
 	ID             bson.ObjectId `bson:"_id,omitempty"`
-	UserID         int64
-	QueueID        int64
+	UserID         string
+	QueueID        string
 	Name           string
 	Description    string
-	SeedArtists    []int64 `pg:",array"`
-	SeedTracks     []int64 `pg:",array"`
-	SeedPlaylists  []int64 `pg:",array"`
+	SeedArtists    []string
+	SeedTracks     []string
+	SeedPlaylists  []string
 	AvatarURL      string
 	Created        time.Time
 	Updated        time.Time
-	TrackBlacklist []int64 `pg:",array"`
-	TrackWhitelist []int64 `pg:",array"`
+	TrackBlacklist []string
+	TrackWhitelist []string
 }

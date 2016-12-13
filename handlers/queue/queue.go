@@ -23,10 +23,6 @@ func Create(c echo.Context) error {
 	if userID == "" {
 		return echo.NewHTTPError(http.StatusInternalServerError, "UserID is required")
 	}
-	numUserID, err := strconv.ParseInt(userID, 10, 0)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
 	maxSize := c.FormValue("MaxSize")
 	if maxSize == "" {
 		return echo.NewHTTPError(http.StatusInternalServerError, "MaxSize is required")
@@ -63,7 +59,7 @@ func Create(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 	}
-	payload.UserID = numUserID
+	payload.UserID = userID
 	payload.MaxSize = numMaxSize
 	payload.Name = name
 	err = store.Create(tableName, &payload)
@@ -76,9 +72,8 @@ func Create(c echo.Context) error {
 // Update updates an existing queue in the store
 func Update(c echo.Context) error {
 	id := c.Param("id")
-	numID, err := strconv.ParseInt(id, 10, 0)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
+	if id == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
 	}
 	store := stmw.GetStore(c)
 	form, _ := c.FormParams()
@@ -86,7 +81,7 @@ func Update(c echo.Context) error {
 	for k, v := range form {
 		payload[k] = v
 	}
-	err = store.UpdateByKey(tableName, payload, "_id", numID)
+	err := store.UpdateByKey(tableName, payload, "_id", id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -96,13 +91,12 @@ func Update(c echo.Context) error {
 // Get retrieves an existing queue in the store
 func Get(c echo.Context) error {
 	id := c.Param("id")
-	numID, err := strconv.ParseInt(id, 10, 0)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
+	if id == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
 	}
-	result := queueR.Queue{ID: numID}
+	result := queueR.Queue{}
 	store := stmw.GetStore(c)
-	err = store.GetByKey(tableName, &result, "_id", numID)
+	err := store.GetByKey(tableName, &result, "_id", id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -124,12 +118,11 @@ func GetAll(c echo.Context) error {
 // Delete deletes an existing queue in the store
 func Delete(c echo.Context) error {
 	id := c.Param("id")
-	numID, err := strconv.ParseInt(id, 10, 0)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "id cannot be a string")
+	if id == "" {
+		return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
 	}
 	store := stmw.GetStore(c)
-	err = store.DeleteByKey(tableName, "_id", numID)
+	err := store.DeleteByKey(tableName, "_id", id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

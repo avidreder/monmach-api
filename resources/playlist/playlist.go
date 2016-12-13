@@ -2,15 +2,17 @@ package playlist
 
 import (
 	"time"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 // Playlist is the struct for a user's playlist
 type Playlist struct {
-	ID        int64
+	ID        bson.ObjectId `bson:"_id,omitempty"`
 	Name      string
-	UserID    int64
+	UserID    string
 	SpotifyID string
-	Tracks    []int64 `pg:",array"`
+	Tracks    []string
 	Created   time.Time
 	Updated   time.Time
 }
