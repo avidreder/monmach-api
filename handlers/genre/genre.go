@@ -8,6 +8,7 @@ import (
 
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	genreR "github.com/avidreder/monmach-api/resources/genre"
+	storeR "github.com/avidreder/monmach-api/resources/store"
 
 	"github.com/labstack/echo"
 	"gopkg.in/mgo.v2/bson"
@@ -81,11 +82,13 @@ func Update(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
 	}
 	store := stmw.GetStore(c)
+	genre := genreR.Genre{}
 	form, _ := c.FormParams()
 	payload := map[string]interface{}{}
 	for k, v := range form {
-		payload[k] = v
+		payload[k] = v[0]
 	}
+	payload = storeR.ValidateInputs(genre, payload)
 	err := store.UpdateByKey(tableName, payload, "_id", bson.ObjectIdHex(id))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())

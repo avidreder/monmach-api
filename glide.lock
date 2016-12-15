@@ -1,5 +1,5 @@
 hash: 57f4df4871a025e7704b6e170b1581115e681a68f51deb6da460eb7d6f3008e9
-updated: 2016-12-02T09:08:57.044130784-08:00
+updated: 2016-12-15T08:35:18.55131577-08:00
 imports:
 - name: github.com/davecgh/go-spew
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
@@ -7,6 +7,8 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: 9ed569b5d1ac936e6494082958d63a6aa4fff99a
+- name: github.com/fatih/structs
+  version: dc3312cb1a4513a366c4c9e622ad55c32df12ed3
 - name: github.com/golang/protobuf
   version: da116c3771bf4a398a43f44e069195ef1c9688ef
   subpackages:
@@ -17,8 +19,6 @@ imports:
   version: fa5329f913702981df43dcb2a380bac429c810b5
 - name: github.com/gorilla/sessions
   version: ca9ada44574153444b00d3fd9c8559e4cc95f896
-- name: github.com/jinzhu/inflection
-  version: 74387dc39a75e970e7a3ae6a3386b5bd2e5c5cff
 - name: github.com/labstack/echo
   version: c5a3575d4c4121ba7a01a9aa21637c712adec067
   subpackages:
@@ -30,10 +30,6 @@ imports:
   - color
   - log
   - random
-- name: github.com/lib/pq
-  version: d8eeeb8bae8896dd8e1b7e514ab0d396c4f12a1b
-  subpackages:
-  - oid
 - name: github.com/markbates/goth
   version: fe9a7e293372a2839c9e9eb3bbb48bb977f2cfa8
   subpackages:
@@ -108,14 +104,6 @@ imports:
   - internal/json
   - internal/sasl
   - internal/scram
-- name: gopkg.in/pg.v5
-  version: 3f395a9844fbaf3a8591d6d3a067f6842e5614fb
-  subpackages:
-  - internal
-  - internal/parser
-  - internal/pool
-  - orm
-  - types
 - name: gopkg.in/square/go-jose.v1
   version: aa2e30fdd1fe9dd3394119af66451ae790d50e0d
   subpackages:
