@@ -10,6 +10,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	stmw "github.com/avidreder/monmach-api/middleware/store"
+	storeR "github.com/avidreder/monmach-api/resources/store"
 	trackR "github.com/avidreder/monmach-api/resources/track"
 
 	"github.com/labstack/echo"
@@ -78,11 +79,13 @@ func Update(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
 	}
 	store := stmw.GetStore(c)
+	track := trackR.Track{}
 	form, _ := c.FormParams()
 	payload := map[string]interface{}{}
 	for k, v := range form {
-		payload[k] = v
+		payload[k] = v[0]
 	}
+	payload = storeR.ValidateInputs(track, payload)
 	err := store.UpdateByKey(tableName, payload, "_id", bson.ObjectIdHex(id))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
