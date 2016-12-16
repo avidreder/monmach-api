@@ -4,7 +4,7 @@ go:
 before_install:
 - sudo add-apt-repository ppa:masterminds/glide -y
 - sudo apt-get -qq update
-- sudo apt-get install -y glide
+- sudo apt-get install -y glide --force-yes
 - go get github.com/mattn/goveralls
 - glide update
 - glide install
