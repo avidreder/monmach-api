@@ -7,3 +7,4 @@ import:
   subpackages:
   - mock
 - package: gopkg.in/mgo.v2
+- package: github.com/golang/protobuf
