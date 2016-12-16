@@ -17,7 +17,7 @@ type Store interface {
 	GetByKey(string, interface{}, string, interface{}) error
 	UpdateByKey(string, map[string]interface{}, string, interface{}) error
 	DeleteByKey(string, string, interface{}) error
-	Create(string, interface{}) error
+	Create(string, map[string]interface{}) error
 }
 
 func ValidateRequired(schema interface{}, values map[string]interface{}) (map[string]interface{}, error) {

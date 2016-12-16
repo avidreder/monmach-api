@@ -32,11 +32,11 @@ func (s Store) Connect() error {
 
 func getCollection(database *mgo.Database, collectionName string) *mgo.Collection {
 	collection := database.C(collectionName)
-	log.Printf("collection: %+v", collection)
 	return collection
 }
 
 func (s Store) GetAll(collection string, model interface{}) error {
+	log.Printf("GetAll: collection: %s, model: %T", collection, model)
 	session, err := mgo.Dial(dbURL)
 	if err != nil {
 		return err
@@ -52,6 +52,7 @@ func (s Store) GetAll(collection string, model interface{}) error {
 }
 
 func (s Store) GetByKey(collection string, model interface{}, key string, value interface{}) error {
+	log.Printf("Get: collection: %s, model: %+v", collection, model)
 	session, err := mgo.Dial(dbURL)
 	if err != nil {
 		return err
@@ -67,6 +68,7 @@ func (s Store) GetByKey(collection string, model interface{}, key string, value 
 }
 
 func (s Store) UpdateByKey(collection string, updates map[string]interface{}, key string, value interface{}) error {
+	log.Printf("Update: collection: %s, updates: %+v", collection, updates)
 	session, err := mgo.Dial(dbURL)
 	if err != nil {
 		return err
@@ -92,6 +94,7 @@ func (s Store) UpdateByKey(collection string, updates map[string]interface{}, ke
 }
 
 func (s Store) DeleteByKey(collection string, key string, value interface{}) error {
+	log.Printf("Delete: collection: %s, id: %+v", collection, value)
 	session, err := mgo.Dial(dbURL)
 	if err != nil {
 		return err
@@ -106,7 +109,8 @@ func (s Store) DeleteByKey(collection string, key string, value interface{}) err
 	return nil
 }
 
-func (s Store) Create(collection string, model interface{}) error {
+func (s Store) Create(collection string, values map[string]interface{}) error {
+	log.Printf("Create: collection: %s, values: %+v", collection, values)
 	session, err := mgo.Dial(dbURL)
 	if err != nil {
 		return err
@@ -114,7 +118,13 @@ func (s Store) Create(collection string, model interface{}) error {
 	defer session.Close()
 	s.db = session.DB(db)
 	c := getCollection(s.db, collection)
-	err = c.Insert(model)
+	bsonValues := bson.M{}
+	for k, v := range values {
+		log.Printf("%v", k)
+		log.Printf("%v", v)
+		bsonValues[k] = v
+	}
+	err = c.Insert(bsonValues)
 	if err != nil {
 		return err
 	}

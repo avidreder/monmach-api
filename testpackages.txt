@@ -1,1 +1,1 @@
-github.com/avidreder/monmach-api/handlers/genre
+github.com/avidreder/monmach-api/middleware/crud

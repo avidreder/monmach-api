@@ -12,6 +12,7 @@ import (
 	"github.com/avidreder/monmach-api/resources/store"
 	userR "github.com/avidreder/monmach-api/resources/user"
 
+	"github.com/fatih/structs"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
 	"github.com/markbates/goth"
@@ -107,7 +108,7 @@ func HandleUserLogin(user userR.User, store store.Store) {
 	oldUser := userR.User{}
 	err := store.GetByKey("users", &oldUser, "email", user.Email)
 	if err != nil {
-		err = store.Create("users", &user)
+		err = store.Create("users", structs.Map(user))
 		if err != nil {
 			log.Printf("Error storing new user: %+v", user.Email)
 			return

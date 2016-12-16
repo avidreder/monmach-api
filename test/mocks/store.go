@@ -12,48 +12,36 @@ type Store struct {
 
 // QueryBIT mocks the associated store function
 func (m Store) Connect() error {
-  args := m.Called()
-	return args.Error(0)
-}
-
-// Get mocks the associated store function
-func (m Store) Get(interface{}) error {
 	args := m.Called()
 	return args.Error(0)
 }
 
-// GetByEmail mocks the associated store function
-func (m Store) GetByEmail(interface{}, interface{}) error {
+// GetByKey mocks the associated store function
+func (m Store) GetByKey(string, interface{}, string, interface{}) error {
 	args := m.Called()
 	return args.Error(0)
 }
 
-// Update mocks the associated store function
-func (m Store) Update(string, int64, map[string]interface{}) error {
+// UpdateByKey mocks the associated store function
+func (m Store) UpdateByKey(string, map[string]interface{}, string, interface{}) error {
 	args := m.Called()
 	return args.Error(0)
 }
 
-// UpdateByEmail mocks the associated store function
-func (m Store) UpdateByEmail(string, string, map[string]interface{}) error {
-	args := m.Called()
-	return args.Error(0)
-}
-
-// Delete mocks the associated store function
-func (m Store) Delete(interface{}) error {
+// DeleteByKey mocks the associated store function
+func (m Store) DeleteByKey(string, string, interface{}) error {
 	args := m.Called()
 	return args.Error(0)
 }
 
 // Create mocks the associated store function
-func (m Store) Create(interface{}) error {
+func (m Store) Create(string, map[string]interface{}) error {
 	args := m.Called()
 	return args.Error(0)
 }
 
 // GetAll mocks the associated store function
-func (m Store) GetAll(interface{}, string) error {
+func (m Store) GetAll(string, interface{}) error {
 	args := m.Called()
 	return args.Error(0)
 }

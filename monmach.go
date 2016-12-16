@@ -4,13 +4,10 @@ import (
 	"log"
 
 	authh "github.com/avidreder/monmach-api/handlers/auth"
-	gh "github.com/avidreder/monmach-api/handlers/genre"
-	plh "github.com/avidreder/monmach-api/handlers/playlist"
-	qh "github.com/avidreder/monmach-api/handlers/queue"
+	crudh "github.com/avidreder/monmach-api/handlers/crud"
 	spoth "github.com/avidreder/monmach-api/handlers/spotify"
-	th "github.com/avidreder/monmach-api/handlers/track"
-	uh "github.com/avidreder/monmach-api/handlers/user"
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
+	crudmw "github.com/avidreder/monmach-api/middleware/crud"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	usermw "github.com/avidreder/monmach-api/middleware/user"
 	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
@@ -37,14 +34,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	testData := struct{
+	testData := struct {
 		name string
 	}{
 		name: "Andrew",
 	}
 	err = session.DB("test").C("test").Insert(&testData)
 
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 	// Load middleware for all routes
@@ -83,50 +80,14 @@ func main() {
 		spotifyR.LoadClient)
 	spotify.GET("/discover", spoth.DiscoverPlaylist)
 
-	// Load routes for playlists
-	playlists := server.Group("/playlists")
-	playlists.Use(stmw.LoadStore)
-	playlists.POST("/new", plh.Create)
-	playlists.GET("/:id", plh.Get)
-	playlists.GET("/all", plh.GetAll)
-	playlists.PUT("/:id", plh.Update)
-	playlists.DELETE("/:id", plh.Delete)
-
-	// Load routes for genres
-	genres := server.Group("/genres")
-	genres.Use(stmw.LoadStore)
-	genres.POST("/new", gh.Create)
-	genres.GET("/:id", gh.Get)
-	genres.GET("/all", gh.GetAll)
-	genres.PUT("/:id", gh.Update)
-	genres.DELETE("/:id", gh.Delete)
-
-	// Load routes for users
-	users := server.Group("/users")
-	users.Use(stmw.LoadStore)
-	users.POST("/new", uh.Create)
-	users.GET("/:id", uh.Get)
-	users.GET("/all", uh.GetAll)
-	users.PUT("/:id", uh.Update)
-	users.DELETE("/:id", uh.Delete)
-
-	// Load routes for tracks
-	tracks := server.Group("/tracks")
-	tracks.Use(stmw.LoadStore)
-	tracks.POST("/new", th.Create)
-	tracks.GET("/:id", th.Get)
-	tracks.GET("/all", th.GetAll)
-	tracks.PUT("/:id", th.Update)
-	tracks.DELETE("/:id", th.Delete)
-
-	// Load routes for queues
-	queues := server.Group("/queues")
-	queues.Use(stmw.LoadStore)
-	queues.POST("/new", qh.Create)
-	queues.GET("/:id", qh.Get)
-	queues.GET("/all", qh.GetAll)
-	queues.PUT("/:id", qh.Update)
-	queues.DELETE("/:id", qh.Delete)
+	// Load routes for crud
+	crud := server.Group("/crud/:table")
+	crud.Use(stmw.LoadStore)
+	crud.POST("/new", crudh.Success, crudmw.Create)
+	crud.GET("/:id", crudh.Results, crudmw.Get)
+	crud.GET("/all", crudh.Results, crudmw.GetAll)
+	crud.PUT("/:id", crudh.Success, crudmw.Update)
+	crud.DELETE("/:id", crudh.Success, crudmw.Delete)
 
 	log.Println("Starting...")
 	server.Start(":3000")
