@@ -49,6 +49,23 @@ func (s *StoreTestSuite) TestValidateRequiredBadStringSlice() {
 	s.Error(err)
 }
 
+func (s *StoreTestSuite) TestValidateRequiredEmptyFloatSlice() {
+	model := trackR.Track{}
+	structMap := structs.Map(model)
+	delete(structMap, "Features")
+	structMap["Features"] = ""
+	_, err := store.ValidateRequired(model, structMap)
+	s.NoError(err)
+}
+
+func (s *StoreTestSuite) TestValidateRequiredEmptyStringSlice() {
+	model := trackR.Track{}
+	structMap := structs.Map(model)
+	structMap["Artists"] = ""
+	_, err := store.ValidateRequired(model, structMap)
+	s.NoError(err)
+}
+
 func (s *StoreTestSuite) TestValidateInputsOK() {
 	model := trackR.Track{}
 	structMap := structs.Map(model)
