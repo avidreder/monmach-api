@@ -1,1 +1,11 @@
 github.com/avidreder/monmach-api/middleware/crud
+github.com/avidreder/monmach-api/middleware/auth
+github.com/avidreder/monmach-api/middleware/store
+github.com/avidreder/monmach-api/middleware/user
+github.com/avidreder/monmach-api/resources/auth
+github.com/avidreder/monmach-api/resources/config
+github.com/avidreder/monmach-api/resources/spotify
+github.com/avidreder/monmach-api/resources/store
+github.com/avidreder/monmach-api/resources/store/mongo
+github.com/avidreder/monmach-api/handlers/auth
+github.com/avidreder/monmach-api/handlers/spotify

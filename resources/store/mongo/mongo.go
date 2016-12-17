@@ -78,13 +78,10 @@ func (s Store) UpdateByKey(collection string, updates map[string]interface{}, ke
 	c := getCollection(s.db, collection)
 	bsonUpdates := bson.M{}
 	for k, v := range updates {
-		log.Printf("%v", k)
-		log.Printf("%v", v)
 		bsonUpdates[k] = v
 	}
 	selector := bson.M{"_id": bson.ObjectIdHex("5850266691f149a024aab0bc")}
 	updater := bson.M{"$set": bsonUpdates}
-	log.Printf("about to update: %+v", updater)
 	err = c.Update(selector, updater)
 	// err = c.Update(bson.M{key: value}, bson.M{"$set": bsonUpdates})
 	if err != nil {
@@ -120,8 +117,6 @@ func (s Store) Create(collection string, values map[string]interface{}) error {
 	c := getCollection(s.db, collection)
 	bsonValues := bson.M{}
 	for k, v := range values {
-		log.Printf("%v", k)
-		log.Printf("%v", v)
 		bsonValues[k] = v
 	}
 	err = c.Insert(bsonValues)
