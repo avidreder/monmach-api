@@ -1,11 +1,10 @@
 package crud
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 
 	stmw "github.com/avidreder/monmach-api/middleware/store"
-	"github.com/avidreder/monmach-api/resources/auth"
 	genreR "github.com/avidreder/monmach-api/resources/genre"
 	playlistR "github.com/avidreder/monmach-api/resources/playlist"
 	queueR "github.com/avidreder/monmach-api/resources/queue"
@@ -16,19 +15,6 @@ import (
 	"github.com/labstack/echo"
 	"gopkg.in/mgo.v2/bson"
 )
-
-// LoadStore places a data store in the context for later use
-func LoadStore(h echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		sessionStore, err := auth.Get()
-		if err != nil {
-			errorMessage := fmt.Sprintf("Could not load session store into context: %s", err)
-			return echo.NewHTTPError(http.StatusUnauthorized, errorMessage)
-		}
-		c.Set("sessionStore", sessionStore)
-		return h(c)
-	}
-}
 
 // Create inserts a new user into the store
 func Create(h echo.HandlerFunc) echo.HandlerFunc {
@@ -106,6 +92,9 @@ func Create(h echo.HandlerFunc) echo.HandlerFunc {
 func Update(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
+		if !bson.IsObjectIdHex(id) {
+			return echo.NewHTTPError(http.StatusInternalServerError, errors.New("ID was not a valid ObjectID"))
+		}
 		table := c.Param("table")
 		store := stmw.GetStore(c)
 		payload := map[string]interface{}{}
@@ -164,8 +153,8 @@ func Update(h echo.HandlerFunc) echo.HandlerFunc {
 func Get(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
-		if id == "" {
-			return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
+		if !bson.IsObjectIdHex(id) {
+			return echo.NewHTTPError(http.StatusInternalServerError, errors.New("ID was not a valid ObjectID"))
 		}
 		table := c.Param("table")
 		store := stmw.GetStore(c)
@@ -272,8 +261,8 @@ func GetAll(h echo.HandlerFunc) echo.HandlerFunc {
 func Delete(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
-		if id == "" {
-			return echo.NewHTTPError(http.StatusInternalServerError, "id is required")
+		if !bson.IsObjectIdHex(id) {
+			return echo.NewHTTPError(http.StatusInternalServerError, errors.New("ID was not a valid ObjectID"))
 		}
 		table := c.Param("table")
 		store := stmw.GetStore(c)
