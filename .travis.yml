@@ -6,7 +6,6 @@ before_install:
 - sudo apt-get -qq update
 - sudo apt-get install -y glide --force-yes
 - go get github.com/mattn/goveralls
-- go get github.com/golang/protobuf
 - glide update
 - glide install
 script:

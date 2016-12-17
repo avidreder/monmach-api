@@ -8,3 +8,6 @@ import:
   - mock
 - package: gopkg.in/mgo.v2
 - package: github.com/golang/protobuf
+  version: da116c3771bf4a398a43f44e069195ef1c9688ef
+  subpackages:
+  - proto
