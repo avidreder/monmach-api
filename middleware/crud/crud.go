@@ -17,23 +17,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// var singleTypeMap = map[string]interface{}{}
-// var pluralTypeMap = map[string]interface{}{}
-//
-// func init() {
-// 	singleTypeMap["genres"] = genreR.Genre{}
-// 	singleTypeMap["playlists"] = playlistR.Playlist{}
-// 	singleTypeMap["queue"] = queueR.Queue{}
-// 	singleTypeMap["user"] = userR.User{}
-// 	singleTypeMap["track"] = trackR.Track{}
-//
-// 	pluralTypeMap["genres"] = []genreR.Genre{}
-// 	pluralTypeMap["playlists"] = []playlistR.Playlist{}
-// 	pluralTypeMap["queue"] = []queueR.Queue{}
-// 	pluralTypeMap["user"] = []userR.User{}
-// 	pluralTypeMap["track"] = []trackR.Track{}
-// }
-
 // LoadStore places a data store in the context for later use
 func LoadStore(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -46,52 +29,6 @@ func LoadStore(h echo.HandlerFunc) echo.HandlerFunc {
 		return h(c)
 	}
 }
-
-// // ParseParams inserts a new user into the store
-// func ParseParams(h echo.HandlerFunc) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		table := c.Param("table")
-// 		c.Set("table", table)
-// 		switch table {
-// 		case "genres":
-// 			c.Set("model", genreR.Genre{})
-// 		case "playlists":
-// 			c.Set("model", playlistR.Playlist{})
-// 		case "queues":
-// 			c.Set("model", queueR.Queue{})
-// 		case "tracks":
-// 			c.Set("model", trackR.Track{})
-// 		case "users":
-// 			c.Set("model", userR.User{})
-// 		default:
-// 			return echo.NewHTTPError(http.StatusInternalServerError, "Not found")
-// 		}
-// 		return h(c)
-// 	}
-// }
-//
-// // ParseParams inserts a new user into the store
-// func ParseParamsPlural(h echo.HandlerFunc) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		table := c.Param("table")
-// 		c.Set("table", table)
-// 		switch table {
-// 		case "genres":
-// 			c.Set("model", []genreR.Genre{})
-// 		case "playlists":
-// 			c.Set("model", []playlistR.Playlist{})
-// 		case "queues":
-// 			c.Set("model", []queueR.Queue{})
-// 		case "tracks":
-// 			c.Set("model", []trackR.Track{})
-// 		case "users":
-// 			c.Set("model", []userR.User{})
-// 		default:
-// 			return echo.NewHTTPError(http.StatusInternalServerError, "Not found")
-// 		}
-// 		return h(c)
-// 	}
-// }
 
 // Create inserts a new user into the store
 func Create(h echo.HandlerFunc) echo.HandlerFunc {
