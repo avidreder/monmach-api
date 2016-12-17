@@ -36,10 +36,12 @@ func ValidateRequired(schema interface{}, values map[string]interface{}) (map[st
 				err := json.Unmarshal([]byte(values[k].(string)), &array)
 				if err == nil {
 					newValues[strings.ToLower(k)] = array
+				} else {
+					return nil, fmt.Errorf("Required field %s was not present", k)
 				}
-			} else if ok && reflect.TypeOf(structMap[k]).String() == "[]float64" && reflect.TypeOf(v).String() == "string" {
+			} else if ok && reflect.TypeOf(v).String() == "[]float64" && reflect.TypeOf(values[k]).String() == "string" {
 				var array []float64
-				err := json.Unmarshal([]byte(v.(string)), &array)
+				err := json.Unmarshal([]byte(values[k].(string)), &array)
 				if err == nil {
 					newValues[strings.ToLower(k)] = array
 				} else {
@@ -56,12 +58,7 @@ func ValidateInputs(schema interface{}, values map[string]interface{}) map[strin
 	structMap := structs.Map(schema)
 	log.Print(structMap)
 	for k, v := range values {
-		log.Printf("%v", k)
-		log.Printf("%v,%T", v, v)
 		_, ok := structMap[k]
-		if ok {
-			log.Print(reflect.TypeOf(structMap[k]).String())
-		}
 		if ok && reflect.TypeOf(structMap[k]).String() == reflect.TypeOf(v).String() {
 			newValues[strings.ToLower(k)] = v
 		} else if ok && reflect.TypeOf(structMap[k]).String() == "[]string" && reflect.TypeOf(v).String() == "string" {
