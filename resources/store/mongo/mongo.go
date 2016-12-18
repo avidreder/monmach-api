@@ -7,9 +7,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var dataStore = Store{}
+var dataStore = &Store{}
 
-// Store implements store interface
+// Store implements *Store interface
 type Store struct {
 	session *mgo.Session
 }
@@ -17,7 +17,7 @@ type Store struct {
 const dbURL = "mongodb://localhost:27017"
 const db = "monmach"
 
-func (s Store) Connect() error {
+func (s *Store) Connect() error {
 	session, err := mgo.Dial(dbURL)
 	if err != nil {
 		return err
@@ -35,7 +35,7 @@ func getCollection(database *mgo.Database, collectionName string) *mgo.Collectio
 	return collection
 }
 
-func (s Store) GetAll(collection string, model interface{}) error {
+func (s *Store) GetAll(collection string, model interface{}) error {
 	log.Printf("GetAll: collection: %s, model: %T", collection, model)
 	session := s.session.Copy()
 	defer session.Close()
@@ -48,7 +48,7 @@ func (s Store) GetAll(collection string, model interface{}) error {
 	return nil
 }
 
-func (s Store) GetByKey(collection string, model interface{}, key string, value interface{}) error {
+func (s *Store) GetByKey(collection string, model interface{}, key string, value interface{}) error {
 	log.Printf("Get: collection: %s, model: %+v", collection, model)
 	session := s.session.Copy()
 	defer session.Close()
@@ -61,7 +61,7 @@ func (s Store) GetByKey(collection string, model interface{}, key string, value 
 	return nil
 }
 
-func (s Store) UpdateByKey(collection string, updates map[string]interface{}, key string, value interface{}) error {
+func (s *Store) UpdateByKey(collection string, updates map[string]interface{}, key string, value interface{}) error {
 	log.Printf("Update: collection: %s, updates: %+v", collection, updates)
 	session := s.session.Copy()
 	defer session.Close()
@@ -81,7 +81,7 @@ func (s Store) UpdateByKey(collection string, updates map[string]interface{}, ke
 	return nil
 }
 
-func (s Store) DeleteByKey(collection string, key string, value interface{}) error {
+func (s *Store) DeleteByKey(collection string, key string, value interface{}) error {
 	log.Printf("Delete: collection: %s, id: %+v", collection, value)
 	session := s.session.Copy()
 	defer session.Close()
@@ -94,7 +94,7 @@ func (s Store) DeleteByKey(collection string, key string, value interface{}) err
 	return nil
 }
 
-func (s Store) Create(collection string, values map[string]interface{}) error {
+func (s *Store) Create(collection string, values map[string]interface{}) error {
 	log.Printf("Create: collection: %s, values: %+v", collection, values)
 	session := s.session.Copy()
 	defer session.Close()
@@ -112,11 +112,11 @@ func (s Store) Create(collection string, values map[string]interface{}) error {
 }
 
 // Get returns a mongodb instance
-func Get() (Store, error) {
+func Get() (*Store, error) {
 	return dataStore, nil
 }
 
 // Set sets the store (mostly for testing)
-func Set(s Store) {
+func Set(s *Store) {
 	dataStore = s
 }
