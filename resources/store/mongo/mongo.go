@@ -11,7 +11,7 @@ var dataStore = &Store{}
 
 // Store implements *Store interface
 type Store struct {
-	session *mgo.Session
+	Session *mgo.Session
 }
 
 const dbURL = "mongodb://localhost:27017"
@@ -26,7 +26,7 @@ func (s *Store) Connect() error {
 	if err != nil {
 		return err
 	}
-	s.session = session
+	s.Session = session
 	return nil
 }
 
@@ -37,7 +37,7 @@ func getCollection(database *mgo.Database, collectionName string) *mgo.Collectio
 
 func (s *Store) GetAll(collection string, model interface{}) error {
 	log.Printf("GetAll: collection: %s, model: %T", collection, model)
-	session := s.session.Copy()
+	session := s.Session.Copy()
 	defer session.Close()
 	database := session.DB(db)
 	c := getCollection(database, collection)
@@ -50,7 +50,7 @@ func (s *Store) GetAll(collection string, model interface{}) error {
 
 func (s *Store) GetByKey(collection string, model interface{}, key string, value interface{}) error {
 	log.Printf("Get: collection: %s, model: %+v", collection, model)
-	session := s.session.Copy()
+	session := s.Session.Copy()
 	defer session.Close()
 	database := session.DB(db)
 	c := getCollection(database, collection)
@@ -63,7 +63,7 @@ func (s *Store) GetByKey(collection string, model interface{}, key string, value
 
 func (s *Store) UpdateByKey(collection string, updates map[string]interface{}, key string, value interface{}) error {
 	log.Printf("Update: collection: %s, updates: %+v", collection, updates)
-	session := s.session.Copy()
+	session := s.Session.Copy()
 	defer session.Close()
 	database := session.DB(db)
 	c := getCollection(database, collection)
@@ -83,7 +83,7 @@ func (s *Store) UpdateByKey(collection string, updates map[string]interface{}, k
 
 func (s *Store) DeleteByKey(collection string, key string, value interface{}) error {
 	log.Printf("Delete: collection: %s, id: %+v", collection, value)
-	session := s.session.Copy()
+	session := s.Session.Copy()
 	defer session.Close()
 	database := session.DB(db)
 	c := getCollection(database, collection)
@@ -96,7 +96,7 @@ func (s *Store) DeleteByKey(collection string, key string, value interface{}) er
 
 func (s *Store) Create(collection string, values map[string]interface{}) error {
 	log.Printf("Create: collection: %s, values: %+v", collection, values)
-	session := s.session.Copy()
+	session := s.Session.Copy()
 	defer session.Close()
 	database := session.DB(db)
 	c := getCollection(database, collection)

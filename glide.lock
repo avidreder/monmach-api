@@ -1,5 +1,5 @@
-hash: 8bed43a1ed74df9c6879eeb1d953a3372fa7ae65f3fb55c08a2b42327cedf90e
-updated: 2016-12-15T19:34:35.306220386-08:00
+hash: 04890ea228d2eca217cc3c168c8a73a863d92cd467f57c060b65bd20d168013a
+updated: 2016-12-18T10:47:48.169525023-08:00
 imports:
 - name: github.com/davecgh/go-spew
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
@@ -101,6 +101,7 @@ imports:
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
   - bson
+  - dbtest
   - internal/json
   - internal/sasl
   - internal/scram
@@ -109,4 +110,6 @@ imports:
   subpackages:
   - cipher
   - json
+- name: gopkg.in/tomb.v2
+  version: d5d1b5820637886def9eef33e03a27a9f166942c
 testImports: []
