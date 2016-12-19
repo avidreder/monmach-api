@@ -67,7 +67,7 @@ func LoadClient(h echo.HandlerFunc) echo.HandlerFunc {
 
 		user := usermw.GetUser(c)
 		token := &oauth2.Token{
-			AccessToken: user.SpotifyToken,
+			AccessToken: user.AccessToken,
 		}
 		client := auth.NewClient(token)
 		c.Set("spotifyClient", &client)

@@ -71,10 +71,7 @@ func (s *Store) UpdateByKey(collection string, updates map[string]interface{}, k
 	for k, v := range updates {
 		bsonUpdates[k] = v
 	}
-	selector := bson.M{"_id": bson.ObjectIdHex("5850266691f149a024aab0bc")}
-	updater := bson.M{"$set": bsonUpdates}
-	err := c.Update(selector, updater)
-	// err = c.Update(bson.M{key: value}, bson.M{"$set": bsonUpdates})
+	err := c.Update(bson.M{key: value}, bson.M{"$set": bsonUpdates})
 	if err != nil {
 		return err
 	}

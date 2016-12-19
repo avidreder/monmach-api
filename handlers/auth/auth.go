@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
@@ -108,9 +109,11 @@ func FinishAuth(c echo.Context) error {
 
 func HandleUserLogin(user userR.User, store store.Store) {
 	oldUser := userR.User{}
-	err := store.GetByKey("users", &oldUser, "email", user.Email)
-	if err != nil {
+	err := store.GetByKey("users", &oldUser, "Email", user.Email)
+	if err != nil && oldUser.Email != user.Email {
 		updates := structs.Map(user)
+		updates["Created"] = time.Now()
+		updates["Updated"] = time.Now()
 		delete(updates, "ID")
 		err = store.Create("users", updates)
 		if err != nil {
@@ -121,11 +124,12 @@ func HandleUserLogin(user userR.User, store store.Store) {
 		return
 	}
 	updates := map[string]interface{}{}
-	updates["SpotifyToken"] = user.SpotifyToken
-	updates["SpotifyRefreshToken"] = user.SpotifyRefreshToken
-	err = store.UpdateByKey("users", updates, "email", user.Email)
+	updates["AccessToken"] = user.AccessToken
+	updates["RefreshToken"] = user.RefreshToken
+	updates["Updated"] = time.Now()
+	err = store.UpdateByKey("users", updates, "Email", user.Email)
 	if err != nil {
-		log.Printf("Error updating user: %+v", user.Email)
+		log.Printf("Error updating user: %+v, %+v", user.Email, err)
 		return
 	}
 	log.Printf("Updated user: %+v", user.Email)
