@@ -20,7 +20,7 @@ import (
 	"github.com/markbates/goth/gothic"
 )
 
-const ClientAddress = "localhost:3000"
+const ClientAddress = "http://localhost:8080"
 
 func init() {
 	gothic.Store = sessions.NewFilesystemStore(os.TempDir(), []byte("monmach"))
@@ -102,7 +102,7 @@ func FinishAuth(c echo.Context) error {
 	}
 	session.Values["email"] = user.Email
 	session.Save(c.Request(), c.Response().Writer())
-	http.Redirect(c.Response().Writer(), c.Request(), "/", 302)
+	http.Redirect(c.Response().Writer(), c.Request(), ClientAddress, 302)
 	go HandleUserLogin(user, store)
 	return nil
 }
