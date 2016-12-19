@@ -19,6 +19,8 @@ import (
 	"github.com/markbates/goth/gothic"
 )
 
+const ClientAddress = "localhost:3000"
+
 func init() {
 	gothic.Store = sessions.NewFilesystemStore(os.TempDir(), []byte("monmach"))
 }
@@ -108,9 +110,11 @@ func HandleUserLogin(user userR.User, store store.Store) {
 	oldUser := userR.User{}
 	err := store.GetByKey("users", &oldUser, "email", user.Email)
 	if err != nil {
-		err = store.Create("users", structs.Map(user))
+		updates := structs.Map(user)
+		delete(updates, "ID")
+		err = store.Create("users", updates)
 		if err != nil {
-			log.Printf("Error storing new user: %+v", user.Email)
+			log.Printf("Error storing new user: %+v, %+v", user.Email, err)
 			return
 		}
 		log.Printf("Stored new user: %+v", user.Email)

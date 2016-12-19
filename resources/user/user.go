@@ -9,13 +9,13 @@ import (
 // User is the struct representing a user
 type User struct {
 	ID                  bson.ObjectId `bson:"_id,omitempty"`
-	SpotifyID           string        `json:"UserID"`
-	Name                string
-	Email               string
-	AvatarURL           string
-	SpotifyToken        string `json:"AccessToken"`
-	SpotifyRefreshToken string `json:"RefreshToken"`
-	Created             time.Time
-	Updated             time.Time
-	TrackBlacklist      []string
+	SpotifyID           string        `bson:"SpotifyID"`
+	Name                string        `bson:"Name"`
+	Email               string        `bson:"Email"`
+	AvatarURL           string        `bson:"AvatarURL"`
+	SpotifyToken        string        `json:"SpotifyToken"`
+	SpotifyRefreshToken string        `json:"SpotifyRefreshToken"`
+	Created             time.Time     `bson:"Created"`
+	Updated             time.Time     `bson:"Updated"`
+	TrackBlacklist      []string      `bson:"TrackBlacklist"`
 }

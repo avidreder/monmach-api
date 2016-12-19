@@ -15,7 +15,7 @@ import (
 // LoadSpotifyProvider places initialized provider in the context for later use
 func LoadSpotifyProvider(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		file, err := os.Open("/srv/monmach-api/spotify.json") // For read access.
+		file, err := os.Open("./spotify.json") // For read access.
 		if err != nil {
 			log.Printf("Could not Initialize Spotify: %s", err)
 		}

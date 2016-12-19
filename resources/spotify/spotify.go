@@ -73,7 +73,6 @@ func LoadClient(h echo.HandlerFunc) echo.HandlerFunc {
 		c.Set("spotifyClient", &client)
 		return h(c)
 	}
-
 }
 
 // GetClient retieves provider from the context
