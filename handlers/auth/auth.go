@@ -40,12 +40,12 @@ func LogoutUser(c echo.Context) error {
 	session, err = gothic.Store.Get(c.Request(), "_gothic_session")
 	log.Printf("gothicSession: %v", session)
 	if err != nil {
-		http.Redirect(c.Response().Writer(), c.Request(), "/", 302)
+		http.Redirect(c.Response().Writer(), c.Request(), ClientAddress, 302)
 		return nil
 	}
 	session.Options.MaxAge = -1
 	session.Save(c.Request(), c.Response().Writer())
-	http.Redirect(c.Response().Writer(), c.Request(), "/login", 302)
+	http.Redirect(c.Response().Writer(), c.Request(), ClientAddress+"/login.html", 302)
 	return nil
 }
 
