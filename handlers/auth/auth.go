@@ -120,6 +120,7 @@ func HandleUserLogin(user userR.User, store store.Store) {
 		updates["Updated"] = time.Now()
 		id := bson.NewObjectId()
 		updates["ID"] = id
+		updates["_id"] = id
 		err = store.Create("users", updates)
 		if err != nil {
 			log.Printf("Error storing new user: %+v, %+v", user.Email, err)
@@ -127,8 +128,17 @@ func HandleUserLogin(user userR.User, store store.Store) {
 		}
 		log.Printf("Stored new user: %+v", user.Email)
 		queueUpdates := structs.Map(queue.Queue{})
+		queueID := bson.NewObjectId()
+		queueUpdates["_id"] = queueID
+		queueUpdates["ID"] = queueID
+		queueUpdates["userid"] = id
 		queueUpdates["UserID"] = id
-		store.Create("queues", queueUpdates)
+		err = store.Create("queues", queueUpdates)
+		if err != nil {
+			log.Printf("Error creating user queue: %+v, %+v", id, err)
+			return
+		}
+		log.Printf("Created user queue: %+v", id)
 		return
 	}
 	updates := map[string]interface{}{}
