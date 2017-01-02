@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 
+	queuemw "github.com/avidreder/monmach-api/middleware/queue"
+	stmw "github.com/avidreder/monmach-api/middleware/store"
 	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
 
 	"github.com/labstack/echo"
@@ -22,6 +24,7 @@ func UserPlaylists(c echo.Context) error {
 	return c.JSON(http.StatusOK, playlists)
 }
 
+// FindDiscoverPlaylist searches spotify for the user playlist
 func FindDiscoverPlaylist(client *spotify.Client) (spotify.ID, error) {
 	playlists, err := client.CurrentUsersPlaylists()
 	if err != nil {
@@ -36,17 +39,31 @@ func FindDiscoverPlaylist(client *spotify.Client) (spotify.ID, error) {
 	return "", errors.New("Could not find discover playlist")
 }
 
-// DiscoverPlaylist gets a user's spotify discover playlist
+// DiscoverPlaylist gets and stores a user's spotify discover playlist
 func DiscoverPlaylist(c echo.Context) error {
 	client := spotifyR.GetClient(c)
+	store := stmw.GetStore(c)
+	queue := queuemw.GetUserQueue(c)
 	discoverID, err := FindDiscoverPlaylist(client)
+	log.Printf("%+v", discoverID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	response, err := client.GetPlaylistTracksOpt("spotifydiscover", discoverID, nil, "items(track(album(images(url,height,width)),name,id,artists(name,id)))")
-	log.Printf("%+v", response)
+	response, err := client.GetPlaylistTracksOpt("spotify", discoverID, nil, "items(track(album(images(url,height,width)),name,id,artists(name,id)))")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
 	responseJSON, err := json.Marshal(response.Tracks)
 	err = json.Unmarshal(responseJSON, &SpotifyTracks)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	queueID := queue.ID
+	log.Print(queueID)
+	updates := map[string]interface{}{}
+	updates["TrackQueue"] = SpotifyTracks
+	updates["trackqueue"] = SpotifyTracks
+	err = store.UpdateByKey("queues", updates, "_id", queueID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

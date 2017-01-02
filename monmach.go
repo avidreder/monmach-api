@@ -8,6 +8,7 @@ import (
 	spoth "github.com/avidreder/monmach-api/handlers/spotify"
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	crudmw "github.com/avidreder/monmach-api/middleware/crud"
+	queuemw "github.com/avidreder/monmach-api/middleware/queue"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	usermw "github.com/avidreder/monmach-api/middleware/user"
 	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
@@ -77,6 +78,7 @@ func main() {
 		stmw.LoadStore,
 		authmw.LoadStore,
 		usermw.LoadUser,
+		queuemw.LoadUserQueue,
 		spotifyR.LoadClient)
 	spotify.GET("/discover", spoth.DiscoverPlaylist)
 
