@@ -10,6 +10,7 @@ import (
 
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
+	"github.com/avidreder/monmach-api/resources/queue"
 	"github.com/avidreder/monmach-api/resources/store"
 	userR "github.com/avidreder/monmach-api/resources/user"
 
@@ -18,8 +19,10 @@ import (
 	"github.com/labstack/echo"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
+	"gopkg.in/mgo.v2/bson"
 )
 
+// ClientAddress is the address of the monmach client
 const ClientAddress = "http://localhost:8080"
 
 func init() {
@@ -107,6 +110,7 @@ func FinishAuth(c echo.Context) error {
 	return nil
 }
 
+// HandleUserLogin creates or updates a user record, and it's associated queue
 func HandleUserLogin(user userR.User, store store.Store) {
 	oldUser := userR.User{}
 	err := store.GetByKey("users", &oldUser, "Email", user.Email)
@@ -114,13 +118,17 @@ func HandleUserLogin(user userR.User, store store.Store) {
 		updates := structs.Map(user)
 		updates["Created"] = time.Now()
 		updates["Updated"] = time.Now()
-		delete(updates, "ID")
+		id := bson.NewObjectId()
+		updates["ID"] = id
 		err = store.Create("users", updates)
 		if err != nil {
 			log.Printf("Error storing new user: %+v, %+v", user.Email, err)
 			return
 		}
 		log.Printf("Stored new user: %+v", user.Email)
+		queueUpdates := structs.Map(queue.Queue{})
+		queueUpdates["UserID"] = id
+		store.Create("queues", queueUpdates)
 		return
 	}
 	updates := map[string]interface{}{}

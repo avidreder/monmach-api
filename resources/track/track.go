@@ -3,22 +3,21 @@ package track
 import (
 	"time"
 
+	"github.com/avidreder/monmach-api/resources/spotify"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
 // Track is the struct for a user's playlist
 type Track struct {
-	ID        bson.ObjectId `bson:"_id,omitempty"`
-	Name      string
-	Artists   []string
-	ImageURL  string
-	SpotifyID string
-	Genres    []string
-	Playlists []string
-	Rating    int64
-	Created   time.Time
-	Updated   time.Time
-	Features  []float64
+	ID           bson.ObjectId        `bson:"_id,omitempty"`
+	SpotifyTrack spotify.SpotifyTrack `bson:"spotifytrack,omitempty"`
+	Genres       []string             `bson:"genres,omitempty"`
+	Playlists    []string             `bson:"playlists,omitempty"`
+	Rating       int64                `bson:"rating,omitempty"`
+	Created      time.Time            `bson:"created,omitempty"`
+	Updated      time.Time            `bson:"updated,omitempty"`
+	Features     []float64            `bson:"features,omitempty"`
 }
 
 // SpotifyFeatures is the response from Spotify's Audio Features API
