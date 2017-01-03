@@ -108,6 +108,20 @@ func (s *Store) Create(collection string, values map[string]interface{}) error {
 	return nil
 }
 
+// CountByQuery gets number of records given a key and value
+func (s *Store) CountByQuery(collection string, key string, value interface{}) (int, error) {
+	log.Printf("Count: collection: %s, key: %+v, value: %+v", collection, key, value)
+	session := s.Session.Copy()
+	defer session.Close()
+	database := session.DB(db)
+	c := getCollection(database, collection)
+	count, err := c.Find(bson.M{key: value}).Count()
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 // Get returns a mongodb instance
 func Get() (*Store, error) {
 	return dataStore, nil

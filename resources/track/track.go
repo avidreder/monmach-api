@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/avidreder/monmach-api/resources/spotify"
+	"github.com/avidreder/monmach-api/resources/store/mongo"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -18,6 +19,19 @@ type Track struct {
 	Created      time.Time            `bson:"created,omitempty"`
 	Updated      time.Time            `bson:"updated,omitempty"`
 	Features     []float64            `bson:"features,omitempty"`
+}
+
+// AlreadyProcessed checks if a track has already been added
+func AlreadyProcessed(trackID string) (bool, error) {
+	store, err := mongo.Get()
+	if err != nil {
+		return false, err
+	}
+	count, err := store.CountByQuery("tracks", "SpotifyTrack.Track.SpotifyID", trackID)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
 
 // SpotifyFeatures is the response from Spotify's Audio Features API
@@ -35,10 +49,4 @@ type Track struct {
 // 	Tempo            float64
 // 	Duration         int64
 // 	TimeSignature    int64
-// }
-
-// Artist is a Spotify Artist profile
-// type Artist struct {
-// 	ID   string
-// 	Name string
 // }

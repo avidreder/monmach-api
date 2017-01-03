@@ -18,8 +18,10 @@ type Store interface {
 	UpdateByKey(string, map[string]interface{}, string, interface{}) error
 	DeleteByKey(string, string, interface{}) error
 	Create(string, map[string]interface{}) error
+	CountByQuery(string, string, interface{}) (int, error)
 }
 
+// ValidateRequired checks all fields are present for CRUD operations
 func ValidateRequired(schema interface{}, values map[string]interface{}) (map[string]interface{}, error) {
 	newValues := map[string]interface{}{}
 	structMap := structs.Map(schema)

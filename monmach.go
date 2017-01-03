@@ -5,6 +5,7 @@ import (
 
 	authh "github.com/avidreder/monmach-api/handlers/auth"
 	crudh "github.com/avidreder/monmach-api/handlers/crud"
+	queueh "github.com/avidreder/monmach-api/handlers/queue"
 	spoth "github.com/avidreder/monmach-api/handlers/spotify"
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	crudmw "github.com/avidreder/monmach-api/middleware/crud"
@@ -48,7 +49,10 @@ func main() {
 	// Load middleware for all routes
 	server.Use(emw.Logger())
 	server.Use(emw.Recover())
-	server.Use(emw.CORS())
+	server.Use(emw.CORSWithConfig(emw.CORSConfig{
+		AllowOrigins:     []string{"http://localhost:8080"},
+		AllowCredentials: true,
+	}))
 
 	logout := server.Group("/logout")
 	logout.Use(authmw.LoadStore)
@@ -71,6 +75,15 @@ func main() {
 		authmw.LoadStore)
 	auth.GET("/spotify", authh.StartAuth)
 	auth.GET("/spotify/callback", authh.FinishAuth)
+
+	// Load routes for user queue
+	queue := server.Group("/queue")
+	queue.Use(authmw.LoadSpotifyProvider,
+		stmw.LoadStore,
+		authmw.LoadStore,
+		usermw.LoadUser,
+		queuemw.LoadUserQueue)
+	queue.GET("", queueh.UserQueue)
 
 	// Load routes for spotify
 	spotify := server.Group("/spotify")

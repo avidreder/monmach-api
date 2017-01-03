@@ -45,3 +45,9 @@ func (m Store) GetAll(string, interface{}) error {
 	args := m.Called()
 	return args.Error(0)
 }
+
+// CountByKey mocks the associated store function
+func (m Store) CountByQuery(string, string, interface{}) (int, error) {
+	args := m.Called()
+	return args.Get(0).(int), args.Error(1)
+}
