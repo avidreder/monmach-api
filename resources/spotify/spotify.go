@@ -29,21 +29,23 @@ var FeaturedPlaylists = []FeaturedPlaylist{
 }
 
 type SpotifyTrack struct {
-	Track struct {
+	Name      string `json:"name"`
+	SpotifyID string `json:"id"`
+	Album     struct {
+		Images []struct {
+			Height int64  `json:"height"`
+			Width  int64  `json:"width"`
+			URL    string `json:"url"`
+		} `json:"images"`
+	} `json:"album"`
+	Artists []struct {
 		Name      string `json:"name"`
 		SpotifyID string `json:"id"`
-		Album     struct {
-			Images []struct {
-				Height int64  `json:"height"`
-				Width  int64  `json:"width"`
-				URL    string `json:"url"`
-			} `json:"images"`
-		} `json:"album"`
-		Artists []struct {
-			Name      string `json:"name"`
-			SpotifyID string `json:"id"`
-		} `json:"artists"`
-	} `json:"track"`
+	} `json:"artists"`
+}
+
+type SpotifyResponse struct {
+	Track SpotifyTrack `json:"track"`
 }
 
 // LoadClient places initialized spotify client

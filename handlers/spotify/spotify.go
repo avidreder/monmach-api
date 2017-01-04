@@ -9,6 +9,7 @@ import (
 	queuemw "github.com/avidreder/monmach-api/middleware/queue"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
+	trackR "github.com/avidreder/monmach-api/resources/track"
 
 	"github.com/labstack/echo"
 	"github.com/zmb3/spotify"
@@ -54,12 +55,15 @@ func DiscoverPlaylist(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	responseJSON, err := json.Marshal(response.Tracks)
-	err = json.Unmarshal(responseJSON, &SpotifyTracks)
+	err = json.Unmarshal(responseJSON, &SpotifyResponses)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	queueID := queue.ID
 	log.Print(queueID)
+	for _, track := range SpotifyResponses {
+		SpotifyTracks = append(SpotifyTracks, trackR.Track{SpotifyTrack: track.Track})
+	}
 	updates := map[string]interface{}{}
 	updates["TrackQueue"] = SpotifyTracks
 	updates["trackqueue"] = SpotifyTracks
@@ -70,4 +74,5 @@ func DiscoverPlaylist(c echo.Context) error {
 	return c.JSON(http.StatusOK, SpotifyTracks)
 }
 
-var SpotifyTracks []spotifyR.SpotifyTrack
+var SpotifyResponses []spotifyR.SpotifyResponse
+var SpotifyTracks []trackR.Track

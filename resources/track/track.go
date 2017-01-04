@@ -13,6 +13,7 @@ import (
 type Track struct {
 	ID           bson.ObjectId        `bson:"_id,omitempty"`
 	SpotifyTrack spotify.SpotifyTrack `bson:"spotifytrack,omitempty"`
+	SpotifyID    string               `bson:"spotifyid,omitempty"`
 	Genres       []string             `bson:"genres,omitempty"`
 	Playlists    []string             `bson:"playlists,omitempty"`
 	Rating       int64                `bson:"rating,omitempty"`
