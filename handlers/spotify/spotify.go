@@ -40,6 +40,17 @@ func FindDiscoverPlaylist(client *spotify.Client) (spotify.ID, error) {
 	return "", errors.New("Could not find discover playlist")
 }
 
+// GetAudioFeatures searches spotify for the user playlist
+func GetAudioFeatures(client *spotify.Client, ids ...spotify.ID) ([]*spotify.AudioFeatures, error) {
+	features, err := client.GetAudioFeatures(ids...)
+	if err != nil {
+		log.Printf("GetAudioFeatures Error: %+v", err)
+		var nilSlice []*spotify.AudioFeatures
+		return nilSlice, err
+	}
+	return features, nil
+}
+
 // DiscoverPlaylist gets and stores a user's spotify discover playlist
 func DiscoverPlaylist(c echo.Context) error {
 	client := spotifyR.GetClient(c)
@@ -62,7 +73,15 @@ func DiscoverPlaylist(c echo.Context) error {
 	queueID := queue.ID
 	log.Print(queueID)
 	for _, track := range SpotifyResponses {
-		SpotifyTracks = append(SpotifyTracks, trackR.Track{SpotifyTrack: track.Track})
+		featureResult, err := GetAudioFeatures(client, spotify.ID(track.Track.SpotifyID))
+		if err == nil {
+			newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID, Features: *featureResult[0]}
+			log.Printf("%+v", newTrack.Features)
+			SpotifyTracks = append(SpotifyTracks, newTrack)
+		} else {
+			newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID}
+			SpotifyTracks = append(SpotifyTracks, newTrack)
+		}
 	}
 	updates := map[string]interface{}{}
 	updates["TrackQueue"] = SpotifyTracks

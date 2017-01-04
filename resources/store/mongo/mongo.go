@@ -62,7 +62,7 @@ func (s *Store) GetByKey(collection string, model interface{}, key string, value
 }
 
 func (s *Store) UpdateByKey(collection string, updates map[string]interface{}, key string, value interface{}) error {
-	log.Printf("Update: collection: %s, updates: %+v", collection, updates)
+	log.Printf("Update: collection: %s", collection)
 	session := s.Session.Copy()
 	defer session.Close()
 	database := session.DB(db)

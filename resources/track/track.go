@@ -3,23 +3,24 @@ package track
 import (
 	"time"
 
-	"github.com/avidreder/monmach-api/resources/spotify"
+	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
 	"github.com/avidreder/monmach-api/resources/store/mongo"
 
+	"github.com/zmb3/spotify"
 	"gopkg.in/mgo.v2/bson"
 )
 
 // Track is the struct for a user's playlist
 type Track struct {
-	ID           bson.ObjectId        `bson:"_id,omitempty"`
-	SpotifyTrack spotify.SpotifyTrack `bson:"spotifytrack,omitempty"`
-	SpotifyID    string               `bson:"spotifyid,omitempty"`
-	Genres       []string             `bson:"genres,omitempty"`
-	Playlists    []string             `bson:"playlists,omitempty"`
-	Rating       int64                `bson:"rating,omitempty"`
-	Created      time.Time            `bson:"created,omitempty"`
-	Updated      time.Time            `bson:"updated,omitempty"`
-	Features     []float64            `bson:"features,omitempty"`
+	ID           bson.ObjectId         `bson:"_id,omitempty"`
+	SpotifyTrack spotifyR.SpotifyTrack `bson:"spotifytrack,omitempty"`
+	SpotifyID    string                `bson:"spotifyid,omitempty"`
+	Genres       []string              `bson:"genres,omitempty"`
+	Playlists    []string              `bson:"playlists,omitempty"`
+	Rating       int64                 `bson:"rating,omitempty"`
+	Created      time.Time             `bson:"created,omitempty"`
+	Updated      time.Time             `bson:"updated,omitempty"`
+	Features     spotify.AudioFeatures `bson:"features,omitempty"`
 }
 
 // AlreadyProcessed checks if a track has already been added
