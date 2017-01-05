@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
@@ -25,6 +26,7 @@ func LoadUser(h echo.HandlerFunc) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not retrieve logged-in user: %v", err))
 		}
 		userEmail := session.Values["email"].(string)
+		log.Printf("Loading User: %s", userEmail)
 		user := user.User{}
 		store := stmw.GetStore(c)
 		err = store.GetByKey("users", &user, "Email", userEmail)

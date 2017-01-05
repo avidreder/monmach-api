@@ -82,8 +82,9 @@ func main() {
 		stmw.LoadStore,
 		authmw.LoadStore,
 		usermw.LoadUser,
-		queuemw.LoadUserQueue)
-	queue.GET("", queueh.UserQueue)
+		spotifyR.LoadClient)
+	queue.GET("/user", queueh.RetrieveQueue, queuemw.LoadUserQueue)
+	queue.GET("/:playlist", queueh.RetrieveQueue, queuemw.QueueFromPlaylist)
 
 	// Load routes for spotify
 	spotify := server.Group("/spotify")
@@ -94,6 +95,7 @@ func main() {
 		queuemw.LoadUserQueue,
 		spotifyR.LoadClient)
 	spotify.GET("/discover", spoth.DiscoverPlaylist)
+	spotify.GET("/playlists", spoth.UserPlaylists)
 
 	// Load routes for crud
 	crud := server.Group("/crud/:table")

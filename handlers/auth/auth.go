@@ -91,6 +91,7 @@ func FinishAuth(c echo.Context) error {
 		log.Printf("Could not log the user in: %v", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
 	}
+	log.Printf("spotifyUser: %+v", response)
 	user := userR.User{}
 	string, _ := json.Marshal(response)
 	err = json.Unmarshal(string, &user)

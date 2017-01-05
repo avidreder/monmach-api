@@ -9,7 +9,7 @@ import (
 // User is the struct representing a user
 type User struct {
 	ID             bson.ObjectId `bson:"_id,omitempty"`
-	SpotifyID      string        `bson:"SpotifyID"`
+	SpotifyID      string        `bson:"SpotifyID" json:"UserID"`
 	Name           string        `bson:"Name"`
 	Email          string        `bson:"Email"`
 	AvatarURL      string        `bson:"AvatarURL"`

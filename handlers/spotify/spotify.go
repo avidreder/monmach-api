@@ -1,18 +1,15 @@
 package spotify
 
 import (
-	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 
 	queuemw "github.com/avidreder/monmach-api/middleware/queue"
+	spotifymw "github.com/avidreder/monmach-api/middleware/spotify"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
-	trackR "github.com/avidreder/monmach-api/resources/track"
 
 	"github.com/labstack/echo"
-	"github.com/zmb3/spotify"
 )
 
 // UserPlaylists gets a user's spotify playlists
@@ -25,73 +22,28 @@ func UserPlaylists(c echo.Context) error {
 	return c.JSON(http.StatusOK, playlists)
 }
 
-// FindDiscoverPlaylist searches spotify for the user playlist
-func FindDiscoverPlaylist(client *spotify.Client) (spotify.ID, error) {
-	playlists, err := client.CurrentUsersPlaylists()
-	if err != nil {
-		return "", err
-	}
-	playlistArray := playlists.Playlists
-	for _, pl := range playlistArray {
-		if pl.Name == "Discover Weekly" {
-			return pl.ID, nil
-		}
-	}
-	return "", errors.New("Could not find discover playlist")
-}
-
-// GetAudioFeatures searches spotify for the user playlist
-func GetAudioFeatures(client *spotify.Client, ids ...spotify.ID) ([]*spotify.AudioFeatures, error) {
-	features, err := client.GetAudioFeatures(ids...)
-	if err != nil {
-		log.Printf("GetAudioFeatures Error: %+v", err)
-		var nilSlice []*spotify.AudioFeatures
-		return nilSlice, err
-	}
-	return features, nil
-}
-
 // DiscoverPlaylist gets and stores a user's spotify discover playlist
 func DiscoverPlaylist(c echo.Context) error {
 	client := spotifyR.GetClient(c)
 	store := stmw.GetStore(c)
 	queue := queuemw.GetUserQueue(c)
-	discoverID, err := FindDiscoverPlaylist(client)
+	discoverID, err := spotifymw.FindDiscoverPlaylist(client)
 	log.Printf("%+v", discoverID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	response, err := client.GetPlaylistTracksOpt("spotify", discoverID, nil, "items(track(album(images(url,height,width)),name,id,artists(name,id)))")
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
-	responseJSON, err := json.Marshal(response.Tracks)
-	err = json.Unmarshal(responseJSON, &SpotifyResponses)
+	tracks, err := spotifymw.TracksFromPlaylist(client, discoverID, "spotify")
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	queueID := queue.ID
 	log.Print(queueID)
-	for _, track := range SpotifyResponses {
-		featureResult, err := GetAudioFeatures(client, spotify.ID(track.Track.SpotifyID))
-		if err == nil {
-			newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID, Features: *featureResult[0]}
-			log.Printf("%+v", newTrack.Features)
-			SpotifyTracks = append(SpotifyTracks, newTrack)
-		} else {
-			newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID}
-			SpotifyTracks = append(SpotifyTracks, newTrack)
-		}
-	}
 	updates := map[string]interface{}{}
-	updates["TrackQueue"] = SpotifyTracks
-	updates["trackqueue"] = SpotifyTracks
+	updates["TrackQueue"] = tracks
+	updates["trackqueue"] = tracks
 	err = store.UpdateByKey("queues", updates, "_id", queueID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, SpotifyTracks)
+	return c.JSON(http.StatusOK, tracks)
 }
-
-var SpotifyResponses []spotifyR.SpotifyResponse
-var SpotifyTracks []trackR.Track
