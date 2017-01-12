@@ -16,6 +16,7 @@ type Track struct {
 	SpotifyTrack spotifyR.SpotifyTrack `bson:"spotifytrack,omitempty"`
 	SpotifyID    string                `bson:"spotifyid,omitempty"`
 	Genres       []string              `bson:"genres,omitempty"`
+	CustomGenres []string              `bson:"customgenres,omitempty"`
 	Playlists    []string              `bson:"playlists,omitempty"`
 	Rating       int64                 `bson:"rating,omitempty"`
 	Created      time.Time             `bson:"created,omitempty"`

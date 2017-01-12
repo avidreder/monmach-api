@@ -37,6 +37,17 @@ func GetAudioFeatures(client *spotify.Client, ids ...spotify.ID) ([]*spotify.Aud
 	return features, nil
 }
 
+// GetArtistGenres searches spotify for the user playlist
+func GetArtistGenres(client *spotify.Client, ids ...spotify.ID) ([]*spotify.FullArtist, error) {
+	artists, err := client.GetArtists(ids...)
+	if err != nil {
+		log.Printf("GetArtistGenres Error: %+v", err)
+		var nilSlice []*spotify.FullArtist
+		return nilSlice, err
+	}
+	return artists, nil
+}
+
 // TracksFromPlaylist gets tracks from spotify and processes them
 func TracksFromPlaylist(client *spotify.Client, playlistID spotify.ID, ownerID string) ([]trackR.Track, error) {
 	tracks := []trackR.Track{}
@@ -56,8 +67,26 @@ func TracksFromPlaylist(client *spotify.Client, playlistID spotify.ID, ownerID s
 	for _, track := range responseObject {
 		featureResult, err := GetAudioFeatures(client, spotify.ID(track.Track.SpotifyID))
 		if err == nil {
-			newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID, Features: *featureResult[0]}
-			log.Printf("%+v", newTrack.Features)
+			newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID, Features: *featureResult[0], Genres: []string{}, CustomGenres: []string{}, Playlists: []string{string(playlistID)}}
+			genreSlice := []string{}
+			for k, artist := range newTrack.SpotifyTrack.Artists {
+				artistInfo, err := GetArtistGenres(client, spotify.ID(artist.SpotifyID))
+				if err == nil {
+					fullArtist := *artistInfo[0]
+					newTrack.SpotifyTrack.Artists[k].Genres = fullArtist.Genres
+					genreSlice = append(genreSlice, fullArtist.Genres...)
+				}
+				genreMap := map[string]struct{}{}
+				dedupedSlice := []string{}
+				for _, v := range genreSlice {
+					_, ok := genreMap[v]
+					if !ok {
+						dedupedSlice = append(dedupedSlice, v)
+						genreMap[v] = struct{}{}
+					}
+				}
+				newTrack.Genres = dedupedSlice
+			}
 			tracks = append(tracks, newTrack)
 		} else {
 			newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID}

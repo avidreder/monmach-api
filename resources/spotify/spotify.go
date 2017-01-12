@@ -39,8 +39,9 @@ type SpotifyTrack struct {
 		} `json:"images"`
 	} `json:"album"`
 	Artists []struct {
-		Name      string `json:"name"`
-		SpotifyID string `json:"id"`
+		Name      string   `json:"name"`
+		SpotifyID string   `json:"id"`
+		Genres    []string `json:"genres"`
 	} `json:"artists"`
 }
 
