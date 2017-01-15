@@ -10,7 +10,7 @@ import (
 
 // Queue is the struct for a user's custom genre
 type Queue struct {
-	ID             bson.ObjectId `bson:"_id"`
+	ID             bson.ObjectId `bson:"_id,omitempty"`
 	UserID         bson.ObjectId `bson:"userid"`
 	Name           string        `bson:"name"`
 	MaxSize        int64         `bson:"maxsize"`

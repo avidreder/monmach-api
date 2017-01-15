@@ -12,7 +12,7 @@ import (
 
 // Track is the struct for a user's playlist
 type Track struct {
-	ID           bson.ObjectId         `bson:"_id"`
+	ID           bson.ObjectId         `bson:"_id,omitempty"`
 	SpotifyTrack spotifyR.SpotifyTrack `bson:"spotifytrack"`
 	SpotifyID    string                `bson:"spotifyid"`
 	Genres       []string              `bson:"genres"`
