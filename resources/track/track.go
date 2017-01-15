@@ -12,16 +12,16 @@ import (
 
 // Track is the struct for a user's playlist
 type Track struct {
-	ID           bson.ObjectId         `bson:"_id,omitempty"`
-	SpotifyTrack spotifyR.SpotifyTrack `bson:"spotifytrack,omitempty"`
-	SpotifyID    string                `bson:"spotifyid,omitempty"`
-	Genres       []string              `bson:"genres,omitempty"`
-	CustomGenres []string              `bson:"customgenres,omitempty"`
-	Playlists    []string              `bson:"playlists,omitempty"`
-	Rating       int64                 `bson:"rating,omitempty"`
-	Created      time.Time             `bson:"created,omitempty"`
-	Updated      time.Time             `bson:"updated,omitempty"`
-	Features     spotify.AudioFeatures `bson:"features,omitempty"`
+	ID           bson.ObjectId         `bson:"_id"`
+	SpotifyTrack spotifyR.SpotifyTrack `bson:"spotifytrack"`
+	SpotifyID    string                `bson:"spotifyid"`
+	Genres       []string              `bson:"genres"`
+	CustomGenres []string              `bson:"customgenres"`
+	Playlists    []string              `bson:"playlists"`
+	Rating       int64                 `bson:"rating"`
+	Created      time.Time             `bson:"created"`
+	Updated      time.Time             `bson:"updated"`
+	Features     spotify.AudioFeatures `bson:"features"`
 }
 
 // AlreadyProcessed checks if a track has already been added

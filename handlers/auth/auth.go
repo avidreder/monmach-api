@@ -12,6 +12,7 @@ import (
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	"github.com/avidreder/monmach-api/resources/queue"
 	"github.com/avidreder/monmach-api/resources/store"
+	trackR "github.com/avidreder/monmach-api/resources/track"
 	userR "github.com/avidreder/monmach-api/resources/user"
 
 	"github.com/fatih/structs"
@@ -134,6 +135,14 @@ func HandleUserLogin(user userR.User, store store.Store) {
 		queueUpdates["ID"] = queueID
 		queueUpdates["userid"] = id
 		queueUpdates["UserID"] = id
+		queueUpdates["TrackQueue"] = make([]trackR.Track, 0)
+		queueUpdates["SeedArtists"] = make([]string, 0)
+		queueUpdates["SeedTracks"] = make([]string, 0)
+		queueUpdates["ListenedTracks"] = make([]string, 0)
+		queueUpdates["trackqueue"] = make([]trackR.Track, 0)
+		queueUpdates["seedartists"] = make([]string, 0)
+		queueUpdates["seedtracks"] = make([]string, 0)
+		queueUpdates["listenedtracks"] = make([]string, 0)
 		err = store.Create("queues", queueUpdates)
 		if err != nil {
 			log.Printf("Error creating user queue: %+v, %+v", id, err)

@@ -67,7 +67,7 @@ func TracksFromPlaylist(client *spotify.Client, playlistID spotify.ID, ownerID s
 	for _, track := range responseObject {
 		featureResult, err := GetAudioFeatures(client, spotify.ID(track.Track.SpotifyID))
 		if err == nil {
-			newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID, Features: *featureResult[0], Genres: []string{}, CustomGenres: []string{}, Playlists: []string{string(playlistID)}}
+			newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID, Features: *featureResult[0], Genres: make([]string, 0), CustomGenres: make([]string, 0), Playlists: []string{string(playlistID)}}
 			genreSlice := []string{}
 			for k, artist := range newTrack.SpotifyTrack.Artists {
 				artistInfo, err := GetArtistGenres(client, spotify.ID(artist.SpotifyID))
@@ -89,7 +89,7 @@ func TracksFromPlaylist(client *spotify.Client, playlistID spotify.ID, ownerID s
 			}
 			tracks = append(tracks, newTrack)
 		} else {
-			newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID}
+			newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID, Genres: make([]string, 0), CustomGenres: make([]string, 0), Playlists: []string{string(playlistID)}}
 			tracks = append(tracks, newTrack)
 		}
 	}

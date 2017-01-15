@@ -10,14 +10,14 @@ import (
 
 // Queue is the struct for a user's custom genre
 type Queue struct {
-	ID             bson.ObjectId `bson:"_id,omitempty"`
-	UserID         bson.ObjectId `bson:"userid,omitempty"`
-	Name           string        `bson:"name,omitempty"`
-	MaxSize        int64         `bson:"maxsize,omitempty"`
-	TrackQueue     []track.Track `bson:"trackqueue,omitempty"`
-	SeedArtists    []string      `bson:"seedartists,omitempty"`
-	SeedTracks     []string      `bson:"seedtracks,omitempty"`
-	ListenedTracks []string      `bson:"listenedtracks,omitempty"`
-	Created        time.Time     `bson:"created,omitempty"`
-	Updated        time.Time     `bson:"updated,omitempty"`
+	ID             bson.ObjectId `bson:"_id"`
+	UserID         bson.ObjectId `bson:"userid"`
+	Name           string        `bson:"name"`
+	MaxSize        int64         `bson:"maxsize"`
+	TrackQueue     []track.Track `bson:"trackqueue"`
+	SeedArtists    []string      `bson:"seedartists"`
+	SeedTracks     []string      `bson:"seedtracks"`
+	ListenedTracks []string      `bson:"listenedtracks"`
+	Created        time.Time     `bson:"created"`
+	Updated        time.Time     `bson:"updated"`
 }

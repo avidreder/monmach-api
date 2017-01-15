@@ -60,6 +60,9 @@ func QueueFromPlaylist(h echo.HandlerFunc) echo.HandlerFunc {
 		queueUpdates["UserID"] = user.ID
 		queueUpdates["TrackQueue"] = tracks
 		queueUpdates["trackqueue"] = tracks
+		queueUpdates["SeedArtists"] = make([]string, 0)
+		queueUpdates["SeedTracks"] = make([]string, 0)
+		queueUpdates["ListenedTracks"] = make([]string, 0)
 		err = store.Create("queues", queueUpdates)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err)

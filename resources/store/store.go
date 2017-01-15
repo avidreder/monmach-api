@@ -33,29 +33,38 @@ func ValidateRequired(schema interface{}, values map[string]interface{}) (map[st
 			}
 			if reflect.TypeOf(values[k]).String() == reflect.TypeOf(v).String() {
 				newValues[k] = v
-			} else if reflect.TypeOf(v).String() == "[]string" && reflect.TypeOf(values[k]).String() == "string" {
-				var array []string
-				if (values[k].(string)) != "" {
-					err := json.Unmarshal([]byte(values[k].(string)), &array)
-					if err == nil {
-						newValues[strings.ToLower(k)] = array
+			} else if reflect.TypeOf(v).String() == "[]string" {
+				if reflect.TypeOf(values[k]).String() == "string" {
+					var array []string
+					if (values[k].(string)) != "" {
+						err := json.Unmarshal([]byte(values[k].(string)), &array)
+						if err == nil {
+							newValues[strings.ToLower(k)] = array
+						} else {
+							return nil, fmt.Errorf("Required field %s was not present: %v, %v", k, err, values[k])
+						}
 					} else {
-						return nil, fmt.Errorf("Required field %s was not present: %v, %v", k, err, values[k])
+						newValues[strings.ToLower(k)] = array
 					}
 				} else {
-					newValues[strings.ToLower(k)] = array
+					log.Printf("Making new slice for: %s", k)
+					newValues[k] = make([]string, 2)
 				}
-			} else if reflect.TypeOf(v).String() == "[]float64" && reflect.TypeOf(values[k]).String() == "string" {
-				var array []float64
-				if (values[k].(string)) != "" {
-					err := json.Unmarshal([]byte(values[k].(string)), &array)
-					if err == nil {
-						newValues[strings.ToLower(k)] = array
+			} else if reflect.TypeOf(v).String() == "[]float64" {
+				if reflect.TypeOf(values[k]).String() == "string" {
+					var array []float64
+					if (values[k].(string)) != "" {
+						err := json.Unmarshal([]byte(values[k].(string)), &array)
+						if err == nil {
+							newValues[strings.ToLower(k)] = array
+						} else {
+							return nil, fmt.Errorf("Required field %s was not present", k)
+						}
 					} else {
-						return nil, fmt.Errorf("Required field %s was not present", k)
+						newValues[strings.ToLower(k)] = array
 					}
 				} else {
-					newValues[strings.ToLower(k)] = array
+					newValues[k] = make([]float64, 2)
 				}
 			}
 		}
