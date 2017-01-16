@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strconv"
 	"strings"
 
 	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
@@ -37,6 +38,12 @@ func ValidateRequired(schema interface{}, values map[string]interface{}) (map[st
 			}
 			if reflect.TypeOf(values[k]).String() == reflect.TypeOf(v).String() {
 				newValues[strings.ToLower(k)] = values[k]
+			} else if reflect.TypeOf(v).String() == "int64" {
+				number, err := strconv.ParseInt(values[k].(string), 10, 64)
+				if err != nil {
+					return nil, fmt.Errorf("Required field %s was not present: %v, %v", k, err, values[k])
+				}
+				newValues[strings.ToLower(k)] = number
 			} else if reflect.TypeOf(v).String() == "[]string" {
 				if reflect.TypeOf(values[k]).String() == "string" {
 					var array []string
