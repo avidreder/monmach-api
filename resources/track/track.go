@@ -30,7 +30,7 @@ func AlreadyProcessed(trackID string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	count, err := store.CountByQuery("tracks", "SpotifyTrack.Track.SpotifyID", trackID)
+	count, err := store.CountByQuery("tracks", "SpotifyTrack.SpotifyID", trackID)
 	if err != nil {
 		return false, err
 	}

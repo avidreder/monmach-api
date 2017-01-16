@@ -2,6 +2,7 @@ package crud
 
 import (
 	"errors"
+	"log"
 	"net/http"
 
 	stmw "github.com/avidreder/monmach-api/middleware/store"
@@ -29,55 +30,60 @@ func Create(h echo.HandlerFunc) echo.HandlerFunc {
 		switch table {
 		case "genres":
 			model := genreR.Genre{}
-			payload, err := storeR.ValidateRequired(model, payload)
+			createPayload, err := storeR.ValidateRequired(model, payload)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
-			err = store.Create(table, payload)
+			err = store.Create(table, createPayload)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			return h(c)
 		case "playlists":
 			model := playlistR.Playlist{}
-			payload, err := storeR.ValidateRequired(model, payload)
+			createPayload, err := storeR.ValidateRequired(model, payload)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
-			err = store.Create(table, payload)
+			err = store.Create(table, createPayload)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			return h(c)
 		case "queues":
 			model := queueR.Queue{}
-			payload, err := storeR.ValidateRequired(model, payload)
+			createPayload, err := storeR.ValidateRequired(model, payload)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
-			err = store.Create(table, payload)
+			err = store.Create(table, createPayload)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			return h(c)
 		case "tracks":
 			model := trackR.Track{}
-			payload, err := storeR.ValidateRequired(model, payload)
+			createPayload, err := storeR.ValidateRequired(model, payload)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
-			err = store.Create(table, payload)
+			processed, err := trackR.AlreadyProcessed(createPayload["spotifyid"].(string))
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+			}
+			log.Printf("Processed: %+v", processed)
+			err = store.Create(table, createPayload)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
 			return h(c)
 		case "users":
 			model := userR.User{}
-			payload, err := storeR.ValidateRequired(model, payload)
+			createPayload, err := storeR.ValidateRequired(model, payload)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
-			err = store.Create(table, payload)
+			err = store.Create(table, createPayload)
 			if err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
