@@ -9,7 +9,6 @@ import (
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	usermw "github.com/avidreder/monmach-api/middleware/user"
 	"github.com/avidreder/monmach-api/resources/queue"
-	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
 
 	"github.com/fatih/structs"
 	"github.com/labstack/echo"
@@ -47,7 +46,7 @@ func QueueFromPlaylist(h echo.HandlerFunc) echo.HandlerFunc {
 		}
 		user := usermw.GetUser(c)
 		store := stmw.GetStore(c)
-		client := spotifyR.GetClient(c)
+		client := spotifymw.GetClient(c)
 		tracks, err := spotifymw.TracksFromPlaylist(client, spotify.ID(playlistID), user.SpotifyID)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Error getting tracks: %v", err))

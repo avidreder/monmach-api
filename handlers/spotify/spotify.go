@@ -7,14 +7,13 @@ import (
 	queuemw "github.com/avidreder/monmach-api/middleware/queue"
 	spotifymw "github.com/avidreder/monmach-api/middleware/spotify"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
-	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
 
 	"github.com/labstack/echo"
 )
 
 // UserPlaylists gets a user's spotify playlists
 func UserPlaylists(c echo.Context) error {
-	client := spotifyR.GetClient(c)
+	client := spotifymw.GetClient(c)
 	playlists, err := client.CurrentUsersPlaylists()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -24,7 +23,7 @@ func UserPlaylists(c echo.Context) error {
 
 // DiscoverPlaylist gets and stores a user's spotify discover playlist
 func DiscoverPlaylist(c echo.Context) error {
-	client := spotifyR.GetClient(c)
+	client := spotifymw.GetClient(c)
 	store := stmw.GetStore(c)
 	queue := queuemw.GetUserQueue(c)
 	discoverID, err := spotifymw.FindDiscoverPlaylist(client)

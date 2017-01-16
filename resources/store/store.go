@@ -7,7 +7,10 @@ import (
 	"reflect"
 	"strings"
 
+	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
+
 	"github.com/fatih/structs"
+	"github.com/zmb3/spotify"
 )
 
 // Store is the interface for data storage, such as a db
@@ -25,6 +28,7 @@ type Store interface {
 func ValidateRequired(schema interface{}, values map[string]interface{}) (map[string]interface{}, error) {
 	newValues := map[string]interface{}{}
 	structMap := structs.Map(schema)
+	log.Printf("%+v", values)
 	for k, v := range structMap {
 		_, ok := values[k]
 		if k != "ID" {
@@ -32,7 +36,7 @@ func ValidateRequired(schema interface{}, values map[string]interface{}) (map[st
 				return nil, fmt.Errorf("Required field %s was not present", k)
 			}
 			if reflect.TypeOf(values[k]).String() == reflect.TypeOf(v).String() {
-				newValues[k] = v
+				newValues[strings.ToLower(k)] = values[k]
 			} else if reflect.TypeOf(v).String() == "[]string" {
 				if reflect.TypeOf(values[k]).String() == "string" {
 					var array []string
@@ -47,7 +51,6 @@ func ValidateRequired(schema interface{}, values map[string]interface{}) (map[st
 						newValues[strings.ToLower(k)] = array
 					}
 				} else {
-					log.Printf("Making new slice for: %s", k)
 					newValues[k] = make([]string, 2)
 				}
 			} else if reflect.TypeOf(v).String() == "[]float64" {
@@ -65,6 +68,38 @@ func ValidateRequired(schema interface{}, values map[string]interface{}) (map[st
 					}
 				} else {
 					newValues[k] = make([]float64, 2)
+				}
+			} else if k == "SpotifyTrack" {
+				if reflect.TypeOf(values[k]).String() == "string" {
+					track := spotifyR.SpotifyTrack{}
+					if (values[k].(string)) != "" {
+						err := json.Unmarshal([]byte(values[k].(string)), &track)
+						if err == nil {
+							newValues[strings.ToLower(k)] = track
+						} else {
+							return nil, fmt.Errorf("Required field %s was not present", k)
+						}
+					} else {
+						newValues[strings.ToLower(k)] = track
+					}
+				} else {
+					newValues[k] = spotifyR.SpotifyTrack{}
+				}
+			} else if k == "Features" {
+				if reflect.TypeOf(values[k]).String() == "string" {
+					features := spotify.AudioFeatures{}
+					if (values[k].(string)) != "" {
+						err := json.Unmarshal([]byte(values[k].(string)), &features)
+						if err == nil {
+							newValues[strings.ToLower(k)] = features
+						} else {
+							return nil, fmt.Errorf("Required field %s was not present", k)
+						}
+					} else {
+						newValues[strings.ToLower(k)] = features
+					}
+				} else {
+					newValues[k] = spotify.AudioFeatures{}
 				}
 			}
 		}

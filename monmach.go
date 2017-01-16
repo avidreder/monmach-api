@@ -10,9 +10,9 @@ import (
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	crudmw "github.com/avidreder/monmach-api/middleware/crud"
 	queuemw "github.com/avidreder/monmach-api/middleware/queue"
+	spotifymw "github.com/avidreder/monmach-api/middleware/spotify"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	usermw "github.com/avidreder/monmach-api/middleware/user"
-	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
 	"github.com/avidreder/monmach-api/resources/store/mongo"
 
 	"github.com/labstack/echo"
@@ -82,7 +82,7 @@ func main() {
 		stmw.LoadStore,
 		authmw.LoadStore,
 		usermw.LoadUser,
-		spotifyR.LoadClient)
+		spotifymw.LoadClient)
 	queue.GET("/user", queueh.RetrieveQueue, queuemw.LoadUserQueue)
 	queue.GET("/:playlist", queueh.RetrieveQueue, queuemw.QueueFromPlaylist)
 
@@ -93,7 +93,7 @@ func main() {
 		authmw.LoadStore,
 		usermw.LoadUser,
 		queuemw.LoadUserQueue,
-		spotifyR.LoadClient)
+		spotifymw.LoadClient)
 	spotify.GET("/discover", spoth.DiscoverPlaylist)
 	spotify.GET("/playlists", spoth.UserPlaylists)
 
