@@ -28,6 +28,7 @@ const ClientAddress = "http://localhost:8080"
 
 func init() {
 	gothic.Store = sessions.NewFilesystemStore(os.TempDir(), []byte("monmach"))
+	log.Printf("temp: %+v", os.TempDir())
 }
 
 // LogoutUser ends a user session
@@ -100,13 +101,15 @@ func FinishAuth(c echo.Context) error {
 		log.Printf("Could not log the user in: %v", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
 	}
-	session, err := sessionStore.New(c.Request(), "auth-session")
+	session, err := sessionStore.Get(c.Request(), "auth-session")
 	if err != nil {
 		log.Printf("Could not log the user in: %v", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not retrieve logged-in user: %v", err))
 	}
-	session.Values["email"] = user.Email
-	session.Save(c.Request(), c.Response().Writer())
+	if session.IsNew {
+		session.Values["email"] = user.Email
+		session.Save(c.Request(), c.Response().Writer())
+	}
 	http.Redirect(c.Response().Writer(), c.Request(), ClientAddress, 302)
 	go HandleUserLogin(user, store)
 	return nil

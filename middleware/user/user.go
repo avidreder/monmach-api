@@ -21,7 +21,9 @@ func GetUser(c echo.Context) *user.User {
 func LoadUser(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		sessionStore := authmw.GetStore(c)
+		log.Printf("%+v", c.Request())
 		session, err := sessionStore.Get(c.Request(), "auth-session")
+		log.Printf("Is it new: %+v", session.IsNew)
 		if session.IsNew || err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not retrieve logged-in user: %v", err))
 		}
