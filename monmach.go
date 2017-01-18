@@ -62,7 +62,7 @@ func main() {
 	server.Use(emw.Logger())
 	server.Use(emw.Recover())
 	server.Use(emw.CORSWithConfig(emw.CORSConfig{
-		AllowOrigins:     []string{"http://localhost:8080"},
+		AllowOrigins:     []string{config.ClientAddress},
 		AllowCredentials: true,
 	}))
 

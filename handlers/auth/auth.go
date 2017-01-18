@@ -10,6 +10,7 @@ import (
 
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
+	configR "github.com/avidreder/monmach-api/resources/config"
 	"github.com/avidreder/monmach-api/resources/queue"
 	"github.com/avidreder/monmach-api/resources/store"
 	trackR "github.com/avidreder/monmach-api/resources/track"
@@ -22,9 +23,6 @@ import (
 	"github.com/markbates/goth/gothic"
 	"gopkg.in/mgo.v2/bson"
 )
-
-// ClientAddress is the address of the monmach client
-const ClientAddress = "http://localhost:8080"
 
 func init() {
 	gothic.Store = sessions.NewFilesystemStore(os.TempDir(), []byte("monmach"))
@@ -45,12 +43,12 @@ func LogoutUser(c echo.Context) error {
 	session, err = gothic.Store.Get(c.Request(), "_gothic_session")
 	log.Printf("gothicSession: %v", session)
 	if err != nil {
-		http.Redirect(c.Response().Writer(), c.Request(), ClientAddress, 302)
+		http.Redirect(c.Response().Writer(), c.Request(), configR.CurrentConfig.ClientAddress, 302)
 		return nil
 	}
 	session.Options.MaxAge = -1
 	session.Save(c.Request(), c.Response().Writer())
-	http.Redirect(c.Response().Writer(), c.Request(), ClientAddress+"/login.html", 302)
+	http.Redirect(c.Response().Writer(), c.Request(), configR.CurrentConfig.ClientAddress+"/login.html", 302)
 	return nil
 }
 
@@ -110,7 +108,7 @@ func FinishAuth(c echo.Context) error {
 		session.Values["email"] = user.Email
 		session.Save(c.Request(), c.Response().Writer())
 	}
-	http.Redirect(c.Response().Writer(), c.Request(), ClientAddress, 302)
+	http.Redirect(c.Response().Writer(), c.Request(), configR.CurrentConfig.ClientAddress, 302)
 	go HandleUserLogin(user, store)
 	return nil
 }
