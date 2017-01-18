@@ -1,7 +1,11 @@
 package mongo
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -14,11 +18,39 @@ type Store struct {
 	Session *mgo.Session
 }
 
-const dbURL = "mongodb://localhost:27017"
+type MongoCredentials struct {
+	Username string
+	Password string
+}
+
+var CurrentCredentials MongoCredentials
+
+var DBString = "mongodb://%s:%s@localhost:27017"
+
 const db = "monmach"
 
+func LoadCredentials(path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatalf("Could not get Mongo Credentials: %s", err)
+		return err
+	}
+	contents, err := ioutil.ReadAll(file)
+	if err != nil {
+		log.Fatalf("Could not get Mongo Credentials: %s", err)
+		return err
+	}
+	err = json.Unmarshal(contents, &CurrentCredentials)
+	if err != nil {
+		log.Fatalf("Could not get Mongo Credentials: %s", err)
+		return err
+	}
+	return nil
+}
+
 func (s *Store) Connect() error {
-	session, err := mgo.Dial(dbURL)
+
+	session, err := mgo.Dial(fmt.Sprintf(DBString, CurrentCredentials.Username, CurrentCredentials.Password))
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	authh "github.com/avidreder/monmach-api/handlers/auth"
@@ -13,6 +14,7 @@ import (
 	spotifymw "github.com/avidreder/monmach-api/middleware/spotify"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	usermw "github.com/avidreder/monmach-api/middleware/user"
+	configR "github.com/avidreder/monmach-api/resources/config"
 	"github.com/avidreder/monmach-api/resources/store/mongo"
 
 	"github.com/labstack/echo"
@@ -25,14 +27,24 @@ const db = "monmach"
 
 func main() {
 	server := echo.New()
+	config, err := configR.GetConfig()
+	if err != nil {
+		log.Printf("Config error: %v", err)
+		panic(err)
+	}
+	err = mongo.LoadCredentials(config.MongoCredentialsPath)
+	if err != nil {
+		log.Printf("Config error: %v", err)
+		panic(err)
+	}
 	store, _ := mongo.Get()
-	err := store.Connect()
+	err = store.Connect()
 	if err != nil {
 		log.Printf("Could not connect to Mongo: %v", err)
 	} else {
 		log.Print("Connected to Mongo")
 	}
-	session, err := mgo.Dial(dbURL)
+	session, err := mgo.Dial(fmt.Sprintf(mongo.DBString, mongo.CurrentCredentials.Username, mongo.CurrentCredentials.Password))
 	if err != nil {
 		panic(err)
 	}

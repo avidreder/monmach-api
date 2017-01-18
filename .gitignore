@@ -26,6 +26,7 @@ _testmain.go
 react/dist/bundle.js
 react/dist/libs
 spotify.json
+mongo.json
 node_modules
 .vagrant
 ansible/spotify.json
