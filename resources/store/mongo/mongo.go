@@ -25,7 +25,7 @@ type MongoCredentials struct {
 
 var CurrentCredentials MongoCredentials
 
-var DBString = "mongodb://%s:%s@localhost:27017"
+var DBString = "mongodb://%s:%s@localhost:27017/monmach"
 
 const db = "monmach"
 
@@ -49,7 +49,8 @@ func LoadCredentials(path string) error {
 }
 
 func (s *Store) Connect() error {
-
+	log.Print(CurrentCredentials)
+	log.Printf(DBString, CurrentCredentials.Username, CurrentCredentials.Password)
 	session, err := mgo.Dial(fmt.Sprintf(DBString, CurrentCredentials.Username, CurrentCredentials.Password))
 	if err != nil {
 		return err

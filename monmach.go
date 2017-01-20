@@ -44,7 +44,7 @@ func main() {
 	} else {
 		log.Print("Connected to Mongo")
 	}
-	session, err := mgo.Dial(fmt.Sprintf(mongo.DBString, mongo.CurrentCredentials.Username, mongo.CurrentCredentials.Password))
+	session, err := mgo.Dial(fmt.Sprintf("mongodb://%s:%s@localhost:27017/test", mongo.CurrentCredentials.Username, mongo.CurrentCredentials.Password))
 	if err != nil {
 		panic(err)
 	}
