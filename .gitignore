@@ -27,9 +27,15 @@ react/dist/bundle.js
 react/dist/libs
 spotify.json
 mongo.json
+mongo.yml
 node_modules
 .vagrant
 ansible/spotify.json
+ansible/mongo.json
+ansible/config/mongo.yml
+ansible/config/spotify.json
+ansible/config/mongo.json
+ansible/config/mongo.yml
 profile_tmp.cov
 profile.cov
 .coveralls.yml

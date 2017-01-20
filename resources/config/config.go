@@ -16,7 +16,7 @@ type ServiceConfig struct {
 var CurrentConfig ServiceConfig
 
 func init() {
-	file, err := os.Open("./localhost.json")
+	file, err := os.Open("/srv/monmach-api/localhost.json")
 	if err != nil {
 		log.Fatalf("Could not Initialize Serfice Config: %s", err)
 	}

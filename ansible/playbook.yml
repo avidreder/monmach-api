@@ -2,59 +2,143 @@
 - hosts: all
   become: yes
   tasks:
+    - name: import mongo credentials
+      include_vars: config/mongo.yml
+
     - name: add mongo apt key
+      tags:
+        - mongo_setup
       apt_key:
         keyserver: keyserver.ubuntu.com
         id: 0C49F3730359A14518585931BC711F9BA15703C6
         state: present
 
     - name: add MongoDB stable repository (for Ubuntu)
+      tags:
+        - mongo_setup
       apt_repository:
         repo: deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.4 multiverse
         state: present
 
     - name: Install apt packages
-      apt: name={{ item }} update_cache=yes state=present
+      ignore_errors: yes
+      tags:
+        - server_setup
+      apt: name={{ item }} update_cache=yes state=installed
       with_items:
         - git
         - golang
         - runit
         - mongodb
+        - python-pip
 
-    # - name: ensure database is created
-    #   command: mongo monmach
-    #   args:
-    #     chdir: /srv/monmach-api/
+    - name: Install the latest pymongo package
+      tags:
+        - mongo_setup
+      pip: name=pymongo state=latest use_mirrors=no
+
+    - name: Create mongodb admin
+      tags:
+        - mongo_setup
+      ignore_errors: yes
+      mongodb_user:
+        database: admin
+        user: areder
+        password: test
+        state: present
+        roles: userAdmin
+
+    - name: Create monmach mongo user (monmach)
+      tags:
+        - mongo_setup
+      ignore_errors: yes
+      mongodb_user:
+        database: monmach
+        user: monmach
+        password: "{{ password }}"
+        state: present
+        roles: readWrite
+
+    - name: Create monmach mongo user (test)
+      tags:
+        - mongo_setup
+      ignore_errors: yes
+      mongodb_user:
+        database: test
+        user: "{{ username }}"
+        password: "{{ password }}"
+        state: present
+        roles: readWrite
+
+    - name: stop mongodb
+      tags:
+        - runit_setup
+      service: name=mongodb state=stopped
+      ignore_errors: yes
 
     - name: Clone repo
       git: repo=https://github.com/avidreder/monmach-api.git dest=/srv/monmach-api version=master force=yes
       ignore_errors: yes
 
     - name: Create monmach-api rundir for runit
+      tags:
+        - runit_setup
+      ignore_errors: yes
       file:
         path: /etc/sv/monmach-api
         state: directory
         mode: 0755
 
+    - name: Create mongodb rundir for runit
+      tags:
+        - runit_setup
+      ignore_errors: yes
+      file:
+        path: /etc/sv/mongodb
+        state: directory
+        mode: 0755
+
     - name: Install monmach runfile for runit
+      tags:
+        - runit_setup
+      ignore_errors: yes
       copy:
         src: runit_monmach_api.run
         dest: /etc/sv/monmach-api/run
         mode: 0751
 
-    - name: Install spotify credentials
+    - name: Install mongodb runfile for runit
+      tags:
+        - runit_setup
+      ignore_errors: yes
       copy:
-        src: spotify.json
+        src: runit_mongodb.run
+        dest: /etc/sv/mongodb/run
+        mode: 0751
+
+    - name: Install spotify credentials
+      ignore_errors: yes
+      copy:
+        src: config/spotify.json
         dest: /srv/monmach-api/spotify.json
         mode: 0777
 
+    - name: Install mongo credentials
+      ignore_errors: yes
+      copy:
+        src: config/mongo.json
+        dest: /srv/monmach-api/mongo.json
+        mode: 0777
+
     - name: Install monmach-api binary
+      ignore_errors: yes
       copy:
         src: monmach-api
         dest: /srv/monmach-api/monmach-api
         mode: 0777
 
     - name: Install service config
+      ignore_errors: yes
       copy:
         src: config/localhost.json
         dest: /srv/monmach-api/localhost.json
@@ -63,19 +147,44 @@
     - file: path=/tmp state=directory mode=0777
 
     - name: fix owner/group
+      ignore_errors: yes
       file:
         path: /srv/monmach-api/monmach-api
         owner: root
         group: root
 
     - name: Put monmach-api in runit
+      tags:
+        - runit_setup
+      ignore_errors: yes
       file:
         path: /etc/sv/monmach-api/monmach-api
         src: /srv/monmach-api/monmach-api
         state: link
 
     - name: Activate monmach-api in runit
+      tags:
+        - runit_setup
+      ignore_errors: yes
       file:
         path: /etc/service/monmach-api
         src: /etc/sv/monmach-api
+        state: link
+
+    - name: Put mongodb in runit
+      tags:
+        - runit_setup
+      ignore_errors: yes
+      file:
+        path: /etc/sv/mongodb/mongodb
+        src: /usr/bin/mongod
+        state: link
+
+    - name: Activate monmach-api in runit
+      tags:
+        - runit_setup
+      ignore_errors: yes
+      file:
+        path: /etc/service/mongodb
+        src: /etc/sv/mongodb
         state: link

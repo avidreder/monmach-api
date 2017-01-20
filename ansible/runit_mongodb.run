@@ -1,0 +1,3 @@
+#!/bin/sh
+exec 2>&1
+exec /etc/sv/mongodb/mongodb --auth --dbpath /var/lib/mongodb
