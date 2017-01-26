@@ -15,6 +15,7 @@ import (
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	usermw "github.com/avidreder/monmach-api/middleware/user"
 	configR "github.com/avidreder/monmach-api/resources/config"
+	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
 	"github.com/avidreder/monmach-api/resources/store/mongo"
 
 	"github.com/labstack/echo"
@@ -54,10 +55,15 @@ func main() {
 		name: "Andrew",
 	}
 	err = session.DB("test").C("test").Insert(&testData)
-
 	if err != nil {
 		panic(err)
 	}
+
+	err = spotifyR.InitializeSpotifyProvider()
+	if err != nil {
+		panic(err)
+	}
+
 	// Load middleware for all routes
 	server.Use(emw.Logger())
 	server.Use(emw.Recover())

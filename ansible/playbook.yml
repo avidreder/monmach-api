@@ -144,7 +144,8 @@
         dest: /srv/monmach-api/localhost.json
         mode: 0777
 
-    - file: path=/tmp state=directory mode=0777
+    - name: create tmp directory
+      file: path=/tmp state=directory mode=2777
 
     - name: fix owner/group
       ignore_errors: yes

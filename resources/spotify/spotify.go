@@ -1,11 +1,46 @@
 package spotify
 
-import "github.com/zmb3/spotify"
+import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
+	"os"
+
+	"github.com/avidreder/monmach-api/resources/auth"
+	spotifyP "github.com/markbates/goth/providers/spotify"
+	"github.com/zmb3/spotify"
+)
 
 type FeaturedPlaylist struct {
 	Name       string
 	OwnerID    spotify.ID
 	PlaylistID spotify.ID
+}
+
+// SpotifyProvider stores an initialized provider
+var SpotifyProvider *spotifyP.Provider
+
+// InitializeSpotifyProvider places initialized provider in the context for later use
+func InitializeSpotifyProvider() error {
+	file, err := os.Open("/srv/monmach-api/spotify.json") // For read access.
+	if err != nil {
+		log.Printf("Could not Initialize Spotify: %s", err)
+		return err
+	}
+	contents, err := ioutil.ReadAll(file)
+	if err != nil {
+		log.Printf("Could not Initialize Spotify: %s", err)
+		return err
+	}
+	credentials := auth.SpotifyCredentials{}
+	err = json.Unmarshal(contents, &credentials)
+	if err != nil {
+		log.Printf("Could not Initialize Spotify: %s", err)
+		return err
+	}
+	log.Print(credentials)
+	SpotifyProvider = spotifyP.New(credentials.ClientKey, credentials.Secret, credentials.CallbackURL, auth.SpotifyScopes...)
+	return nil
 }
 
 var FeaturedPlaylists = []FeaturedPlaylist{
