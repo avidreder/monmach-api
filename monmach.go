@@ -61,6 +61,7 @@ func main() {
 
 	err = spotifyR.InitializeSpotifyProvider()
 	if err != nil {
+		log.Printf("Could not Initialize Spotify: %s", err)
 		panic(err)
 	}
 

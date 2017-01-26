@@ -24,18 +24,15 @@ var SpotifyProvider *spotifyP.Provider
 func InitializeSpotifyProvider() error {
 	file, err := os.Open("/srv/monmach-api/spotify.json") // For read access.
 	if err != nil {
-		log.Printf("Could not Initialize Spotify: %s", err)
 		return err
 	}
 	contents, err := ioutil.ReadAll(file)
 	if err != nil {
-		log.Printf("Could not Initialize Spotify: %s", err)
 		return err
 	}
 	credentials := auth.SpotifyCredentials{}
 	err = json.Unmarshal(contents, &credentials)
 	if err != nil {
-		log.Printf("Could not Initialize Spotify: %s", err)
 		return err
 	}
 	log.Print(credentials)
