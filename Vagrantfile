@@ -11,12 +11,14 @@ Vagrant.configure(2) do |config|
 
   # Private Network
   config.vm.network :private_network, ip:"192.168.88.8"
-  
+  config.ssh.insert_key = false
+
   # ansible!
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "ansible/playbook.yml"
     ansible.limit = "localhost"
     ansible.inventory_path = "ansible/inventory"
+    ansible.verbose = "v"
     # ansible.ask_sudo_pass = true
   end
 

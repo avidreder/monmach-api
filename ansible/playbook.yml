@@ -76,9 +76,18 @@
       service: name=mongodb state=stopped
       ignore_errors: yes
 
-    - name: Clone repo
-      git: repo=https://github.com/avidreder/monmach-api.git dest=/srv/monmach-api version=master force=yes
+    # - name: Clone repo
+    #   git: repo=https://github.com/avidreder/monmach-api.git dest=/srv/monmach-api version=master force=yes
+    #   ignore_errors: yes
+
+    - name: Create monmach directory
+      tags:
+        - runit_setup
       ignore_errors: yes
+      file:
+        path: /srv/monmach-api
+        state: directory
+        mode: 0755
 
     - name: Create monmach-api rundir for runit
       tags:
