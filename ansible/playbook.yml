@@ -1,6 +1,9 @@
 ---
 - hosts: all
   become: yes
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson
   tasks:
     - name: import mongo credentials
       include_vars: config/mongo.yml
@@ -75,10 +78,6 @@
         - runit_setup
       service: name=mongodb state=stopped
       ignore_errors: yes
-
-    # - name: Clone repo
-    #   git: repo=https://github.com/avidreder/monmach-api.git dest=/srv/monmach-api version=master force=yes
-    #   ignore_errors: yes
 
     - name: Create monmach directory
       tags:
