@@ -11,6 +11,7 @@ import (
 
 	usermw "github.com/avidreder/monmach-api/middleware/user"
 	authR "github.com/avidreder/monmach-api/resources/auth"
+	configR "github.com/avidreder/monmach-api/resources/config"
 	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
 	trackR "github.com/avidreder/monmach-api/resources/track"
 	"github.com/labstack/echo"
@@ -21,7 +22,11 @@ import (
 // LoadClient places initialized spotify client
 func LoadClient(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		file, err := os.Open("/srv/monmach-api/spotify.json") // For read access.
+		config, err := configR.GetConfig()
+		if err != nil {
+			log.Printf("Could not get service config: %s", err)
+		}
+		file, err := os.Open(config.SpotifyCredentialsPath) // For read access.
 		if err != nil {
 			log.Printf("Could not Initialize Spotify Client: %s", err)
 		}
@@ -34,7 +39,7 @@ func LoadClient(h echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			log.Printf("Could not Initialize Spotify Client: %s", err)
 		}
-		auth := spotify.NewAuthenticator(credentials.CallbackURL, spotify.ScopeUserReadPrivate)
+		auth := spotify.NewAuthenticator(config.SpotifyCallback, spotify.ScopeUserReadPrivate)
 		auth.SetAuthInfo(credentials.ClientKey, credentials.Secret)
 
 		user := usermw.GetUser(c)

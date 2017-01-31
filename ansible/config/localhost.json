@@ -1,5 +1,0 @@
-{
-	"spotifyCredentialsPath":"/srv/monmach-api/spotify.json",
-	"mongoCredentialsPath":"/srv/monmach-api/mongo.json",
-	"clientAddress":"http://localhost:8080"
-}

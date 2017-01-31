@@ -1,0 +1,6 @@
+{
+	"spotifyCredentialsPath":"/srv/monmach-api/spotify.json",
+	"mongoCredentialsPath":"/srv/monmach-api/mongo.json",
+	"clientAddress":"http://104.236.177.72:8080",
+	"spotifyCallback":"http://104.236.177.72:3000/auth/spotify/callback"
+}

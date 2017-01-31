@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/avidreder/monmach-api/resources/auth"
+	configR "github.com/avidreder/monmach-api/resources/config"
 	spotifyP "github.com/markbates/goth/providers/spotify"
 	"github.com/zmb3/spotify"
 )
@@ -22,7 +23,11 @@ var SpotifyProvider *spotifyP.Provider
 
 // InitializeSpotifyProvider places initialized provider in the context for later use
 func InitializeSpotifyProvider() error {
-	file, err := os.Open("/srv/monmach-api/spotify.json") // For read access.
+	config, err := configR.GetConfig()
+	if err != nil {
+		log.Printf("Could not get service config: %s", err)
+	}
+	file, err := os.Open(config.SpotifyCredentialsPath) // For read access.
 	if err != nil {
 		return err
 	}
@@ -36,7 +41,7 @@ func InitializeSpotifyProvider() error {
 		return err
 	}
 	log.Print(credentials)
-	SpotifyProvider = spotifyP.New(credentials.ClientKey, credentials.Secret, credentials.CallbackURL, auth.SpotifyScopes...)
+	SpotifyProvider = spotifyP.New(credentials.ClientKey, credentials.Secret, config.SpotifyCallback, auth.SpotifyScopes...)
 	return nil
 }
 

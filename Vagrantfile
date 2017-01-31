@@ -24,7 +24,7 @@ Vagrant.configure(2) do |config|
   # use `vagrant rsync` or `vagrant rsync-auto` to push into the ONLY if you
   # NEED to. `vagrant provision` will let ansible do it, which is the way a real
   # deployment would work.
-  config.vm.synced_folder "/Users/areder/go/src/github.com/avidreder/monmach-api", "/srv/monmach-api", type: "rsync"
-  config.vm.synced_folder "/Users/areder/projects/monmach-client", "/srv/monmach-client", type: "rsync"
+  config.vm.synced_folder "/Users/areder/go/src/github.com/avidreder/monmach-api/vagrant", "/srv/monmach-api", type: "rsync", rsync__exclude: [".git/","node_modules/"]
+  config.vm.synced_folder "/Users/areder/projects/monmach-client", "/srv/monmach-client", type: "rsync", rsync__exclude: [".git/","node_modules/"]
 
 end

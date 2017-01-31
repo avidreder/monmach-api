@@ -30,6 +30,7 @@ mongo.json
 mongo.yml
 node_modules
 .vagrant
+vagrant
 ansible/spotify.json
 ansible/mongo.json
 ansible/config/mongo.yml

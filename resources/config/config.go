@@ -8,9 +8,10 @@ import (
 )
 
 type ServiceConfig struct {
-	SpotifyCredentialsPath string
-	MongoCredentialsPath   string
-	ClientAddress          string
+	SpotifyCredentialsPath string `json:"spotifyCredentialsPath"`
+	MongoCredentialsPath   string `json:"mongoCredentialsPath"`
+	ClientAddress          string `json:"clientAddress"`
+	SpotifyCallback        string `json:"spotifyCallback"`
 }
 
 var CurrentConfig ServiceConfig

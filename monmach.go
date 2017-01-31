@@ -47,7 +47,7 @@ func main() {
 	}
 	session, err := mgo.Dial(fmt.Sprintf("mongodb://%s:%s@localhost:27017/test", mongo.CurrentCredentials.Username, mongo.CurrentCredentials.Password))
 	if err != nil {
-		panic(err)
+		log.Print(err)
 	}
 	testData := struct {
 		name string
@@ -56,13 +56,12 @@ func main() {
 	}
 	err = session.DB("test").C("test").Insert(&testData)
 	if err != nil {
-		panic(err)
+		log.Print(err)
 	}
 
 	err = spotifyR.InitializeSpotifyProvider()
 	if err != nil {
 		log.Printf("Could not Initialize Spotify: %s", err)
-		panic(err)
 	}
 
 	// Load middleware for all routes

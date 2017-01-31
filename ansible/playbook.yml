@@ -145,11 +145,20 @@
         dest: /srv/monmach-api/monmach-api
         mode: 0777
 
-    - name: Install service config
+    - name: Install service config (vagrant)
+      hosts: vagrant
       ignore_errors: yes
       copy:
-        src: config/localhost.json
-        dest: /srv/monmach-api/localhost.json
+        src: config/vagrant.json
+        dest: /srv/monmach-api/vagrant.json
+        mode: 0777
+
+    - name: Install service config (development)
+      hosts: development
+      ignore_errors: yes
+      copy:
+        src: config/development.json
+        dest: /srv/monmach-api/development.json
         mode: 0777
 
     - name: create tmp directory
