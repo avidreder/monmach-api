@@ -48,7 +48,7 @@ func LogoutUser(c echo.Context) error {
 	}
 	session.Options.MaxAge = -1
 	session.Save(c.Request(), c.Response().Writer())
-	http.Redirect(c.Response().Writer(), c.Request(), configR.CurrentConfig.ClientAddress+"/login.html", 302)
+	http.Redirect(c.Response().Writer(), c.Request(), configR.CurrentConfig.ClientAddress, 302)
 	return nil
 }
 
