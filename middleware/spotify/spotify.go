@@ -72,6 +72,21 @@ func FindDiscoverPlaylist(client *spotify.Client) (spotify.ID, error) {
 	return "", errors.New("Could not find discover playlist")
 }
 
+// FindPlaylistOwner searches spotify for the user playlist
+func FindPlaylistOwner(client *spotify.Client, playlistID spotify.ID) (string, error) {
+	playlists, err := client.CurrentUsersPlaylists()
+	if err != nil {
+		return "", err
+	}
+	playlistArray := playlists.Playlists
+	for _, pl := range playlistArray {
+		if pl.ID == playlistID {
+			return pl.Owner.ID, nil
+		}
+	}
+	return "", errors.New("Could not find discover playlist")
+}
+
 // GetAudioFeatures searches spotify for the user playlist
 func GetAudioFeatures(client *spotify.Client, ids ...spotify.ID) ([]*spotify.AudioFeatures, error) {
 	features, err := client.GetAudioFeatures(ids...)

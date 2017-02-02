@@ -47,7 +47,11 @@ func QueueFromPlaylist(h echo.HandlerFunc) echo.HandlerFunc {
 		user := usermw.GetUser(c)
 		store := stmw.GetStore(c)
 		client := spotifymw.GetClient(c)
-		tracks, err := spotifymw.TracksFromPlaylist(client, spotify.ID(playlistID), user.SpotifyID)
+		playlistOwner, err := spotifymw.FindPlaylistOwner(client, spotify.ID(playlistID))
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Error getting playlist owner: %v", err))
+		}
+		tracks, err := spotifymw.TracksFromPlaylist(client, spotify.ID(playlistID), playlistOwner)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Error getting tracks: %v", err))
 		}
