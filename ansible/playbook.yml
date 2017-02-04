@@ -86,7 +86,7 @@
       mongodb_user:
         database: admin
         user: areder
-        password: test
+        password: "{{ password }}"
         state: present
         roles: userAdmin
 
@@ -95,8 +95,11 @@
         - mongo_setup
       ignore_errors: yes
       mongodb_user:
+        login_database: admin
+        login_user: areder
+        login_password: "{{ password }}"
         database: monmach
-        user: monmach
+        user: "{{ username }}"
         password: "{{ password }}"
         state: present
         roles: readWrite
@@ -106,6 +109,9 @@
         - mongo_setup
       ignore_errors: yes
       mongodb_user:
+        login_database: admin
+        login_user: areder
+        login_password: "{{ password }}"
         database: test
         user: "{{ username }}"
         password: "{{ password }}"
