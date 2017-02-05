@@ -27,5 +27,5 @@ Vagrant.configure(2) do |config|
   # NEED to. `vagrant provision` will let ansible do it, which is the way a real
   # deployment would work.
   config.vm.synced_folder "/home/areder/projects/monmach-client", "/srv/monmach-client", type: "rsync", rsync__auto: true, rsync__exclude: [".git/","node_modules/"]
-
+  config.vm.synced_folder "/home/areder/go/src/github.com/avidreder/monmach-api/vagrant", "/srv/monmach-api/bin", type: "rsync", rsync__auto: true, rsync__exclude: [".git/","node_modules/"]
 end
