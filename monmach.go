@@ -6,10 +6,12 @@ import (
 
 	authh "github.com/avidreder/monmach-api/handlers/auth"
 	crudh "github.com/avidreder/monmach-api/handlers/crud"
+	playlisth "github.com/avidreder/monmach-api/handlers/playlist"
 	queueh "github.com/avidreder/monmach-api/handlers/queue"
 	spoth "github.com/avidreder/monmach-api/handlers/spotify"
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	crudmw "github.com/avidreder/monmach-api/middleware/crud"
+	playlistmw "github.com/avidreder/monmach-api/middleware/playlist"
 	queuemw "github.com/avidreder/monmach-api/middleware/queue"
 	spotifymw "github.com/avidreder/monmach-api/middleware/spotify"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
@@ -102,7 +104,15 @@ func main() {
 		usermw.LoadUser,
 		spotifymw.LoadClient)
 	queue.GET("/user", queueh.RetrieveQueue, queuemw.LoadUserQueue)
-	queue.GET("/:playlist", queueh.RetrieveQueue, queuemw.QueueFromPlaylist)
+
+	// Load routes for playlists
+	playlist := server.Group("/playlist")
+	playlist.Use(authmw.LoadSpotifyProvider,
+		stmw.LoadStore,
+		authmw.LoadStore,
+		usermw.LoadUser,
+		spotifymw.LoadClient)
+	playlist.GET("/:playlist", playlisth.RetrieveTracks, playlistmw.TracksFromPlaylist)
 
 	// Load routes for spotify
 	spotify := server.Group("/spotify")
