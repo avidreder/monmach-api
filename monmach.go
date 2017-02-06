@@ -11,6 +11,7 @@ import (
 	spoth "github.com/avidreder/monmach-api/handlers/spotify"
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
 	crudmw "github.com/avidreder/monmach-api/middleware/crud"
+	genremw "github.com/avidreder/monmach-api/middleware/genre"
 	playlistmw "github.com/avidreder/monmach-api/middleware/playlist"
 	queuemw "github.com/avidreder/monmach-api/middleware/queue"
 	spotifymw "github.com/avidreder/monmach-api/middleware/spotify"
@@ -124,6 +125,12 @@ func main() {
 		spotifymw.LoadClient)
 	spotify.GET("/discover", spoth.DiscoverPlaylist)
 	spotify.GET("/playlists", spoth.UserPlaylists)
+
+	// Load routes for genre
+	genre := server.Group("/genre")
+	genre.Use(stmw.LoadStore)
+	genre.POST("/:id/seed", crudh.Success, genremw.AddTrackToSeedTracks)
+	genre.POST("/:id/listened", crudh.Success, genremw.AddTrackToListened)
 
 	// Load routes for crud
 	crud := server.Group("/crud/:table")
