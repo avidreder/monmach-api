@@ -94,6 +94,19 @@ func (s *Store) GetByKey(collection string, model interface{}, key string, value
 	return nil
 }
 
+func (s *Store) GetManyByKey(collection string, model interface{}, key string, value interface{}) error {
+	log.Printf("GetManyByKey: collection: %s, model: %+v", collection, model)
+	session := s.Session.Copy()
+	defer session.Close()
+	database := session.DB(db)
+	c := getCollection(database, collection)
+	err := c.Find(bson.M{key: value}).All(model)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *Store) UpdateByKey(collection string, updates map[string]interface{}, key string, value interface{}) error {
 	log.Printf("Update: collection: %s", collection)
 	session := s.Session.Copy()

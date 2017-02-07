@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
 
 	"golang.org/x/oauth2"
 
@@ -89,22 +90,34 @@ func FindPlaylistOwner(client *spotify.Client, playlistID spotify.ID) (string, e
 
 // GetAudioFeatures searches spotify for the user playlist
 func GetAudioFeatures(client *spotify.Client, ids ...spotify.ID) ([]*spotify.AudioFeatures, error) {
-	features, err := client.GetAudioFeatures(ids...)
-	if err != nil {
-		log.Printf("GetAudioFeatures Error: %+v", err)
-		var nilSlice []*spotify.AudioFeatures
-		return nilSlice, err
+	var features []*spotify.AudioFeatures
+	for _, id := range ids {
+		feature, err := client.GetAudioFeatures(id)
+		if err != nil {
+			log.Printf("GetAudioFeatures Error: %+v", err)
+			var nilSlice []*spotify.AudioFeatures
+			return nilSlice, err
+		}
+		log.Print("Got feature sucessfully")
+		features = append(features, feature[0])
+		time.Sleep(100 * time.Millisecond)
 	}
 	return features, nil
 }
 
 // GetArtistGenres searches spotify for the user playlist
 func GetArtistGenres(client *spotify.Client, ids ...spotify.ID) ([]*spotify.FullArtist, error) {
-	artists, err := client.GetArtists(ids...)
-	if err != nil {
-		log.Printf("GetArtistGenres Error: %+v", err)
-		var nilSlice []*spotify.FullArtist
-		return nilSlice, err
+	var artists []*spotify.FullArtist
+	for _, id := range ids {
+		artist, err := client.GetArtists(id)
+		if err != nil {
+			log.Printf("GetArtistGenres Error: %+v", err)
+			var nilSlice []*spotify.FullArtist
+			return nilSlice, err
+		}
+		log.Print("Got artist genres sucessfully")
+		artists = append(artists, artist[0])
+		time.Sleep(100 * time.Millisecond)
 	}
 	return artists, nil
 }

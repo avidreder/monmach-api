@@ -22,6 +22,12 @@ func (m Store) GetByKey(string, interface{}, string, interface{}) error {
 	return args.Error(0)
 }
 
+// GetManyByKey mocks the associated store function
+func (m Store) GetManyByKey(string, interface{}, string, interface{}) error {
+	args := m.Called()
+	return args.Error(0)
+}
+
 // UpdateByKey mocks the associated store function
 func (m Store) UpdateByKey(string, map[string]interface{}, string, interface{}) error {
 	args := m.Called()

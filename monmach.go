@@ -128,7 +128,10 @@ func main() {
 
 	// Load routes for genre
 	genre := server.Group("/genre")
-	genre.Use(stmw.LoadStore)
+	genre.Use(stmw.LoadStore,
+		authmw.LoadStore,
+		usermw.LoadUser)
+	genre.GET("/user", crudh.Results, genremw.GetUserGenres)
 	genre.POST("/:id/seed", crudh.Success, genremw.AddTrackToSeedTracks)
 	genre.POST("/:id/listened", crudh.Success, genremw.AddTrackToListened)
 

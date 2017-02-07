@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	stmw "github.com/avidreder/monmach-api/middleware/store"
+	usermw "github.com/avidreder/monmach-api/middleware/user"
 	genreR "github.com/avidreder/monmach-api/resources/genre"
 	trackR "github.com/avidreder/monmach-api/resources/track"
 
@@ -87,6 +88,21 @@ func AddTrackToListened(h echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
+		return h(c)
+	}
+}
+
+// GetUserGenres gets custom genres for a user
+func GetUserGenres(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		user := usermw.GetUser(c)
+		store := stmw.GetStore(c)
+		genres := []genreR.Genre{}
+		err := store.GetManyByKey("genres", &genres, "userid", user.ID.Hex())
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		c.Set("result", genres)
 		return h(c)
 	}
 }
