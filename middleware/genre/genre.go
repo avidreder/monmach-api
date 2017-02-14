@@ -2,6 +2,7 @@ package genre
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	stmw "github.com/avidreder/monmach-api/middleware/store"
@@ -121,6 +122,14 @@ func CreateNewGenre(h echo.HandlerFunc) echo.HandlerFunc {
 		err := json.Unmarshal([]byte(paramString), &trackParams)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		count, err := store.CountByQuery("genres", "name", trackParams.Name)
+		log.Print("name")
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		if count > 0 {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Genre Name already taken")
 		}
 		fields := map[string]interface{}{}
 		fields["name"] = trackParams.Name
