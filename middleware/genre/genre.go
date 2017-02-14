@@ -106,3 +106,35 @@ func GetUserGenres(h echo.HandlerFunc) echo.HandlerFunc {
 		return h(c)
 	}
 }
+
+// CreateNewGenre gets custom genres for a user
+func CreateNewGenre(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		trackParams := struct {
+			Name        string `json:"name"`
+			Description string `json:"description"`
+		}{}
+		user := usermw.GetUser(c)
+		store := stmw.GetStore(c)
+		params, _ := c.FormParams()
+		paramString := params["data"][0]
+		err := json.Unmarshal([]byte(paramString), &trackParams)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		fields := map[string]interface{}{}
+		fields["name"] = trackParams.Name
+		fields["description"] = trackParams.Description
+		fields["userid"] = user.ID.Hex()
+		fields["trackqueue"] = make([]trackR.Track, 0)
+		fields["seedartists"] = make([]string, 0)
+		fields["seedtracks"] = make([]string, 0)
+		fields["seedplaylists"] = make([]string, 0)
+		fields["listenedtracks"] = make([]string, 0)
+		err = store.Create("genres", fields)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		return h(c)
+	}
+}

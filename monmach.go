@@ -133,6 +133,7 @@ func main() {
 		usermw.LoadUser)
 	genre.GET("/user", crudh.Results, genremw.GetUserGenres)
 	genre.POST("/:id/seed", crudh.Success, genremw.AddTrackToSeedTracks)
+	genre.POST("/user/new", crudh.Success, genremw.CreateNewGenre)
 	genre.POST("/:id/listened", crudh.Success, genremw.AddTrackToListened)
 
 	// Load routes for crud
