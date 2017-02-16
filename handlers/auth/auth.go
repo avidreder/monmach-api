@@ -108,7 +108,7 @@ func FinishAuth(c echo.Context) error {
 		session.Values["email"] = user.Email
 		session.Save(c.Request(), c.Response().Writer())
 	}
-	http.Redirect(c.Response().Writer(), c.Request(), configR.CurrentConfig.ClientAddress, 302)
+	c.Redirect(302, configR.CurrentConfig.ClientAddress)
 	go HandleUserLogin(user, store)
 	return nil
 }
