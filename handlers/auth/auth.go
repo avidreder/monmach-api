@@ -2,7 +2,6 @@ package auth
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -26,7 +25,6 @@ import (
 
 func init() {
 	gothic.Store = sessions.NewFilesystemStore(os.TempDir(), []byte("monmach"))
-	log.Printf("temp: %+v", os.TempDir())
 }
 
 // LogoutUser ends a user session
@@ -87,22 +85,22 @@ func FinishAuth(c echo.Context) error {
 	q.Add("provider", "spotify")
 	c.Request().URL.RawQuery = q.Encode()
 	response, err := gothic.CompleteUserAuth(c.Response().Writer(), c.Request())
-	if err != nil {
-		log.Printf("Could not log the user in: %v", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
-	}
+	// if err != nil {
+	// 	log.Printf("Gothic: Could not log the user in: %v", err)
+	// 	return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Gothic: Could not log the user in: %v", err))
+	// }
 	log.Printf("spotifyUser: %+v", response)
 	user := userR.User{}
 	string, _ := json.Marshal(response)
 	err = json.Unmarshal(string, &user)
 	if err != nil {
 		log.Printf("Could not log the user in: %v", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
+		// return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
 	}
 	session, err := sessionStore.Get(c.Request(), "auth-session")
 	if err != nil {
 		log.Printf("Could not log the user in: %v", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not retrieve logged-in user: %v", err))
+		// return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Session: Could not retrieve logged-in user: %v", err))
 	}
 	if session.IsNew {
 		session.Values["email"] = user.Email

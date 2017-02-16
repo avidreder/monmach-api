@@ -42,6 +42,13 @@ func InitializeSpotifyProvider() error {
 	}
 	log.Print(credentials)
 	SpotifyProvider = spotifyP.New(credentials.ClientKey, credentials.Secret, config.SpotifyCallback, auth.SpotifyScopes...)
+	log.Printf("prov: %+v", SpotifyProvider)
+	// using no https for now...
+	// tr := &http.Transport{
+	// 	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	// }
+	// client := &http.Client{Transport: tr}
+	// SpotifyProvider.HTTPClient = client
 	return nil
 }
 
