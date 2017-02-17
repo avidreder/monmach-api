@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"crypto/rand"
 	"os"
 
 	"github.com/gorilla/sessions"
@@ -9,7 +10,9 @@ import (
 var sessionStore *sessions.FilesystemStore
 
 func init() {
-	sessionStore = sessions.NewFilesystemStore(os.TempDir(), []byte("monmach-sessions"))
+	key := make([]byte, 64)
+	rand.Read(key)
+	sessionStore = sessions.NewFilesystemStore(os.TempDir(), key)
 }
 
 // Get returns a postgres instance

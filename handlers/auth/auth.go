@@ -1,7 +1,9 @@
 package auth
 
 import (
+	"crypto/rand"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -24,7 +26,9 @@ import (
 )
 
 func init() {
-	gothic.Store = sessions.NewFilesystemStore(os.TempDir(), []byte("monmach"))
+	key := make([]byte, 64)
+	rand.Read(key)
+	gothic.Store = sessions.NewFilesystemStore(os.TempDir(), key)
 }
 
 // LogoutUser ends a user session
@@ -68,10 +72,22 @@ func GetUser(c echo.Context) error {
 
 // StartAuth begins authorization
 func StartAuth(c echo.Context) error {
+	sessionStore := authmw.GetStore(c)
 	provider := authmw.GetSpotifyProvider(c)
 	q := c.Request().URL.Query()
 	q.Add("provider", "spotify")
 	c.Request().URL.RawQuery = q.Encode()
+	session, err := sessionStore.New(c.Request(), "auth-session")
+	log.Printf("authSession: %v", session)
+	if err == nil {
+		session.Options.MaxAge = -1
+		session.Save(c.Request(), c.Response().Writer())
+	}
+	session, err = gothic.Store.New(c.Request(), "_gothic_session")
+	if err == nil {
+		session.Options.MaxAge = -1
+		session.Save(c.Request(), c.Response().Writer())
+	}
 	goth.UseProviders(provider)
 	gothic.BeginAuthHandler(c.Response().Writer(), c.Request())
 	return nil
@@ -84,22 +100,25 @@ func FinishAuth(c echo.Context) error {
 	q := c.Request().URL.Query()
 	q.Add("provider", "spotify")
 	c.Request().URL.RawQuery = q.Encode()
+	log.Printf("REEEEEEEEEEEEEE: %+v", c.Request())
 	response, err := gothic.CompleteUserAuth(c.Response().Writer(), c.Request())
-	// if err != nil {
-	// 	log.Printf("Gothic: Could not log the user in: %v", err)
-	// 	return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Gothic: Could not log the user in: %v", err))
-	// }
+	if err != nil {
+		log.Printf("Gothic: Could not log the user in: %v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Gothic: Could not log the user in: %v", err))
+	}
 	log.Printf("spotifyUser: %+v", response)
 	user := userR.User{}
 	string, _ := json.Marshal(response)
 	err = json.Unmarshal(string, &user)
 	if err != nil {
 		log.Printf("Could not log the user in: %v", err)
-		// return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
 	}
-	session, err := sessionStore.Get(c.Request(), "auth-session")
+	session, err := sessionStore.New(c.Request(), "auth-session")
 	if err != nil {
 		log.Printf("Could not log the user in: %v", err)
+		session.Values["email"] = user.Email
+		session.Save(c.Request(), c.Response().Writer())
 		// return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Session: Could not retrieve logged-in user: %v", err))
 	}
 	if session.IsNew {
