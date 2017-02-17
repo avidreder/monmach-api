@@ -8,8 +8,6 @@ import (
 	"os"
 	"time"
 
-	"golang.org/x/oauth2"
-
 	usermw "github.com/avidreder/monmach-api/middleware/user"
 	authR "github.com/avidreder/monmach-api/resources/auth"
 	configR "github.com/avidreder/monmach-api/resources/config"
@@ -76,10 +74,7 @@ func LoadClient(h echo.HandlerFunc) echo.HandlerFunc {
 		auth.SetAuthInfo(credentials.ClientKey, credentials.Secret)
 
 		user := usermw.GetUser(c)
-		token := &oauth2.Token{
-			AccessToken: user.AccessToken,
-		}
-		client := auth.NewClient(token)
+		client := auth.NewClient(&user.Token)
 		c.Set("spotifyClient", &client)
 		return h(c)
 	}

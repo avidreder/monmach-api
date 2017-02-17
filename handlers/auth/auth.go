@@ -1,11 +1,9 @@
 package auth
 
 import (
-	"crypto/rand"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
@@ -18,38 +16,21 @@ import (
 	userR "github.com/avidreder/monmach-api/resources/user"
 
 	"github.com/fatih/structs"
-	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
-	"github.com/markbates/goth/gothic"
 	"gopkg.in/mgo.v2/bson"
 )
-
-func init() {
-	key := make([]byte, 64)
-	rand.Read(key)
-	gothic.Store = sessions.NewFilesystemStore(os.TempDir(), key)
-}
 
 // LogoutUser ends a user session
 func LogoutUser(c echo.Context) error {
 	sessionStore := authmw.GetStore(c)
 	session, err := sessionStore.Get(c.Request(), "auth-session")
-	log.Printf("authSession: %v", session)
 	if err != nil {
-		http.Redirect(c.Response().Writer(), c.Request(), "/", 302)
+		c.Redirect(302, configR.CurrentConfig.ClientAddress)
 		return nil
 	}
 	session.Options.MaxAge = -1
 	session.Save(c.Request(), c.Response().Writer())
-	session, err = gothic.Store.Get(c.Request(), "_gothic_session")
-	log.Printf("gothicSession: %v", session)
-	if err != nil {
-		http.Redirect(c.Response().Writer(), c.Request(), configR.CurrentConfig.ClientAddress, 302)
-		return nil
-	}
-	session.Options.MaxAge = -1
-	session.Save(c.Request(), c.Response().Writer())
-	http.Redirect(c.Response().Writer(), c.Request(), configR.CurrentConfig.ClientAddress, 302)
+	c.Redirect(302, configR.CurrentConfig.ClientAddress)
 	return nil
 }
 
@@ -83,28 +64,25 @@ func FinishAuth(c echo.Context) error {
 	auth := spotifymw.GetAuthenticator(c)
 	token, err := auth.Token("state", c.Request())
 	if err != nil {
-		log.Printf("Could not log the user in: %v", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
+		log.Printf("Could not get token from Spotify: %v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not get token from Spotify"))
 	}
 	client := auth.NewClient(token)
 	spotifyUser, err := client.CurrentUser()
-	log.Printf("user: %+v, err: %+v", spotifyUser, err)
 	if err != nil {
-		log.Printf("Could not log the user in: %v", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
+		log.Printf("Could not get user from Spotify: %v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not get user from Spotify"))
 	}
 	user := userR.User{}
-	user.AccessToken = token.AccessToken
-	user.RefreshToken = token.RefreshToken
+	user.Token = *token
 	user.Email = spotifyUser.Email
 	user.Name = spotifyUser.DisplayName
 	user.SpotifyID = spotifyUser.ID
 	session, err := sessionStore.New(c.Request(), "auth-session")
 	if err != nil {
-		log.Printf("Could not log the user in: %v", err)
 		session.Values["email"] = user.Email
 		session.Save(c.Request(), c.Response().Writer())
-		// return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Session: Could not retrieve logged-in user: %v", err))
+		log.Printf("Creating new session: %v", err)
 	}
 	if session.IsNew {
 		session.Values["email"] = user.Email
@@ -155,8 +133,7 @@ func HandleUserLogin(user userR.User, store store.Store) {
 		return
 	}
 	updates := map[string]interface{}{}
-	updates["AccessToken"] = user.AccessToken
-	updates["RefreshToken"] = user.RefreshToken
+	updates["Token"] = user.Token
 	updates["Updated"] = time.Now()
 	err = store.UpdateByKey("users", updates, "Email", user.Email)
 	if err != nil {

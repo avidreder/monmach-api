@@ -3,6 +3,7 @@ package user
 import (
 	"time"
 
+	"golang.org/x/oauth2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -13,8 +14,7 @@ type User struct {
 	Name           string        `bson:"Name"`
 	Email          string        `bson:"Email"`
 	AvatarURL      string        `bson:"AvatarURL"`
-	AccessToken    string        `bson:"AccessToken"`
-	RefreshToken   string        `bson:"RefreshToken"`
+	Token          oauth2.Token  `bson:"Token"`
 	Created        time.Time     `bson:"Created"`
 	Updated        time.Time     `bson:"Updated"`
 	TrackBlacklist []string      `bson:"TrackBlacklist"`
