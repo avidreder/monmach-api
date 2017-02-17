@@ -83,12 +83,6 @@ func main() {
 	getUser.Use(authmw.LoadStore)
 	getUser.GET("", authh.GetUser)
 
-	test := server.Group("/test")
-	test.Use(authmw.LoadStore,
-		authmw.CheckLogin)
-	test.GET("", func(c echo.Context) error {
-		return c.HTML(200, "Logged In")
-	})
 	// Load routes for auth
 	auth := server.Group("/auth")
 	auth.Use(authmw.LoadSpotifyProvider,
@@ -139,7 +133,9 @@ func main() {
 
 	// Load routes for crud
 	crud := server.Group("/crud/:table")
-	crud.Use(stmw.LoadStore)
+	crud.Use(stmw.LoadStore,
+		authmw.LoadStore,
+		usermw.LoadUser)
 	crud.POST("/new", crudh.Success, crudmw.Create)
 	crud.GET("/:id", crudh.Results, crudmw.Get)
 	crud.GET("/all", crudh.Results, crudmw.GetAll)

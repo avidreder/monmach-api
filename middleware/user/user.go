@@ -25,7 +25,7 @@ func LoadUser(h echo.HandlerFunc) echo.HandlerFunc {
 		session, err := sessionStore.Get(c.Request(), "auth-session")
 		log.Printf("Is it new: %+v", session.IsNew)
 		if session.IsNew || err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not retrieve logged-in user: %v", err))
+			return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("Could not retrieve logged-in user: %v", err))
 		}
 		userEmail := session.Values["email"].(string)
 		log.Printf("Loading User: %s", userEmail)
@@ -33,7 +33,7 @@ func LoadUser(h echo.HandlerFunc) echo.HandlerFunc {
 		store := stmw.GetStore(c)
 		err = store.GetByKey("users", &user, "Email", userEmail)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not retrieve logged-in user: %v", err))
+			return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("Could not retrieve logged-in user: %v", err))
 		}
 		c.Set("user", &user)
 		return h(c)
