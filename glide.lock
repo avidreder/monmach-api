@@ -1,5 +1,5 @@
 hash: 04890ea228d2eca217cc3c168c8a73a863d92cd467f57c060b65bd20d168013a
-updated: 2016-12-18T10:47:48.169525023-08:00
+updated: 2017-02-16T20:10:05.835646571-08:00
 imports:
 - name: github.com/davecgh/go-spew
   version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
@@ -65,7 +65,7 @@ imports:
   subpackages:
   - acme
 - name: github.com/zmb3/spotify
-  version: c9bcaa12ab08e26b462136cf4fe2d7c7013993aa
+  version: d12d726b0e288deb2a8d21212da3f64268612fe5
 - name: golang.org/x/crypto
   version: 9477e0b78b9ac3d0b03822fd95422e2fe07627cd
   subpackages:
@@ -101,7 +101,6 @@ imports:
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
   - bson
-  - dbtest
   - internal/json
   - internal/sasl
   - internal/scram
@@ -110,6 +109,4 @@ imports:
   subpackages:
   - cipher
   - json
-- name: gopkg.in/tomb.v2
-  version: d5d1b5820637886def9eef33e03a27a9f166942c
 testImports: []

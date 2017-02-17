@@ -20,6 +20,38 @@ import (
 	"github.com/zmb3/spotify"
 )
 
+// LoadAuthenticator places initialized spotify client
+func LoadAuthenticator(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		config, err := configR.GetConfig()
+		if err != nil {
+			log.Printf("Could not get service config: %s", err)
+		}
+		file, err := os.Open(config.SpotifyCredentialsPath) // For read access.
+		if err != nil {
+			log.Printf("Could not Initialize Spotify Client: %s", err)
+		}
+		contents, err := ioutil.ReadAll(file)
+		if err != nil {
+			log.Printf("Could not Initialize Spotify Client: %s", err)
+		}
+		credentials := authR.SpotifyCredentials{}
+		err = json.Unmarshal(contents, &credentials)
+		if err != nil {
+			log.Printf("Could not Initialize Spotify Client: %s", err)
+		}
+		auth := spotify.NewAuthenticator(config.SpotifyCallback, spotify.ScopeUserReadPrivate)
+		auth.SetAuthInfo(credentials.ClientKey, credentials.Secret)
+		c.Set("spotifyAuthenticator", &auth)
+		return h(c)
+	}
+}
+
+// GetAuthenticator retieves authenticator from the context
+func GetAuthenticator(c echo.Context) *spotify.Authenticator {
+	return c.Get("spotifyAuthenticator").(*spotify.Authenticator)
+}
+
 // LoadClient places initialized spotify client
 func LoadClient(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {

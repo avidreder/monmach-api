@@ -93,7 +93,8 @@ func main() {
 	auth := server.Group("/auth")
 	auth.Use(authmw.LoadSpotifyProvider,
 		stmw.LoadStore,
-		authmw.LoadStore)
+		authmw.LoadStore,
+		spotifymw.LoadAuthenticator)
 	auth.GET("/spotify", authh.StartAuth)
 	auth.GET("/spotify/callback", authh.FinishAuth)
 

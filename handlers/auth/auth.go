@@ -10,6 +10,7 @@ import (
 	"time"
 
 	authmw "github.com/avidreder/monmach-api/middleware/auth"
+	spotifymw "github.com/avidreder/monmach-api/middleware/spotify"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	configR "github.com/avidreder/monmach-api/resources/config"
 	"github.com/avidreder/monmach-api/resources/queue"
@@ -20,7 +21,6 @@ import (
 	"github.com/fatih/structs"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
-	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -72,24 +72,8 @@ func GetUser(c echo.Context) error {
 
 // StartAuth begins authorization
 func StartAuth(c echo.Context) error {
-	sessionStore := authmw.GetStore(c)
-	provider := authmw.GetSpotifyProvider(c)
-	q := c.Request().URL.Query()
-	q.Add("provider", "spotify")
-	c.Request().URL.RawQuery = q.Encode()
-	session, err := sessionStore.New(c.Request(), "auth-session")
-	log.Printf("authSession: %v", session)
-	if err == nil {
-		session.Options.MaxAge = -1
-		session.Save(c.Request(), c.Response().Writer())
-	}
-	session, err = gothic.Store.New(c.Request(), "_gothic_session")
-	if err == nil {
-		session.Options.MaxAge = -1
-		session.Save(c.Request(), c.Response().Writer())
-	}
-	goth.UseProviders(provider)
-	gothic.BeginAuthHandler(c.Response().Writer(), c.Request())
+	auth := spotifymw.GetAuthenticator(c)
+	c.Redirect(301, auth.AuthURL("state"))
 	return nil
 }
 
@@ -97,10 +81,9 @@ func StartAuth(c echo.Context) error {
 func FinishAuth(c echo.Context) error {
 	store := stmw.GetStore(c)
 	sessionStore := authmw.GetStore(c)
-	q := c.Request().URL.Query()
-	q.Add("provider", "spotify")
-	c.Request().URL.RawQuery = q.Encode()
-	log.Printf("REEEEEEEEEEEEEE: %+v", c.Request())
+	auth := spotifymw.GetAuthenticator(c)
+	token, err := auth.Token("state", c.Request())
+	log.Printf("token: %+v, err: %+v", token, err)
 	response, err := gothic.CompleteUserAuth(c.Response().Writer(), c.Request())
 	if err != nil {
 		log.Printf("Gothic: Could not log the user in: %v", err)
