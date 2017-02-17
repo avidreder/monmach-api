@@ -2,7 +2,6 @@ package auth
 
 import (
 	"crypto/rand"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -83,20 +82,23 @@ func FinishAuth(c echo.Context) error {
 	sessionStore := authmw.GetStore(c)
 	auth := spotifymw.GetAuthenticator(c)
 	token, err := auth.Token("state", c.Request())
-	log.Printf("token: %+v, err: %+v", token, err)
-	response, err := gothic.CompleteUserAuth(c.Response().Writer(), c.Request())
-	if err != nil {
-		log.Printf("Gothic: Could not log the user in: %v", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Gothic: Could not log the user in: %v", err))
-	}
-	log.Printf("spotifyUser: %+v", response)
-	user := userR.User{}
-	string, _ := json.Marshal(response)
-	err = json.Unmarshal(string, &user)
 	if err != nil {
 		log.Printf("Could not log the user in: %v", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
 	}
+	client := auth.NewClient(token)
+	spotifyUser, err := client.CurrentUser()
+	log.Printf("user: %+v, err: %+v", spotifyUser, err)
+	if err != nil {
+		log.Printf("Could not log the user in: %v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Could not log the user in: %v", err))
+	}
+	user := userR.User{}
+	user.AccessToken = token.AccessToken
+	user.RefreshToken = token.RefreshToken
+	user.Email = spotifyUser.Email
+	user.Name = spotifyUser.DisplayName
+	user.SpotifyID = spotifyUser.ID
 	session, err := sessionStore.New(c.Request(), "auth-session")
 	if err != nil {
 		log.Printf("Could not log the user in: %v", err)
