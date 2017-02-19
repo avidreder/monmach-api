@@ -52,7 +52,7 @@ func GetUser(c echo.Context) error {
 
 // StartAuth begins authorization
 func StartAuth(c echo.Context) error {
-	auth := spotifymw.GetAuthenticator(c)
+	auth := *spotifymw.GetAuthenticator(c)
 	c.Redirect(301, auth.AuthURL("state"))
 	return nil
 }
@@ -61,7 +61,7 @@ func StartAuth(c echo.Context) error {
 func FinishAuth(c echo.Context) error {
 	store := stmw.GetStore(c)
 	sessionStore := authmw.GetStore(c)
-	auth := spotifymw.GetAuthenticator(c)
+	auth := *spotifymw.GetAuthenticator(c)
 	token, err := auth.Token("state", c.Request())
 	if err != nil {
 		log.Printf("Could not get token from Spotify: %v", err)

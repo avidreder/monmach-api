@@ -18,7 +18,6 @@ import (
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	usermw "github.com/avidreder/monmach-api/middleware/user"
 	configR "github.com/avidreder/monmach-api/resources/config"
-	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
 	"github.com/avidreder/monmach-api/resources/store/mongo"
 
 	"github.com/labstack/echo"
@@ -62,11 +61,6 @@ func main() {
 		log.Print(err)
 	}
 
-	err = spotifyR.InitializeSpotifyProvider()
-	if err != nil {
-		log.Printf("Could not Initialize Spotify: %s", err)
-	}
-
 	// Load middleware for all routes
 	server.Use(emw.Logger())
 	server.Use(emw.Recover())
@@ -84,17 +78,12 @@ func main() {
 	getUser.GET("", authh.GetUser)
 
 	// Load routes for auth
-	auth := server.Group("/auth")
-	auth.Use(authmw.LoadSpotifyProvider,
-		stmw.LoadStore,
-		authmw.LoadStore,
-		spotifymw.LoadAuthenticator)
-	auth.GET("/spotify", authh.StartAuth)
-	auth.GET("/spotify/callback", authh.FinishAuth)
+	server.GET("/auth/spotify/callback", authh.FinishAuth, stmw.LoadStore, authmw.LoadStore, spotifymw.LoadAuthenticator)
+	server.GET("/auth/spotify/start", authh.StartAuth, stmw.LoadStore, authmw.LoadStore, spotifymw.LoadAuthenticator)
 
 	// Load routes for user queue
 	queue := server.Group("/queue")
-	queue.Use(authmw.LoadSpotifyProvider,
+	queue.Use(
 		stmw.LoadStore,
 		authmw.LoadStore,
 		usermw.LoadUser,
@@ -103,7 +92,7 @@ func main() {
 
 	// Load routes for playlists
 	playlist := server.Group("/playlist")
-	playlist.Use(authmw.LoadSpotifyProvider,
+	playlist.Use(
 		stmw.LoadStore,
 		authmw.LoadStore,
 		usermw.LoadUser,
@@ -112,7 +101,7 @@ func main() {
 
 	// Load routes for spotify
 	spotify := server.Group("/spotify")
-	spotify.Use(authmw.LoadSpotifyProvider,
+	spotify.Use(
 		stmw.LoadStore,
 		authmw.LoadStore,
 		usermw.LoadUser,

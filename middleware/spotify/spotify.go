@@ -41,6 +41,7 @@ func LoadAuthenticator(h echo.HandlerFunc) echo.HandlerFunc {
 		auth := spotify.NewAuthenticator(config.SpotifyCallback, spotify.ScopeUserReadPrivate)
 		auth.SetAuthInfo(credentials.ClientKey, credentials.Secret)
 		c.Set("spotifyAuthenticator", &auth)
+		log.Printf("initialize: %+v", auth.AuthURL("state"))
 		return h(c)
 	}
 }

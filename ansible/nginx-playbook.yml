@@ -1,0 +1,59 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install apt packages
+      apt: name={{ item }} update_cache=yes state=latest
+      with_items:
+        - nginx
+        - letsencrypt
+
+- hosts: development
+  become: yes
+  tasks:
+    - name: Install nginx-development
+      copy:
+        src: config/nginx-development.conf
+        dest: /etc/nginx/sites-available/nginx-development.conf
+        mode: 0751
+
+    - name: Create nginx localhost symlink
+      command: ln -s /etc/nginx/sites-available/nginx-development.conf /etc/nginx/sites-enabled/
+      ignore_errors: yes
+
+    - name: Delete default available
+      command: rm /etc/nginx/sites-available/default
+      ignore_errors: yes
+
+    - name: Delete default enabled
+      command: rm /etc/nginx/sites-enabled/default
+      ignore_errors: yes
+
+    - name: Restart nginx
+      command: service nginx restart
+      ignore_errors: yes
+
+- hosts: localhost
+  become: yes
+  tasks:
+    - name: Install nginx localhost
+      copy:
+        src: localhost.conf
+        dest: /etc/nginx/sites-available/localhost.conf
+        mode: 0751
+
+    - name: Create nginx localhost symlink
+      command: ln -s /etc/nginx/sites-available/localhost.conf /etc/nginx/sites-enabled/
+      ignore_errors: yes
+
+    - name: Delete default available
+      command: rm /etc/nginx/sites-available/default
+      ignore_errors: yes
+
+    - name: Delete default enabled
+      command: rm /etc/nginx/sites-enabled/default
+      ignore_errors: yes
+
+    - name: Restart nginx
+      command: service nginx restart
+      ignore_errors: yes
