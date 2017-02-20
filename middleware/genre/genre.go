@@ -126,6 +126,112 @@ func AddArtistToSeedArtists(h echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+// RemoveArtistFromSeedArtists places a user into the contest
+func RemoveArtistFromSeedArtists(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		genreID := c.Param("id")
+		if genreID == "" {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Not a valid genre ID")
+		}
+		bsonID := bson.ObjectIdHex(genreID)
+		store := stmw.GetStore(c)
+		genre := genreR.Genre{}
+		newArtist := spotifyR.SpotifyArtist{}
+		params, _ := c.FormParams()
+		artistString := params["data"][0]
+		err := json.Unmarshal([]byte(artistString), &newArtist)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		err = store.GetByKey("genres", &genre, "_id", bsonID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		for k, v := range genre.SeedArtists {
+			if v.SpotifyID == newArtist.SpotifyID {
+				newSeedArtists := append(genre.SeedArtists[:k], genre.SeedArtists[k+1:]...)
+				payload := map[string]interface{}{}
+				payload["seedartists"] = newSeedArtists
+				err = store.UpdateByKey("genres", payload, "_id", bsonID)
+				if err != nil {
+					return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+				}
+				return h(c)
+			}
+		}
+		return h(c)
+	}
+}
+
+// RemoveTrackFromSeedTracks places a user into the contest
+func RemoveTrackFromSeedTracks(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		genreID := c.Param("id")
+		if genreID == "" {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Not a valid genre ID")
+		}
+		bsonID := bson.ObjectIdHex(genreID)
+		store := stmw.GetStore(c)
+		genre := genreR.Genre{}
+		newTrack := trackR.Track{}
+		params, _ := c.FormParams()
+		trackString := params["data"][0]
+		err := json.Unmarshal([]byte(trackString), &newTrack)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		err = store.GetByKey("genres", &genre, "_id", bsonID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		for k, v := range genre.SeedTracks {
+			if v.SpotifyID == newTrack.SpotifyID {
+				newSeedTracks := append(genre.SeedTracks[:k], genre.SeedTracks[k+1:]...)
+				payload := map[string]interface{}{}
+				payload["seedtracks"] = newSeedTracks
+				err = store.UpdateByKey("genres", payload, "_id", bsonID)
+				if err != nil {
+					return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+				}
+				return h(c)
+			}
+		}
+		return h(c)
+	}
+}
+
+// RemoveGenreFromSeedGenres places a user into the contest
+func RemoveGenreFromSeedGenres(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		genreID := c.Param("id")
+		if genreID == "" {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Not a valid genre ID")
+		}
+		bsonID := bson.ObjectIdHex(genreID)
+		store := stmw.GetStore(c)
+		genre := genreR.Genre{}
+		params, _ := c.FormParams()
+		genreString := params["data"][0]
+		err := store.GetByKey("genres", &genre, "_id", bsonID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		for k, v := range genre.SeedGenres {
+			if genreString == v {
+				newSeedGenres := append(genre.SeedGenres[:k], genre.SeedGenres[k+1:]...)
+				payload := map[string]interface{}{}
+				payload["seedgenres"] = newSeedGenres
+				err = store.UpdateByKey("genres", payload, "_id", bsonID)
+				if err != nil {
+					return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+				}
+				return h(c)
+			}
+		}
+		return h(c)
+	}
+}
+
 // AddTrackToListened places a user into the contest
 func AddTrackToListened(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
