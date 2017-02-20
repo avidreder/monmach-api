@@ -1,7 +1,9 @@
 package queue
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	spotifymw "github.com/avidreder/monmach-api/middleware/spotify"
@@ -29,6 +31,28 @@ func TracksFromPlaylist(h echo.HandlerFunc) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Error getting playlist owner: %v", err))
 		}
 		tracks, err := spotifymw.TracksFromPlaylist(client, spotify.ID(playlistID), playlistOwner)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Error getting tracks: %v", err))
+		}
+		c.Set("tracks", &tracks)
+		return h(c)
+	}
+}
+
+// RecommendedTracks places a user into the contest
+func RecommendedTracks(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		client := spotifymw.GetClient(c)
+		params, _ := c.FormParams()
+		postParams := spotifymw.RecommendedTrackParams{}
+		dataString := params["data"][0]
+		log.Printf("string: %+v", dataString)
+		err := json.Unmarshal([]byte(dataString), &postParams)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		log.Printf("rec params: %+v", postParams)
+		tracks, err := spotifymw.RecommendedTracks(client, postParams)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Error getting tracks: %v", err))
 		}

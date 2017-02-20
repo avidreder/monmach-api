@@ -82,3 +82,7 @@ type SpotifyTrack struct {
 type SpotifyResponse struct {
 	Track SpotifyTrack `json:"track"`
 }
+
+type SpotifyRecommendationResponse struct {
+	Tracks []SpotifyTrack `json:"tracks"`
+}

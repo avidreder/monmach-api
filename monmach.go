@@ -99,6 +99,15 @@ func main() {
 		spotifymw.LoadClient)
 	playlist.GET("/:playlist", playlisth.RetrieveTracks, playlistmw.TracksFromPlaylist)
 
+	// Load routes for playlists
+	recommended := server.Group("/recommended")
+	recommended.Use(
+		stmw.LoadStore,
+		authmw.LoadStore,
+		usermw.LoadUser,
+		spotifymw.LoadClient)
+	recommended.POST("", playlisth.RetrieveTracks, playlistmw.RecommendedTracks)
+
 	// Load routes for spotify
 	spotify := server.Group("/spotify")
 	spotify.Use(
