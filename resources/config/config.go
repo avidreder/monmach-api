@@ -12,6 +12,7 @@ type ServiceConfig struct {
 	MongoCredentialsPath   string `json:"mongoCredentialsPath"`
 	ClientAddress          string `json:"clientAddress"`
 	SpotifyCallback        string `json:"spotifyCallback"`
+	CookieDomain           string `json:"cookieDomain"`
 }
 
 var CurrentConfig ServiceConfig
