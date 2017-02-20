@@ -8,6 +8,7 @@ import (
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	usermw "github.com/avidreder/monmach-api/middleware/user"
 	genreR "github.com/avidreder/monmach-api/resources/genre"
+	spotifyR "github.com/avidreder/monmach-api/resources/spotify"
 	trackR "github.com/avidreder/monmach-api/resources/track"
 
 	"gopkg.in/mgo.v2/bson"
@@ -47,6 +48,76 @@ func AddTrackToSeedTracks(h echo.HandlerFunc) echo.HandlerFunc {
 		payload := map[string]interface{}{}
 		payload["seedtracks"] = newSeedTracks
 		payload["listenedtracks"] = newListenedTracks
+		err = store.UpdateByKey("genres", payload, "_id", bsonID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		return h(c)
+	}
+}
+
+// AddGenreToSeedGenres places a user into the contest
+func AddGenreToSeedGenres(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		genreID := c.Param("id")
+		if genreID == "" {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Not a valid genre ID")
+		}
+		bsonID := bson.ObjectIdHex(genreID)
+		store := stmw.GetStore(c)
+		genre := genreR.Genre{}
+		params, _ := c.FormParams()
+		genreString := params["data"][0]
+		log.Printf("genre is: %v", genreString)
+		err := store.GetByKey("genres", &genre, "_id", bsonID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		for _, e := range genre.SeedGenres {
+			if e == genreString {
+				return echo.NewHTTPError(http.StatusInternalServerError, "Genre already in seeds")
+			}
+		}
+		newSeedGenres := append(genre.SeedGenres, genreString)
+		payload := map[string]interface{}{}
+		payload["seedgenres"] = newSeedGenres
+		err = store.UpdateByKey("genres", payload, "_id", bsonID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		return h(c)
+	}
+}
+
+// AddArtistToSeedArtists places a user into the contest
+func AddArtistToSeedArtists(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		genreID := c.Param("id")
+		if genreID == "" {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Not a valid genre ID")
+		}
+		bsonID := bson.ObjectIdHex(genreID)
+		store := stmw.GetStore(c)
+		genre := genreR.Genre{}
+		newArtist := spotifyR.SpotifyArtist{}
+		params, _ := c.FormParams()
+		artistString := params["data"][0]
+		err := json.Unmarshal([]byte(artistString), &newArtist)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		err = store.GetByKey("genres", &genre, "_id", bsonID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		for _, e := range genre.SeedArtists {
+			if e.SpotifyID == newArtist.SpotifyID {
+				return echo.NewHTTPError(http.StatusInternalServerError, "Artist already in genre")
+			}
+		}
+		newSeedArtists := append(genre.SeedArtists, newArtist)
+		payload := map[string]interface{}{}
+		payload["seedartists"] = newSeedArtists
 		err = store.UpdateByKey("genres", payload, "_id", bsonID)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())

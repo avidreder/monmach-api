@@ -60,6 +60,12 @@ var FeaturedPlaylists = []FeaturedPlaylist{
 	},
 }
 
+type SpotifyArtist struct {
+	Name      string   `json:"name"`
+	SpotifyID string   `json:"id"`
+	Genres    []string `json:"genres"`
+}
+
 type SpotifyTrack struct {
 	Name      string `json:"name"`
 	SpotifyID string `json:"id"`
@@ -70,11 +76,7 @@ type SpotifyTrack struct {
 			URL    string `json:"url"`
 		} `json:"images"`
 	} `json:"album"`
-	Artists []struct {
-		Name      string   `json:"name"`
-		SpotifyID string   `json:"id"`
-		Genres    []string `json:"genres"`
-	} `json:"artists"`
+	Artists []SpotifyArtist `json:"artists"`
 }
 
 type SpotifyResponse struct {

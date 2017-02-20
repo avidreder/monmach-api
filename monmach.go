@@ -116,7 +116,9 @@ func main() {
 		authmw.LoadStore,
 		usermw.LoadUser)
 	genre.GET("/user", crudh.Results, genremw.GetUserGenres)
-	genre.POST("/:id/seed", crudh.Success, genremw.AddTrackToSeedTracks)
+	genre.POST("/:id/seeds/genre", crudh.Success, genremw.AddGenreToSeedGenres)
+	genre.POST("/:id/seeds/track", crudh.Success, genremw.AddTrackToSeedTracks)
+	genre.POST("/:id/seeds/artist", crudh.Success, genremw.AddArtistToSeedArtists)
 	genre.POST("/user/new", crudh.Success, genremw.CreateNewGenre)
 	genre.POST("/:id/listened", crudh.Success, genremw.AddTrackToListened)
 
