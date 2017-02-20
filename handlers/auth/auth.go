@@ -81,11 +81,13 @@ func FinishAuth(c echo.Context) error {
 	session, err := sessionStore.New(c.Request(), "auth-session")
 	if err != nil {
 		session.Values["email"] = user.Email
+		session.Options.Domain = "monmach.com"
 		session.Save(c.Request(), c.Response().Writer())
 		log.Printf("Creating new session: %v", err)
 	}
 	if session.IsNew {
 		session.Values["email"] = user.Email
+		session.Options.Domain = "monmach.com"
 		session.Save(c.Request(), c.Response().Writer())
 	}
 	c.Redirect(302, configR.CurrentConfig.ClientAddress)

@@ -17,33 +17,20 @@
         dest: /etc/nginx/sites-available/nginx-development.conf
         mode: 0751
 
-    - name: Create nginx localhost symlink
-      command: ln -s /etc/nginx/sites-available/nginx-development.conf /etc/nginx/sites-enabled/
-      ignore_errors: yes
-
-    - name: Delete default available
-      command: rm /etc/nginx/sites-available/default
-      ignore_errors: yes
-
-    - name: Delete default enabled
-      command: rm /etc/nginx/sites-enabled/default
-      ignore_errors: yes
-
-    - name: Restart nginx
-      command: service nginx restart
-      ignore_errors: yes
-
-- hosts: localhost
-  become: yes
-  tasks:
-    - name: Install nginx localhost
+    - name: Install ssl-monmach
       copy:
-        src: localhost.conf
-        dest: /etc/nginx/sites-available/localhost.conf
+        src: config/nginx-development.conf
+        dest: /etc/nginx/snippets/ssl-monmach.conf
+        mode: 0751
+
+    - name: Install ssl-params
+      copy:
+        src: config/nginx-development.conf
+        dest: /etc/nginx/snippets/ssl-params.conf
         mode: 0751
 
     - name: Create nginx localhost symlink
-      command: ln -s /etc/nginx/sites-available/localhost.conf /etc/nginx/sites-enabled/
+      command: ln -s /etc/nginx/sites-available/nginx-development.conf /etc/nginx/sites-enabled/
       ignore_errors: yes
 
     - name: Delete default available
