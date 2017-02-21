@@ -221,7 +221,7 @@ func RecommendedTracks(client *spotify.Client, params RecommendedTrackParams) ([
 			seedCount++
 		}
 	}
-	responseObject := []spotifyR.SpotifyRecommendationResponse{}
+	responseObject := spotify.Recommendations{}
 	response, err := client.GetRecommendations(seeds, nil, nil)
 	if err != nil {
 		return []trackR.Track{}, err
@@ -234,36 +234,47 @@ func RecommendedTracks(client *spotify.Client, params RecommendedTrackParams) ([
 	if err != nil {
 		return []trackR.Track{}, err
 	}
-	log.Printf("trax: %+v", responseObject)
-	// for _, track := range responseObject.Tracks {
-	// 	featureResult, err := GetAudioFeatures(client, spotify.ID(track.Track.SpotifyID))
-	// 	if err == nil {
-	// 		newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID, Features: *featureResult[0], Genres: make([]string, 0), CustomGenres: make([]string, 0), Playlists: make([]string, 0)}
-	// 		genreSlice := []string{}
-	// 		for k, artist := range newTrack.SpotifyTrack.Artists {
-	// 			artistInfo, err := GetArtistGenres(client, spotify.ID(artist.SpotifyID))
-	// 			if err == nil {
-	// 				fullArtist := *artistInfo[0]
-	// 				newTrack.SpotifyTrack.Artists[k].Genres = fullArtist.Genres
-	// 				genreSlice = append(genreSlice, fullArtist.Genres...)
-	// 			}
-	// 			genreMap := map[string]struct{}{}
-	// 			dedupedSlice := []string{}
-	// 			for _, v := range genreSlice {
-	// 				_, ok := genreMap[v]
-	// 				if !ok {
-	// 					dedupedSlice = append(dedupedSlice, v)
-	// 					genreMap[v] = struct{}{}
-	// 				}
-	// 			}
-	// 			newTrack.Genres = dedupedSlice
-	// 		}
-	// 		tracks = append(tracks, newTrack)
-	// 	} else {
-	// 		newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID, Genres: make([]string, 0), CustomGenres: make([]string, 0), Playlists: make([]string, 0)}
-	// 		tracks = append(tracks, newTrack)
-	// 	}
-	// }
+	for _, track := range responseObject.Tracks {
+		trackContainer := spotifyR.SpotifyTrack{}
+		trackJSON, err := json.Marshal(track)
+		if err != nil {
+			log.Printf("track marshal error %+v", err)
+			return []trackR.Track{}, err
+		}
+		err = json.Unmarshal(trackJSON, &trackContainer)
+		if err != nil {
+			log.Printf("track unmarshal error %+v", err)
+			return []trackR.Track{}, err
+		}
+		log.Printf("got track with id: %+v", trackContainer.SpotifyID)
+		featureResult, err := GetAudioFeatures(client, spotify.ID(trackContainer.SpotifyID))
+		if err == nil {
+			newTrack := trackR.Track{SpotifyTrack: trackContainer, SpotifyID: trackContainer.SpotifyID, Features: *featureResult[0], Genres: make([]string, 0), CustomGenres: make([]string, 0), Playlists: make([]string, 0)}
+			genreSlice := []string{}
+			for k, artist := range newTrack.SpotifyTrack.Artists {
+				artistInfo, err := GetArtistGenres(client, spotify.ID(artist.SpotifyID))
+				if err == nil {
+					fullArtist := *artistInfo[0]
+					newTrack.SpotifyTrack.Artists[k].Genres = fullArtist.Genres
+					genreSlice = append(genreSlice, fullArtist.Genres...)
+				}
+				genreMap := map[string]struct{}{}
+				dedupedSlice := []string{}
+				for _, v := range genreSlice {
+					_, ok := genreMap[v]
+					if !ok {
+						dedupedSlice = append(dedupedSlice, v)
+						genreMap[v] = struct{}{}
+					}
+				}
+				newTrack.Genres = dedupedSlice
+			}
+			tracks = append(tracks, newTrack)
+		} else {
+			newTrack := trackR.Track{SpotifyTrack: trackContainer, SpotifyID: trackContainer.SpotifyID, Genres: make([]string, 0), CustomGenres: make([]string, 0), Playlists: make([]string, 0)}
+			tracks = append(tracks, newTrack)
+		}
+	}
 	return tracks, nil
 }
 
