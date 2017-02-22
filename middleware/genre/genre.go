@@ -313,9 +313,9 @@ func CreateNewGenre(h echo.HandlerFunc) echo.HandlerFunc {
 		fields["description"] = trackParams.Description
 		fields["userid"] = user.ID.Hex()
 		fields["trackqueue"] = make([]trackR.Track, 0)
-		fields["seedartists"] = make([]string, 0)
-		fields["seedtracks"] = make([]string, 0)
-		fields["seedplaylists"] = make([]string, 0)
+		fields["seedartists"] = make([]spotifyR.SpotifyArtist, 0)
+		fields["seedtracks"] = make([]trackR.Track, 0)
+		fields["seedgenres"] = make([]string, 0)
 		fields["listenedtracks"] = make([]string, 0)
 		err = store.Create("genres", fields)
 		if err != nil {
