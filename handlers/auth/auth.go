@@ -103,6 +103,7 @@ func HandleUserLogin(user userR.User, store store.Store) {
 		updates := structs.Map(user)
 		updates["Created"] = time.Now()
 		updates["Updated"] = time.Now()
+		updates["Token"] = user.Token
 		id := bson.NewObjectId()
 		updates["ID"] = id
 		updates["_id"] = id
