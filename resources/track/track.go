@@ -15,6 +15,7 @@ type Track struct {
 	ID           bson.ObjectId         `bson:"_id,omitempty"`
 	SpotifyTrack spotifyR.SpotifyTrack `bson:"spotifytrack"`
 	SpotifyID    string                `bson:"spotifyid"`
+	OwnerID      bson.ObjectId         `bson:"ownerid"`
 	Genres       []string              `bson:"genres"`
 	CustomGenres []string              `bson:"customgenres"`
 	Playlists    []string              `bson:"playlists"`

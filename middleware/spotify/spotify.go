@@ -16,6 +16,7 @@ import (
 	"github.com/labstack/echo"
 
 	"github.com/zmb3/spotify"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // LoadAuthenticator places initialized spotify client
@@ -151,7 +152,7 @@ func GetArtistGenres(client *spotify.Client, ids ...spotify.ID) ([]*spotify.Full
 }
 
 // TracksFromPlaylist gets tracks from spotify and processes them
-func TracksFromPlaylist(client *spotify.Client, playlistID spotify.ID, ownerID string) ([]trackR.Track, error) {
+func TracksFromPlaylist(client *spotify.Client, playlistID spotify.ID, ownerID string, userID bson.ObjectId) ([]trackR.Track, error) {
 	tracks := []trackR.Track{}
 	responseObject := []spotifyR.SpotifyResponse{}
 	response, err := client.GetPlaylistTracksOpt(ownerID, playlistID, nil, "items(track(album(images(url,height,width)),name,id,artists(name,id)))")
@@ -189,9 +190,10 @@ func TracksFromPlaylist(client *spotify.Client, playlistID spotify.ID, ownerID s
 				}
 				newTrack.Genres = dedupedSlice
 			}
+			newTrack.OwnerID = userID
 			tracks = append(tracks, newTrack)
 		} else {
-			newTrack := trackR.Track{SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID, Genres: make([]string, 0), CustomGenres: make([]string, 0), Playlists: []string{string(playlistID)}}
+			newTrack := trackR.Track{OwnerID: userID, SpotifyTrack: track.Track, SpotifyID: track.Track.SpotifyID, Genres: make([]string, 0), CustomGenres: make([]string, 0), Playlists: []string{string(playlistID)}}
 			tracks = append(tracks, newTrack)
 		}
 	}
@@ -199,7 +201,7 @@ func TracksFromPlaylist(client *spotify.Client, playlistID spotify.ID, ownerID s
 }
 
 // RecommendedTracks gets tracks from spotify and processes them
-func RecommendedTracks(client *spotify.Client, params RecommendedTrackParams) ([]trackR.Track, error) {
+func RecommendedTracks(client *spotify.Client, params RecommendedTrackParams, userID bson.ObjectId) ([]trackR.Track, error) {
 	tracks := []trackR.Track{}
 	seedCount := 0
 	seeds := spotify.Seeds{}
@@ -249,7 +251,7 @@ func RecommendedTracks(client *spotify.Client, params RecommendedTrackParams) ([
 		log.Printf("got track with id: %+v", trackContainer.SpotifyID)
 		featureResult, err := GetAudioFeatures(client, spotify.ID(trackContainer.SpotifyID))
 		if err == nil {
-			newTrack := trackR.Track{SpotifyTrack: trackContainer, SpotifyID: trackContainer.SpotifyID, Features: *featureResult[0], Genres: make([]string, 0), CustomGenres: make([]string, 0), Playlists: make([]string, 0)}
+			newTrack := trackR.Track{OwnerID: userID, SpotifyTrack: trackContainer, SpotifyID: trackContainer.SpotifyID, Features: *featureResult[0], Genres: make([]string, 0), CustomGenres: make([]string, 0), Playlists: make([]string, 0)}
 			genreSlice := []string{}
 			for k, artist := range newTrack.SpotifyTrack.Artists {
 				artistInfo, err := GetArtistGenres(client, spotify.ID(artist.SpotifyID))
@@ -271,7 +273,7 @@ func RecommendedTracks(client *spotify.Client, params RecommendedTrackParams) ([
 			}
 			tracks = append(tracks, newTrack)
 		} else {
-			newTrack := trackR.Track{SpotifyTrack: trackContainer, SpotifyID: trackContainer.SpotifyID, Genres: make([]string, 0), CustomGenres: make([]string, 0), Playlists: make([]string, 0)}
+			newTrack := trackR.Track{OwnerID: userID, SpotifyTrack: trackContainer, SpotifyID: trackContainer.SpotifyID, Genres: make([]string, 0), CustomGenres: make([]string, 0), Playlists: make([]string, 0)}
 			tracks = append(tracks, newTrack)
 		}
 	}

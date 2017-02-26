@@ -25,6 +25,7 @@ func AddTrackToSeedTracks(h echo.HandlerFunc) echo.HandlerFunc {
 		}
 		bsonID := bson.ObjectIdHex(genreID)
 		store := stmw.GetStore(c)
+		user := usermw.GetUser(c)
 		genre := genreR.Genre{}
 		newTrack := trackR.Track{}
 		params, _ := c.FormParams()
@@ -43,6 +44,7 @@ func AddTrackToSeedTracks(h echo.HandlerFunc) echo.HandlerFunc {
 				return echo.NewHTTPError(http.StatusInternalServerError, "Track already in playlist")
 			}
 		}
+		newTrack.OwnerID = user.ID
 		newSeedTracks := append(genre.SeedTracks, newTrack)
 		newListenedTracks := append(genre.ListenedTracks, newTrack)
 		payload := map[string]interface{}{}
@@ -276,7 +278,7 @@ func GetUserGenres(h echo.HandlerFunc) echo.HandlerFunc {
 		user := usermw.GetUser(c)
 		store := stmw.GetStore(c)
 		genres := []genreR.Genre{}
-		err := store.GetManyByKey("genres", &genres, "userid", user.ID.Hex())
+		err := store.GetManyByKey("genres", &genres, "userid", user.ID)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
@@ -311,7 +313,8 @@ func CreateNewGenre(h echo.HandlerFunc) echo.HandlerFunc {
 		fields := map[string]interface{}{}
 		fields["name"] = trackParams.Name
 		fields["description"] = trackParams.Description
-		fields["userid"] = user.ID.Hex()
+		fields["userid"] = user.ID
+		fields["ownerid"] = user.ID
 		fields["trackqueue"] = make([]trackR.Track, 0)
 		fields["seedartists"] = make([]spotifyR.SpotifyArtist, 0)
 		fields["seedtracks"] = make([]trackR.Track, 0)

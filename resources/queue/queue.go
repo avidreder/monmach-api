@@ -12,6 +12,7 @@ import (
 type Queue struct {
 	ID             bson.ObjectId `bson:"_id,omitempty"`
 	UserID         bson.ObjectId `bson:"userid"`
+	OwnerID        bson.ObjectId `bson:"ownerid"`
 	Name           string        `bson:"name"`
 	MaxSize        int64         `bson:"maxsize"`
 	TrackQueue     []track.Track `bson:"trackqueue"`

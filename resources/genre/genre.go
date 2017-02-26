@@ -13,6 +13,7 @@ import (
 type Genre struct {
 	ID             bson.ObjectId            `bson:"_id,omitempty"`
 	UserID         string                   `bson:"userid"`
+	OwnerID        string                   `bson:"ownerid"`
 	QueueID        string                   `bson:"queueid"`
 	Name           string                   `bson:"name"`
 	Description    string                   `bson:"description"`

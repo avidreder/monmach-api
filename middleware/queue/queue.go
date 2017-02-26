@@ -51,21 +51,19 @@ func QueueFromPlaylist(h echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Error getting playlist owner: %v", err))
 		}
-		tracks, err := spotifymw.TracksFromPlaylist(client, spotify.ID(playlistID), playlistOwner)
+		tracks, err := spotifymw.TracksFromPlaylist(client, spotify.ID(playlistID), playlistOwner, user.ID)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Error getting tracks: %v", err))
 		}
 		queueUpdates := structs.Map(queue.Queue{})
 		queueID := bson.NewObjectId()
 		queueUpdates["_id"] = queueID
-		queueUpdates["ID"] = queueID
 		queueUpdates["userid"] = user.ID
-		queueUpdates["UserID"] = user.ID
-		queueUpdates["TrackQueue"] = tracks
+		queueUpdates["ownerid"] = user.ID.Hex()
 		queueUpdates["trackqueue"] = tracks
-		queueUpdates["SeedArtists"] = make([]string, 0)
-		queueUpdates["SeedTracks"] = make([]string, 0)
-		queueUpdates["ListenedTracks"] = make([]string, 0)
+		queueUpdates["seedartists"] = make([]string, 0)
+		queueUpdates["seedtracks"] = make([]string, 0)
+		queueUpdates["listenedtracks"] = make([]string, 0)
 		err = store.Create("queues", queueUpdates)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err)

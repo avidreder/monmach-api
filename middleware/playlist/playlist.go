@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	spotifymw "github.com/avidreder/monmach-api/middleware/spotify"
+	usermw "github.com/avidreder/monmach-api/middleware/user"
 	trackR "github.com/avidreder/monmach-api/resources/track"
 
 	"github.com/labstack/echo"
@@ -21,6 +22,7 @@ func GetTracks(c echo.Context) *[]trackR.Track {
 // TracksFromPlaylist places a user into the contest
 func TracksFromPlaylist(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		user := usermw.GetUser(c)
 		playlistID := c.Param("playlist")
 		if playlistID == "" {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Not a valid playlist ID")
@@ -30,7 +32,7 @@ func TracksFromPlaylist(h echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Error getting playlist owner: %v", err))
 		}
-		tracks, err := spotifymw.TracksFromPlaylist(client, spotify.ID(playlistID), playlistOwner)
+		tracks, err := spotifymw.TracksFromPlaylist(client, spotify.ID(playlistID), playlistOwner, user.ID)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Error getting tracks: %v", err))
 		}
@@ -43,6 +45,7 @@ func TracksFromPlaylist(h echo.HandlerFunc) echo.HandlerFunc {
 func RecommendedTracks(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		client := spotifymw.GetClient(c)
+		user := usermw.GetUser(c)
 		params, _ := c.FormParams()
 		postParams := spotifymw.RecommendedTrackParams{}
 		dataString := params["data"][0]
@@ -52,7 +55,7 @@ func RecommendedTracks(h echo.HandlerFunc) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 		log.Printf("rec params: %+v", postParams)
-		tracks, err := spotifymw.RecommendedTracks(client, postParams)
+		tracks, err := spotifymw.RecommendedTracks(client, postParams, user.ID)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Error getting tracks: %v", err))
 		}

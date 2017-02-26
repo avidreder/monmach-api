@@ -10,12 +10,10 @@ import (
 	spotifymw "github.com/avidreder/monmach-api/middleware/spotify"
 	stmw "github.com/avidreder/monmach-api/middleware/store"
 	configR "github.com/avidreder/monmach-api/resources/config"
-	"github.com/avidreder/monmach-api/resources/queue"
 	"github.com/avidreder/monmach-api/resources/store"
 	trackR "github.com/avidreder/monmach-api/resources/track"
 	userR "github.com/avidreder/monmach-api/resources/user"
 
-	"github.com/fatih/structs"
 	"github.com/labstack/echo"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -100,33 +98,37 @@ func HandleUserLogin(user userR.User, store store.Store) {
 	oldUser := userR.User{}
 	err := store.GetByKey("users", &oldUser, "Email", user.Email)
 	if err != nil && oldUser.Email != user.Email {
-		updates := structs.Map(user)
-		updates["Created"] = time.Now()
-		updates["Updated"] = time.Now()
-		updates["Token"] = user.Token
+		// updates := structs.Map(user)
+		updates := map[string]interface{}{}
+		updates["created"] = time.Now()
+		updates["updated"] = time.Now()
+		updates["token"] = user.Token
+		updates["email"] = user.Email
+		updates["avatarurl"] = user.AvatarURL
+		updates["trackblacklist"] = make([]string, 0)
 		id := bson.NewObjectId()
-		updates["ID"] = id
+		log.Printf("RAAAAAA %+v", id)
 		updates["_id"] = id
+		// updates["ID"] = id
 		err = store.Create("users", updates)
 		if err != nil {
 			log.Printf("Error storing new user: %+v, %+v", user.Email, err)
 			return
 		}
 		log.Printf("Stored new user: %+v", user.Email)
-		queueUpdates := structs.Map(queue.Queue{})
+		queueUpdates := map[string]interface{}{}
 		queueID := bson.NewObjectId()
 		queueUpdates["_id"] = queueID
-		queueUpdates["ID"] = queueID
+		queueUpdates["ownerid"] = id
 		queueUpdates["userid"] = id
-		queueUpdates["UserID"] = id
-		queueUpdates["TrackQueue"] = make([]trackR.Track, 0)
-		queueUpdates["SeedArtists"] = make([]string, 0)
-		queueUpdates["SeedTracks"] = make([]string, 0)
-		queueUpdates["ListenedTracks"] = make([]string, 0)
+		queueUpdates["name"] = ""
+		queueUpdates["maxsize"] = 100
 		queueUpdates["trackqueue"] = make([]trackR.Track, 0)
 		queueUpdates["seedartists"] = make([]string, 0)
 		queueUpdates["seedtracks"] = make([]string, 0)
 		queueUpdates["listenedtracks"] = make([]string, 0)
+		queueUpdates["created"] = time.Now()
+		queueUpdates["updated"] = time.Now()
 		err = store.Create("queues", queueUpdates)
 		if err != nil {
 			log.Printf("Error creating user queue: %+v, %+v", id, err)
@@ -136,8 +138,8 @@ func HandleUserLogin(user userR.User, store store.Store) {
 		return
 	}
 	updates := map[string]interface{}{}
-	updates["Token"] = user.Token
-	updates["Updated"] = time.Now()
+	updates["token"] = user.Token
+	updates["updated"] = time.Now()
 	err = store.UpdateByKey("users", updates, "Email", user.Email)
 	if err != nil {
 		log.Printf("Error updating user: %+v, %+v", user.Email, err)
