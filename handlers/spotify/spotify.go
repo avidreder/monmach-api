@@ -42,7 +42,7 @@ func DiscoverPlaylist(c echo.Context) error {
 	updates := map[string]interface{}{}
 	updates["TrackQueue"] = tracks
 	updates["trackqueue"] = tracks
-	err = store.UpdateByKey("queues", updates, "_id", queueID)
+	err = store.UpdateByKey(user.ID, "queues", updates, "_id", queueID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

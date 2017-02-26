@@ -12,18 +12,20 @@ import (
 
 	"github.com/fatih/structs"
 	"github.com/zmb3/spotify"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // Store is the interface for data storage, such as a db
 type Store interface {
 	Connect() error
-	GetAll(string, interface{}) error
-	GetByKey(string, interface{}, string, interface{}) error
-	GetManyByKey(string, interface{}, string, interface{}) error
-	UpdateByKey(string, map[string]interface{}, string, interface{}) error
-	DeleteByKey(string, string, interface{}) error
+	AdminGetUser(interface{}, string, interface{}) error
+	GetAll(bson.ObjectId, string, interface{}) error
+	GetByKey(bson.ObjectId, string, interface{}, string, interface{}) error
+	GetManyByKey(bson.ObjectId, string, interface{}, string, interface{}) error
+	UpdateByKey(bson.ObjectId, string, map[string]interface{}, string, interface{}) error
+	DeleteByKey(bson.ObjectId, string, string, interface{}) error
 	Create(string, map[string]interface{}) error
-	CountByQuery(string, string, interface{}) (int, error)
+	CountByQuery(bson.ObjectId, string, string, interface{}) (int, error)
 }
 
 // ValidateRequired checks all fields are present for CRUD operations

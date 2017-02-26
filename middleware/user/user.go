@@ -31,7 +31,7 @@ func LoadUser(h echo.HandlerFunc) echo.HandlerFunc {
 		log.Printf("Loading User: %s", userEmail)
 		user := user.User{}
 		store := stmw.GetStore(c)
-		err = store.GetByKey("users", &user, "email", userEmail)
+		err = store.AdminGetUser(&user, "email", userEmail)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("Could not retrieve logged-in user: %v", err))
 		}

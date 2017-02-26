@@ -12,9 +12,9 @@ import (
 // Genre is the struct for a user's custom genre
 type Genre struct {
 	ID             bson.ObjectId            `bson:"_id,omitempty"`
-	UserID         string                   `bson:"userid"`
-	OwnerID        string                   `bson:"ownerid"`
-	QueueID        string                   `bson:"queueid"`
+	UserID         bson.ObjectId            `bson:"userid"`
+	OwnerID        bson.ObjectId            `bson:"ownerid"`
+	QueueID        bson.ObjectId            `bson:"queueid"`
 	Name           string                   `bson:"name"`
 	Description    string                   `bson:"description"`
 	SeedArtists    []spotifyR.SpotifyArtist `bson:"seedartists"`

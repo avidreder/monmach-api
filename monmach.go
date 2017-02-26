@@ -137,7 +137,8 @@ func main() {
 	// Load routes for crud
 	crud := server.Group("/crud/:table")
 	crud.Use(stmw.LoadStore,
-		authmw.LoadStore)
+		authmw.LoadStore,
+		usermw.LoadUser)
 	crud.POST("/new", crudh.Success, crudmw.Create)
 	crud.GET("/:id", crudh.Results, crudmw.Get)
 	crud.GET("/all", crudh.Results, crudmw.GetAll)

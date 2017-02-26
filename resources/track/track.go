@@ -26,12 +26,12 @@ type Track struct {
 }
 
 // AlreadyProcessed checks if a track has already been added
-func AlreadyProcessed(trackID string) (bool, error) {
+func AlreadyProcessed(ownerID bson.ObjectId, trackID string) (bool, error) {
 	store, err := mongo.Get()
 	if err != nil {
 		return false, err
 	}
-	count, err := store.CountByQuery("tracks", "SpotifyTrack.SpotifyID", trackID)
+	count, err := store.CountByQuery(ownerID, "tracks", "SpotifyTrack.SpotifyID", trackID)
 	if err != nil {
 		return false, err
 	}

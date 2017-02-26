@@ -27,7 +27,7 @@ func LoadUserQueue(h echo.HandlerFunc) echo.HandlerFunc {
 		user := usermw.GetUser(c)
 		userQueue := queue.Queue{}
 		store := stmw.GetStore(c)
-		err := store.GetByKey("queues", &userQueue, "userid", user.ID)
+		err := store.GetByKey(user.ID, "queues", &userQueue, "userid", user.ID)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Could not retrieve user queue")
 		}
@@ -69,7 +69,7 @@ func QueueFromPlaylist(h echo.HandlerFunc) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusInternalServerError, err)
 		}
 		userQueue := queue.Queue{}
-		err = store.GetByKey("queues", &userQueue, "_id", queueID)
+		err = store.GetByKey(user.ID, "queues", &userQueue, "_id", queueID)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Could not retrieve user queue")
 		}

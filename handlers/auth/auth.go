@@ -96,7 +96,7 @@ func FinishAuth(c echo.Context) error {
 // HandleUserLogin creates or updates a user record, and it's associated queue
 func HandleUserLogin(user userR.User, store store.Store) {
 	oldUser := userR.User{}
-	err := store.GetByKey("users", &oldUser, "Email", user.Email)
+	err := store.AdminGetUser(&oldUser, "Email", user.Email)
 	if err != nil && oldUser.Email != user.Email {
 		// updates := structs.Map(user)
 		updates := map[string]interface{}{}
@@ -109,7 +109,7 @@ func HandleUserLogin(user userR.User, store store.Store) {
 		id := bson.NewObjectId()
 		log.Printf("RAAAAAA %+v", id)
 		updates["_id"] = id
-		// updates["ID"] = id
+		updates["ownerid"] = id
 		err = store.Create("users", updates)
 		if err != nil {
 			log.Printf("Error storing new user: %+v, %+v", user.Email, err)
@@ -140,7 +140,7 @@ func HandleUserLogin(user userR.User, store store.Store) {
 	updates := map[string]interface{}{}
 	updates["token"] = user.Token
 	updates["updated"] = time.Now()
-	err = store.UpdateByKey("users", updates, "Email", user.Email)
+	err = store.UpdateByKey(oldUser.ID, "users", updates, "Email", user.Email)
 	if err != nil {
 		log.Printf("Error updating user: %+v, %+v", user.Email, err)
 		return

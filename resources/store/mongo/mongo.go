@@ -68,25 +68,25 @@ func getCollection(database *mgo.Database, collectionName string) *mgo.Collectio
 	return collection
 }
 
-func (s *Store) GetAll(collection string, model interface{}) error {
+func (s *Store) GetAll(ownerID bson.ObjectId, collection string, model interface{}) error {
 	log.Printf("GetAll: collection: %s, model: %T", collection, model)
 	session := s.Session.Copy()
 	defer session.Close()
 	database := session.DB(db)
 	c := getCollection(database, collection)
-	err := c.Find(bson.M{}).All(model)
+	err := c.Find(bson.M{"ownerid": ownerID}).All(model)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *Store) GetByKey(collection string, model interface{}, key string, value interface{}) error {
-	log.Printf("Get: collection: %s, model: %+v", collection, model)
+func (s *Store) AdminGetUser(model interface{}, key string, value interface{}) error {
+	log.Printf("Admin Get User: collection: %s, model: %+v", "users", model)
 	session := s.Session.Copy()
 	defer session.Close()
 	database := session.DB(db)
-	c := getCollection(database, collection)
+	c := getCollection(database, "users")
 	err := c.Find(bson.M{key: value}).One(model)
 	if err != nil {
 		return err
@@ -94,20 +94,33 @@ func (s *Store) GetByKey(collection string, model interface{}, key string, value
 	return nil
 }
 
-func (s *Store) GetManyByKey(collection string, model interface{}, key string, value interface{}) error {
-	log.Printf("GetManyByKey: collection: %s, model: %+v", collection, model)
+func (s *Store) GetByKey(ownerID bson.ObjectId, collection string, model interface{}, key string, value interface{}) error {
+	log.Printf("Get: collection: %s, model: %+v", collection, model)
 	session := s.Session.Copy()
 	defer session.Close()
 	database := session.DB(db)
 	c := getCollection(database, collection)
-	err := c.Find(bson.M{key: value}).All(model)
+	err := c.Find(bson.M{key: value, "ownerid": ownerID}).One(model)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *Store) UpdateByKey(collection string, updates map[string]interface{}, key string, value interface{}) error {
+func (s *Store) GetManyByKey(ownerID bson.ObjectId, collection string, model interface{}, key string, value interface{}) error {
+	log.Printf("GetManyByKey: collection: %s, model: %+v", collection, model)
+	session := s.Session.Copy()
+	defer session.Close()
+	database := session.DB(db)
+	c := getCollection(database, collection)
+	err := c.Find(bson.M{key: value, "ownerid": ownerID}).All(model)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Store) UpdateByKey(ownerID bson.ObjectId, collection string, updates map[string]interface{}, key string, value interface{}) error {
 	log.Printf("Update: collection: %s", collection)
 	session := s.Session.Copy()
 	defer session.Close()
@@ -124,13 +137,13 @@ func (s *Store) UpdateByKey(collection string, updates map[string]interface{}, k
 	return nil
 }
 
-func (s *Store) DeleteByKey(collection string, key string, value interface{}) error {
+func (s *Store) DeleteByKey(ownerID bson.ObjectId, collection string, key string, value interface{}) error {
 	log.Printf("Delete: collection: %s, id: %+v", collection, value)
 	session := s.Session.Copy()
 	defer session.Close()
 	database := session.DB(db)
 	c := getCollection(database, collection)
-	err := c.Remove(bson.M{key: value})
+	err := c.Remove(bson.M{key: value, "ownerid": ownerID})
 	if err != nil {
 		return err
 	}
@@ -155,13 +168,13 @@ func (s *Store) Create(collection string, values map[string]interface{}) error {
 }
 
 // CountByQuery gets number of records given a key and value
-func (s *Store) CountByQuery(collection string, key string, value interface{}) (int, error) {
+func (s *Store) CountByQuery(ownerID bson.ObjectId, collection string, key string, value interface{}) (int, error) {
 	log.Printf("Count: collection: %s, key: %+v, value: %+v", collection, key, value)
 	session := s.Session.Copy()
 	defer session.Close()
 	database := session.DB(db)
 	c := getCollection(database, collection)
-	count, err := c.Find(bson.M{key: value}).Count()
+	count, err := c.Find(bson.M{key: value, "ownerid": ownerID}).Count()
 	if err != nil {
 		return 0, err
 	}
