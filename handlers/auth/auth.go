@@ -37,13 +37,15 @@ func GetUser(c echo.Context) error {
 	sessionStore := authmw.GetStore(c)
 	session, err := sessionStore.Get(c.Request(), "auth-session")
 	payload := struct {
-		LoggedIn bool
-		Email    string
+		LoggedIn  bool
+		Email     string
+		SpotifyID string
 	}{}
 	if session.IsNew || err != nil {
 		return c.JSON(404, payload)
 	}
 	payload.Email = session.Values["email"].(string)
+	payload.SpotifyID = session.Values["spotifyid"].(string)
 	payload.LoggedIn = true
 	return c.JSON(200, payload)
 }
@@ -79,12 +81,14 @@ func FinishAuth(c echo.Context) error {
 	session, err := sessionStore.New(c.Request(), "auth-session")
 	if err != nil {
 		session.Values["email"] = user.Email
+		session.Values["spotifyid"] = user.SpotifyID
 		session.Options.Domain = configR.CurrentConfig.CookieDomain
 		session.Save(c.Request(), c.Response().Writer())
 		log.Printf("Creating new session: %v", err)
 	}
 	if session.IsNew {
 		session.Values["email"] = user.Email
+		session.Values["spotifyid"] = user.SpotifyID
 		session.Options.Domain = configR.CurrentConfig.CookieDomain
 		session.Save(c.Request(), c.Response().Writer())
 	}
@@ -96,8 +100,8 @@ func FinishAuth(c echo.Context) error {
 // HandleUserLogin creates or updates a user record, and it's associated queue
 func HandleUserLogin(user userR.User, store store.Store) {
 	oldUser := userR.User{}
-	err := store.AdminGetUser(&oldUser, "Email", user.Email)
-	if err != nil && oldUser.Email != user.Email {
+	err := store.AdminGetUser(&oldUser, "spotifyid", user.SpotifyID)
+	if err != nil && oldUser.SpotifyID != user.SpotifyID {
 		// updates := structs.Map(user)
 		updates := map[string]interface{}{}
 		updates["created"] = time.Now()
@@ -105,6 +109,7 @@ func HandleUserLogin(user userR.User, store store.Store) {
 		updates["token"] = user.Token
 		updates["email"] = user.Email
 		updates["avatarurl"] = user.AvatarURL
+		updates["spotifyid"] = user.SpotifyID
 		updates["trackblacklist"] = make([]string, 0)
 		id := bson.NewObjectId()
 		log.Printf("RAAAAAA %+v", id)

@@ -28,10 +28,11 @@ func LoadUser(h echo.HandlerFunc) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("Could not retrieve logged-in user: %v", err))
 		}
 		userEmail := session.Values["email"].(string)
+		userSpotifyID := session.Values["spotifyid"].(string)
 		log.Printf("Loading User: %s", userEmail)
 		user := user.User{}
 		store := stmw.GetStore(c)
-		err = store.AdminGetUser(&user, "email", userEmail)
+		err = store.AdminGetUser(&user, "spotifyid", userSpotifyID)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("Could not retrieve logged-in user: %v", err))
 		}
