@@ -124,6 +124,12 @@
       service: name=mongodb state=stopped
       ignore_errors: yes
 
+    - name: stop monmach
+      tags:
+        - runit_setup
+      command: sv stop monmach-api
+      ignore_errors: yes
+
     - name: Create monmach-api rundir for runit
       tags:
         - runit_setup
@@ -226,3 +232,15 @@
         path: /etc/service/mongodb
         src: /etc/sv/mongodb
         state: link
+
+    - name: stop monmach
+      tags:
+        - runit_setup
+      command: sv stop monmach-api
+      ignore_errors: yes
+
+    - name: start monmach
+      tags:
+        - runit_setup
+      command: sv start monmach-api
+      ignore_errors: yes
