@@ -39,7 +39,8 @@ func LoadAuthenticator(h echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			log.Printf("Could not Initialize Spotify Client: %s", err)
 		}
-		auth := spotify.NewAuthenticator(config.SpotifyCallback, spotify.ScopeUserReadPrivate)
+		scopes := []string{"user-read-email", "playlist-read-private", "playlist-modify-public", "playlist-modify-private"}
+		auth := spotify.NewAuthenticator(config.SpotifyCallback, scopes...)
 		auth.SetAuthInfo(credentials.ClientKey, credentials.Secret)
 		c.Set("spotifyAuthenticator", &auth)
 		log.Printf("initialize: %+v", auth.AuthURL("state"))
