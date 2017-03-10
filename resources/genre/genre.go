@@ -19,6 +19,7 @@ type Genre struct {
 	Description    string                   `bson:"description"`
 	SeedArtists    []spotifyR.SpotifyArtist `bson:"seedartists"`
 	SeedTracks     []trackR.Track           `bson:"seedtracks"`
+	TrackList      []trackR.Track           `bson:"tracklist"`
 	SeedGenres     []string                 `bson:"seedgenres"`
 	AvatarURL      string                   `bson:"avatarurl"`
 	Created        time.Time                `bson:"created"`

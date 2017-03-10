@@ -16,6 +16,94 @@ import (
 	"github.com/labstack/echo"
 )
 
+// AddTrack places a user into the contest
+func AddTrack(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		genreID := c.Param("id")
+		if genreID == "" {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Not a valid genre ID")
+		}
+		bsonID := bson.ObjectIdHex(genreID)
+		store := stmw.GetStore(c)
+		user := usermw.GetUser(c)
+		genre := genreR.Genre{}
+		newTrack := trackR.Track{}
+		params, _ := c.FormParams()
+		trackString := params["data"][0]
+		err := json.Unmarshal([]byte(trackString), &newTrack)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		newTrack.ID = bson.NewObjectId()
+		err = store.GetByKey(user.ID, "genres", &genre, "_id", bsonID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		for _, e := range genre.TrackList {
+			if e.SpotifyID == newTrack.SpotifyID {
+				return echo.NewHTTPError(http.StatusInternalServerError, "Track already in track list")
+			}
+		}
+		addToListened := true
+		for _, e := range genre.ListenedTracks {
+			if e.SpotifyID == newTrack.SpotifyID {
+				addToListened = false
+			}
+		}
+		newTrack.OwnerID = user.ID
+		newTrackList := append(genre.TrackList, newTrack)
+		payload := map[string]interface{}{}
+		payload["tracklist"] = newTrackList
+		if addToListened {
+			newListenedTracks := append(genre.ListenedTracks, newTrack)
+			payload["listenedtracks"] = newListenedTracks
+		}
+		err = store.UpdateByKey(user.ID, "genres", payload, "_id", bsonID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		return h(c)
+	}
+}
+
+// RemoveTrack places a user into the contest
+func RemoveTrack(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		genreID := c.Param("id")
+		if genreID == "" {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Not a valid genre ID")
+		}
+		user := usermw.GetUser(c)
+		bsonID := bson.ObjectIdHex(genreID)
+		store := stmw.GetStore(c)
+		genre := genreR.Genre{}
+		newTrack := trackR.Track{}
+		params, _ := c.FormParams()
+		trackString := params["data"][0]
+		err := json.Unmarshal([]byte(trackString), &newTrack)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		err = store.GetByKey(user.ID, "genres", &genre, "_id", bsonID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		for k, v := range genre.TrackList {
+			if v.SpotifyID == newTrack.SpotifyID {
+				newTrackList := append(genre.TrackList[:k], genre.TrackList[k+1:]...)
+				payload := map[string]interface{}{}
+				payload["tracklist"] = newTrackList
+				err = store.UpdateByKey(user.ID, "genres", payload, "_id", bsonID)
+				if err != nil {
+					return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+				}
+				return h(c)
+			}
+		}
+		return h(c)
+	}
+}
+
 // AddTrackToSeedTracks places a user into the contest
 func AddTrackToSeedTracks(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -39,17 +127,25 @@ func AddTrackToSeedTracks(h echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
+		for _, e := range genre.SeedTracks {
+			if e.SpotifyID == newTrack.SpotifyID {
+				return echo.NewHTTPError(http.StatusInternalServerError, "Track already in seeds")
+			}
+		}
+		addToListened := true
 		for _, e := range genre.ListenedTracks {
 			if e.SpotifyID == newTrack.SpotifyID {
-				return echo.NewHTTPError(http.StatusInternalServerError, "Track already in playlist")
+				addToListened = false
 			}
 		}
 		newTrack.OwnerID = user.ID
 		newSeedTracks := append(genre.SeedTracks, newTrack)
-		newListenedTracks := append(genre.ListenedTracks, newTrack)
 		payload := map[string]interface{}{}
 		payload["seedtracks"] = newSeedTracks
-		payload["listenedtracks"] = newListenedTracks
+		if addToListened {
+			newListenedTracks := append(genre.ListenedTracks, newTrack)
+			payload["listenedtracks"] = newListenedTracks
+		}
 		err = store.UpdateByKey(user.ID, "genres", payload, "_id", bsonID)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -324,6 +420,7 @@ func CreateNewGenre(h echo.HandlerFunc) echo.HandlerFunc {
 		fields["trackqueue"] = make([]trackR.Track, 0)
 		fields["seedartists"] = make([]spotifyR.SpotifyArtist, 0)
 		fields["seedtracks"] = make([]trackR.Track, 0)
+		fields["tracklist"] = make([]trackR.Track, 0)
 		fields["seedgenres"] = make([]string, 0)
 		fields["listenedtracks"] = make([]string, 0)
 		err = store.Create("genres", fields)
