@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -75,6 +76,29 @@ func QueueFromPlaylist(h echo.HandlerFunc) echo.HandlerFunc {
 		}
 		log.Printf("user queue: %+v", userQueue)
 		c.Set("queue", &userQueue)
+		return h(c)
+	}
+}
+
+func UpdateQueueTracks(h echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		user := usermw.GetUser(c)
+		store := stmw.GetStore(c)
+		currentQueue := GetUserQueue(c)
+		newQueue := queue.Queue{}
+		params, _ := c.FormParams()
+		queueString := params["data"][0]
+		log.Print(queueString)
+		err := json.Unmarshal([]byte(queueString), &newQueue)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+		queueUpdates := map[string]interface{}{}
+		queueUpdates["trackqueue"] = newQueue.TrackQueue
+		err = store.UpdateByKey(user.ID, "queues", queueUpdates, "_id", currentQueue.ID)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err)
+		}
 		return h(c)
 	}
 }

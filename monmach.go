@@ -89,6 +89,7 @@ func main() {
 		usermw.LoadUser,
 		spotifymw.LoadClient)
 	queue.GET("/user", queueh.RetrieveQueue, queuemw.LoadUserQueue)
+	queue.POST("/save", queueh.RetrieveQueue, queuemw.LoadUserQueue, queuemw.UpdateQueueTracks)
 
 	// Load routes for playlists
 	playlist := server.Group("/playlist")
